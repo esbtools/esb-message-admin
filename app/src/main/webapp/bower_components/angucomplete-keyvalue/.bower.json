@@ -1,0 +1,38 @@
+{
+  "name": "angucomplete-keyvalue",
+  "version": "0.0.1",
+  "homepage": "http://paterczm.github.io/angucomplete-keyvalue/",
+  "authors": [
+    "Daryl Rowland <daryl@cloudyclear.com>",
+    "Marek Paterczyk"
+  ],
+  "description": "Key-value autocomplete for AngularJS",
+  "keywords": [
+    "autocomplete",
+    "typeahead",
+    "angularjs"
+  ],
+  "license": "MIT",
+  "main": "./angucomplete.js",
+  "ignore": [
+    "example",
+    "bower_components",
+    "node_modules"
+  ],
+  "dependencies": {
+    "angular": ">=1.2.0"
+  },
+  "devDependencies": {
+    "angular-mocks": ">=1.2.0",
+    "jquery": "~2.1.0"
+  },
+  "_release": "0.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.0.1",
+    "commit": "5e1aa7337a7e63618f411b0d6b871791c04e3c68"
+  },
+  "_source": "git://github.com/paterczm/angucomplete-keyvalue.git",
+  "_target": "0.0.x",
+  "_originalSource": "angucomplete-keyvalue"
+}

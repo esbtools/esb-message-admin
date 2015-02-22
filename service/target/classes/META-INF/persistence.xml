@@ -1,0 +1,32 @@
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
+   version="1.0">
+   <persistence-unit name="EsbMessageAdminErrorPU">
+      <jta-data-source>java:/ESBMessageAdminDS</jta-data-source>
+      <class>org.esbtools.message.admin.service.orm.EsbMessageEntity</class>
+      <class>org.esbtools.message.admin.service.orm.EsbMessageHeaderEntity</class>
+      <properties>
+          <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+            <property name="hibernate.show_sql" value="true"></property>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true" />
+            <property name="hibernate.cache.use_minimal_puts" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+      </properties>
+   </persistence-unit>
+   <persistence-unit name="EsbMessageAdminMetadataPU">
+      <jta-data-source>java:/ESBMessageAdminDS</jta-data-source>
+      <class>org.esbtools.message.admin.service.orm.MetadataEntity</class>
+      <properties>
+          <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
+            <property name="hibernate.cache.provider_class" value="org.hibernate.cache.NoCacheProvider"/>
+            <property name="hibernate.show_sql" value="true"></property>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true" />
+            <property name="hibernate.cache.use_minimal_puts" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+      </properties>
+   </persistence-unit>
+</persistence>

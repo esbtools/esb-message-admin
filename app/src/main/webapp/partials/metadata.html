@@ -1,0 +1,99 @@
+<div id="syncpane">
+    <div ng-controller="MetadataCtrl">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Manage Search Keys</h4>
+                <ol class="ab-nav breadcrumb">
+                    <li ng-repeat="crumb in crumbs" ng-class="{ active: $last }">
+                      <a ng-if="!$last" ng-click="gotoCrumb(crumb)" ng-bind="crumb.name" class="margin-right-xs"></a>
+                      <span ng-if="$last" ng-bind="crumb.name"></span>
+                    </li>
+                </ol>
+                <div ng-hide="addMode || updateMode" class="panel-body">
+	                <button type="button" class="btn btn-success" ng-click="createChildField(parent)">
+	                    <span class="glyphicon glyphicon-plus"> Add</span>
+	                </button>
+	                <button type="button" class="btn btn-info" ng-click="editChild(parent)">
+	                    <span class="glyphicon glyphicon-pencil"> Edit</span>
+	                </button>
+	                <button ng-click="deleteChild(parent)" class="btn btn-danger">
+	                    <span class="glyphicon glyphicon-trash"> Delete</span>
+	                </button>
+	                <br><br>
+	                <table class="table table-striped table-condensed" ng-table="metadataTable">
+	                    <thead>
+	                        <tr>
+	                            <th ng-hide="hideName()" style="min-width: 80px;">Name</th>
+	                            <th ng-hide="hideType()" style="min-width: 80px;">Type</th>
+	                            <th style="min-width: 80px;">Value</th>
+	                            <th ng-hide="cantHaveChild()" style="width:20px;"> </th>
+	                            <th ng-hide="hideValues()" style="width:20px;"> </th>
+	                        </tr>
+	                    </thead>
+	                    <tbody>
+	                        <tr ng-repeat="child in parent.children">
+	                            <td ng-hide="hideName()" >{{ child.name }}</td>
+	                            <td ng-hide="hideType()" >{{ child.type }}</td>
+	                            <td>{{ child.value }}</td>
+	                            <td ng-hide="cantHaveChild()">
+	                                <button ng-click="manageChildren(child)" class="btn btn-primary">
+	                                    <span class="glyphicon glyphicon-cog"> Manage</span>
+	                                </button>
+	                            </td>
+	                            <td ng-hide="hideValues()"><button ng-click="manageValues(child)" class="btn btn-primary">manage values</button></td>
+	                            <td><button ng-click="editChild(child)" class="btn btn-info">update {{getNextType(parent.type, false)}}</button></td>
+	                        </tr>
+	                    </tbody>
+	                </table>
+	            </div>
+                <div ng-hide="!addMode" class="panel-body">
+                    <form class="form-inline" role="form" name='addForm'>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">Name</div>
+                                <input class="form-control" id="addFormName" type="text" ng-model="addFormName" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">Value</div>
+                                <input class="form-control" id="addFormName" type="text" ng-model="addFormValue" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-0 col-sm-0">
+                                <button type="button" class="btn btn-primary" ng-click="requestAdd()" ng-disabled="false">Add</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div ng-hide="!updateMode" class="panel-body">
+                    <form class="form-inline" role="form" name='updateForm'>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">Name</div>
+                                <input class="form-control" id="updateFormName" type="text" ng-model="parent.name" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="input-group">
+                                <div class="input-group-addon">Value</div>
+                                <input class="form-control" id="updateFormValue" type="text" ng-model="parent.value" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-offset-0 col-sm-0">
+                                <button type="button" class="btn btn-primary" ng-click="requestUpdate()" ng-disabled="false">Update</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
