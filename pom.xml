@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3.SNAPSHOT</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <description>ESB Error Message Management Tool</description>
     <url></url>
