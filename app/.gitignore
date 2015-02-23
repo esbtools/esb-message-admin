@@ -1,0 +1,13 @@
+target
+target/*
+.classpath
+.settings
+.settings/*
+.project
+.idea
+.idea/*
+bin
+bin/*
+*~
+*.iml
+.arcconfig

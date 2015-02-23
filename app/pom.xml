@@ -3,10 +3,10 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>pom</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.3.SNAPSHOT</version>
     </parent>
     <artifactId>esb-message-admin-app</artifactId>
-    <version>0.1.3-SNAPSHOT</version>
+    <version>0.1.3.SNAPSHOT</version>
     <packaging>war</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <licenses>

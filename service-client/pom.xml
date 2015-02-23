@@ -7,10 +7,10 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>pom</artifactId>
-        <version>0.3-SNAPSHOT</version>
+        <version>0.3.SNAPSHOT</version>
     </parent>
     <artifactId>esb-message-admin-service-client</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1.SNAPSHOT</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <dependencies>
         <dependency>
