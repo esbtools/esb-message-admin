@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.1.4-SNAPSHOT</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <description>ESB Error Message Management Tool</description>
     <url></url>
@@ -180,8 +180,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.1</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -7,16 +7,17 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.1.4-SNAPSHOT</version>
     </parent>
+    <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-service-client</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.1.4-SNAPSHOT</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <dependencies>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-spi</artifactId>
-            <version>0.1.3-SNAPSHOT</version>
+            <version>0.1.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -47,6 +48,4 @@
             <artifactId>cdi-api</artifactId>
         </dependency>
     </dependencies>
-
-    <groupId>org.esbtools.message.admin</groupId>
 </project>
