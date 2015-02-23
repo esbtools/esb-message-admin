@@ -109,6 +109,7 @@
                             <requires>
                                 <require>jbossas-standalone &gt;= 7</require>
                             </requires>
+                            <sourceEncoding>UTF-8</sourceEncoding>
                             <mappings>
                                 <mapping>
                                     <directory>/var/lib/jbossas/standalone/deployments</directory>
