@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
-        <artifactId>pom</artifactId>
+        <artifactId>esb-message-admin-pom</artifactId>
         <version>0.3.SNAPSHOT</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>

@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
-        <artifactId>pom</artifactId>
+        <artifactId>esb-message-admin-pom</artifactId>
         <version>0.3.SNAPSHOT</version>
     </parent>
     <artifactId>esb-message-admin-service-client</artifactId>
