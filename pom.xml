@@ -135,6 +135,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <artifactId>cdi-api</artifactId>
                 <version>1.0</version>
             </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.7</version>
+            </dependency>
 
             <!-- Test dependencies -->
             <dependency>
