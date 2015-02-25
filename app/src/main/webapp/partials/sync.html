@@ -3,43 +3,35 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <h4>Sync Entity</h4>
-                <form class="form-inline" role="form" name='syncForm'>
+                <form class="form-horizontal" role="form" name='syncForm'>
 
                     <div class="form-group">
                         <div class="col-sm-2">
                             <select class="form-control" id="syncEntity" ng-model="syncEntity" ng-change="entityChange()" ng-options="entity as entity.name for entity in entities.children">
-                                <option disabled value="">Sync Entity:</option>
+                                <option disabled value="">sync Entity:</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="form-group">
                         <div class="col-sm-2">
                             <select class="form-control" id="syncSystem" ng-model="syncSystem" ng-change="systemChange()" ng-options="system as system.name for system in systems">
-                                <option disabled value="">From System:</option>
+                                <option disabled value="">from System:</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="form-group">
                         <div class="col-sm-2">
                             <select class="form-control" id="syncKey" ng-model="syncKey" ng-options="key as key.name for key in keys">
-                                <option disabled value="">Using Key:</option>
+                                <option disabled value="">using Key:</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-sm-2">
-                            <textarea class="form-control" ng-model="syncValues" ng-list="/[- |,|\n]/" ng-trim="true" placeholder="Keys seperated by new line, space or comma."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <div class="col-sm-offset-0 col-sm-0">
+                        <div class="col-sm-1">
                             <button type="button" class="btn btn-primary" ng-click="sync()" ng-disabled="enableSubmit()">Sync</button>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-2">
+                            <textarea class="form-control" ng-model="syncValues" ng-list="/[- |,|\n]/" ng-trim="true" placeholder="Keys seperated by new line, space or comma." cols="45"></textarea>
+                        </div>
+                    </div>
+
                 </form>
             </div>
         </div>
