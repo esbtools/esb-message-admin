@@ -10,7 +10,7 @@
                     </li>
                 </ol>
                 <div ng-hide="addMode || updateMode" class="panel-body">
-                    <button  ng-hide="cantHaveChild()" type="button" class="btn btn-success" ng-click="addChild(parent)">
+                    <button  ng-hide="cantHaveChild()" type="button" class="btn btn-success btn-xs" ng-click="addChild(parent)">
                         <span class="glyphicon glyphicon-plus"> Add</span>
                     </button>
                     <table  ng-hide="cantHaveChild()" class="table table-striped table-condensed" ng-table="metadataTable">
@@ -24,7 +24,7 @@
                             <tr ng-repeat="child in parent.children.concat(parent.suggestions)">
                                 <td>
                                     <div class="btn-group" dropdown is-open="status.isopen">
-                                      <button type="button" class="btn btn-primary dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+                                      <button type="button" class="btn btn-primary  btn-xs dropdown-toggle" dropdown-toggle ng-disabled="disabled">
                                         Manage <span class="caret"></span>
                                       </button>
                                       <ul class="dropdown-menu" role="menu">
