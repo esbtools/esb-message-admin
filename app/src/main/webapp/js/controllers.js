@@ -181,16 +181,8 @@ esbMessageAdminControllers.controller('ErrorDetailsCtrl', ['$scope', '$rootScope
 
   }]);
 
-esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', 'EsbMessageService',
+esbMessageAdminControllers.controller('SearchKeysCtrl', ['$scope', '$rootScope', 'EsbMessageService',
   function($scope, $rootScope, EsbMessageService) {
-
-      EsbMessageService.getSearchKeysTree().then(function(response){
-          $scope.searchKeys = response.data.tree;
-          $scope.parent = $scope.searchKeys;
-          $scope.children = $scope.parent.children;
-          $scope.crumbs = [$scope.searchKeys];
-
-      });
 
       $scope.searchKeys = {
               "id": 0,
@@ -199,88 +191,93 @@ esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', '
               "value": "searchKeys",
               "children": []
       };
-      $scope.parent = $scope.searchKeys;
+
+      $scope.getChildTypes = function(type) {
+          if(type==="SearchKeys") {
+              return ["SearchKey"];
+          } else {
+              return ["XPATH","Suggestion"];
+          }
+      };
+
+      $scope.getPeerTypes = function(type) {
+          if(type==="SearchKey") {
+              return ["SearchKey"];
+          } else {
+              return ["XPATH","Suggestion"];
+          }
+      };
+
+      $scope.updateParent = function(parent) {
+          $scope.keyType = null;
+          $scope.parent = parent;
+          $scope.childTypes = $scope.getChildTypes($scope.parent.type);
+          $scope.childKeyType = $scope.childTypes[0];
+          $scope.peerTypes = $scope.getPeerTypes($scope.parent.type);
+          $scope.peerKeyType = $scope.peerTypes[0];
+      };
+
+      $scope.updateParent($scope.searchKeys);
+
       $scope.crumbs = [$scope.searchKeys];
       $scope.addMode = false;
       $scope.updateMode = false;
 
-      $scope.getNextType = function(currType, grandChild) {
-          if(currType==="SearchKeys") {
-              if(grandChild) {
-                  if($scope.children===$scope.parent.acceptableValues) {
-                      return "values";
-                  } else {
-                      return "paths";
-                  }
-              } else {
-                  return "search key";
-              }
-          } else if(currType==="SearchKey") {
-              if(!grandChild) {
-                  if($scope.children===$scope.parent.acceptableValues) {
-                      return "value";
-                  } else {
-                      return "path";
-                  }
-              }
-          }
-      };
+      EsbMessageService.getSearchKeysTree().then(function(response){
+          $scope.searchKeys = response.data.tree;
+          $scope.updateParent($scope.searchKeys);
+          $scope.crumbs = [$scope.searchKeys];
+      });
 
-      $scope.createChildField = function(parent) {
+      $scope.addChild = function(parent) {
           $scope.addMode = true;
-          $scope.parent = parent;
-          var newCrumb = { "name": "Add new "+ $scope.getNextType(parent.type) };
+          $scope.updateParent(parent);
+          var newCrumb = { "value": "Add new child" };
           $scope.crumbs.push(newCrumb);
-          //alert("add child of  :"+JSON.stringify(parent));
       };
 
       $scope.requestAdd = function() {
-          $scope.crumbs.pop();
-          alert("add child of  :"+JSON.stringify($scope.parent.name)+" "+$scope.addFormName+" "+$scope.addFormValue);
-          $scope.addMode = false;
 
+          var name = $scope.parent.type;
+          EsbMessageService.addKey($scope.parent.id, name, $scope.childKeyType, $scope.addFormValue).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
+          $scope.addFormValue = "";
+          $scope.addMode = false;
+          $scope.crumbs.pop();
       };
 
       $scope.editChild = function(field) {
           $scope.updateMode = true;
-          $scope.parent = field;
+          $scope.updateParent(field);
           $scope.crumbs.push(field);
-          //alert("service call to update :"+JSON.stringify(field));
       };
 
       $scope.requestUpdate = function() {
-          alert("update :"+$scope.parent.id+" "+$scope.parent.name+" "+$scope.parent.value+" "+$scope.parent.type);
-          $scope.updateMode = false;
 
+          EsbMessageService.updateKey($scope.parent.id, $scope.peerKeyType, $scope.peerKeyType, $scope.parent.value).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
+          $scope.crumbs.pop();
+          $scope.updateMode = false;
+      };
+
+      $scope.deleteChild = function(field) {
+          EsbMessageService.deleteKey(field.id).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
       };
 
       $scope.manageChildren = function(field) {
-          $scope.parent = field;
+          $scope.updateParent(field);
           $scope.crumbs.push(field);
       };
-
-      $scope.manageValues = function(field) {
-          $scope.parent = field;
-          $scope.crumbs.push(field);
-      };
-
-      $scope.hideType = function() {
-          if( $scope.parent.type!=="SearchKey" || $scope.children===$scope.parent.acceptableValues)
-              return true;
-      };
-
-      $scope.hideName = function() {
-          if( $scope.parent.type==="SearchKey" && $scope.children===$scope.parent.children)
-              return true;
-      };
-
-      $scope.hideValues = function() {
-          if( $scope.parent.type!=="SearchKeys")
-              return true
-      }
 
       $scope.cantHaveChild = function() {
-          if( $scope.parent.type==="SearchKey")
+          if( $scope.parent.type==="Suggestion" || $scope.parent.type==="XPATH" )
               return true;
       };
 
@@ -290,13 +287,13 @@ esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', '
           $scope.updateMode = false;
 
           if(crumb.type==="SearchKeys") {
-              $scope.parent = $scope.searchKeys;
+              $scope.updateParent($scope.searchKeys);
           } else {
               var currChildren = $scope.searchKeys.children;
               for(i=1; i<$scope.crumbs.length;i++) {
                   for(j=0;j<currChildren.length;j++) {
                       if(crumb.id==currChildren[j].id) {
-                          $scope.parent = currChildren[j];
+                          $scope.updateParent(currChildren[j]);
                           // exit all loops
                           j = currChildren.length+1;
                           i = $scope.crumbs.length+1;
