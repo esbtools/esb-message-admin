@@ -276,8 +276,8 @@ esbMessageAdminControllers.controller('SearchKeysCtrl', ['$scope', '$rootScope',
           $scope.crumbs.push(field);
       };
 
-      $scope.cantHaveChild = function() {
-          if( $scope.parent.type==="Suggestion" || $scope.parent.type==="XPATH" )
+      $scope.cantHaveChild = function(field) {
+          if( field.type==="Suggestion" || field.type==="XPATH" )
               return true;
       };
 
@@ -339,8 +339,8 @@ esbMessageAdminControllers.controller('SyncKeysCtrl', ['$scope', '$rootScope', '
     $scope.addMode = false;
     $scope.updateMode = false;
 
-    $scope.cantHaveChild = function() {
-        if( $scope.parent.type==="SyncKey")
+    $scope.cantHaveChild = function(field) {
+        if( field.type==="SyncKey")
             return true;
     };
 

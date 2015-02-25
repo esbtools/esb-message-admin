@@ -10,10 +10,10 @@
                     </li>
                 </ol>
                 <div ng-hide="addMode || updateMode" class="panel-body">
-                    <button ng-hide="cantHaveChild()" type="button" class="btn btn-success btn-xs" ng-click="addChild(parent)">
+                    <button ng-hide="cantHaveChild(parent)" type="button" class="btn btn-success btn-xs" ng-click="addChild(parent)">
                         <span class="glyphicon glyphicon-plus"></span> Add
                     </button>
-                    <table ng-hide="cantHaveChild()" class="table table-striped table-condensed" ng-table="fieldTable">
+                    <table ng-hide="cantHaveChild(parent)" class="table table-striped table-condensed" ng-table="fieldTable">
                         <thead>
                             <tr>
                                 <th style="width:80px;"> </th>
@@ -29,7 +29,7 @@
                                         Manage <span class="caret"></span>
                                       </button>
                                       <ul class="dropdown-menu" role="menu">
-                                        <li>
+                                        <li ng-hide="cantHaveChild(child)">
                                             <a ng-click="manageChildren(child)">
                                                 <span class="glyphicon glyphicon-envelope"></span>
                                                 View

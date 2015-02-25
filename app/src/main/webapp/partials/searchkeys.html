@@ -28,7 +28,7 @@
                                         Manage <span class="caret"></span>
                                       </button>
                                       <ul class="dropdown-menu" role="menu">
-                                        <li>
+                                        <li ng-hide="cantHaveChild(child)">
                                             <a ng-click="manageChildren(child)">
                                                 <span class="glyphicon glyphicon-envelope"></span>
                                                 View
