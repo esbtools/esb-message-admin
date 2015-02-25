@@ -45,7 +45,7 @@ public class AuditEventDAOTest {
         AuditEventDAO dao = new AuditEventDAOImpl(mgr);
 
         // store an audit event
-        AuditEventEntity expected = new AuditEventEntity(new Date(),"ACTION1","ORDER","ORDER_NUMBER","12345","A message");
+        AuditEventEntity expected = new AuditEventEntity(new Date(),"testuser","ACTION1","ORDER","ORDER_NUMBER","12345","A message");
         expected = dao.save(expected);
 
         // the entity should have an id now
@@ -69,7 +69,7 @@ public class AuditEventDAOTest {
         AuditEventDAO dao = new AuditEventDAOImpl(mgr);
 
         // store an audit event
-        AuditEventEntity expected = new AuditEventEntity(new Date(),"ACTION1","ORDER","ORDER_NUMBER","12345","A message");
+        AuditEventEntity expected = new AuditEventEntity(new Date(),"testuser","ACTION1","ORDER","ORDER_NUMBER","12345","A message");
         expected = dao.save(expected);
 
         // the entity should have an id now
@@ -87,9 +87,9 @@ public class AuditEventDAOTest {
         AuditEventDAO dao = new AuditEventDAOImpl(mgr);
 
         // store audit events
-        AuditEventEntity expected1 = new AuditEventEntity(new Date(),"ACTION1","ORDER","ORDER_NUMBER","12345","A message");
+        AuditEventEntity expected1 = new AuditEventEntity(new Date(),"testuser","ACTION1","ORDER","ORDER_NUMBER","12345","A message");
         expected1 = dao.save(expected1);
-        AuditEventEntity expected2 = new AuditEventEntity(new Date(),"ACTION2","CUSTOMER","CUSTOMER_NUMBER","24221","Another message");
+        AuditEventEntity expected2 = new AuditEventEntity(new Date(),"testuser","ACTION2","CUSTOMER","CUSTOMER_NUMBER","24221","Another message");
         expected2 = dao.save(expected2);
 
         List<AuditEventEntity> got = dao.findAll();
@@ -104,22 +104,30 @@ public class AuditEventDAOTest {
         dao.deleteAll();
 
         // store audit events
-        AuditEventEntity event1 = new AuditEventEntity(new DateTime("2015-02-23T12:39:45").toDate(),"ACTION1","MESSAGE_TYPE1","KEY_TYPE1","1001","Message 1");
+        AuditEventEntity event1 = new AuditEventEntity(new DateTime("2015-02-23T12:39:45").toDate(),"testuser1","ACTION1","MESSAGE_TYPE1","KEY_TYPE1","1001","Message 1");
         dao.save(event1);
-        AuditEventEntity event2 = new AuditEventEntity(new DateTime("2015-02-23T12:55:21").toDate(),"ACTION2","MESSAGE_TYPE1","KEY_TYPE2","1002","Message 2");
+        AuditEventEntity event2 = new AuditEventEntity(new DateTime("2015-02-23T12:55:21").toDate(),"testuser2","ACTION2","MESSAGE_TYPE1","KEY_TYPE2","1002","Message 2");
         dao.save(event2);
-        AuditEventEntity event3 = new AuditEventEntity(new DateTime("2015-02-24T01:00:12").toDate(),"ACTION2","MESSAGE_TYPE1","KEY_TYPE4","1003","Message 3");
+        AuditEventEntity event3 = new AuditEventEntity(new DateTime("2015-02-24T01:00:12").toDate(),"testuser2","ACTION2","MESSAGE_TYPE1","KEY_TYPE4","1003","Message 3");
         dao.save(event3);
-        AuditEventEntity event4 = new AuditEventEntity(new DateTime("2015-02-24T02:17:12").toDate(),"ACTION1","MESSAGE_TYPE2","KEY_TYPE4","1004","Message 4");
+        AuditEventEntity event4 = new AuditEventEntity(new DateTime("2015-02-24T02:17:12").toDate(),"testuser2","ACTION1","MESSAGE_TYPE2","KEY_TYPE4","1004","Message 4");
         dao.save(event4);
-        AuditEventEntity event5 = new AuditEventEntity(new DateTime("2015-02-24T02:19:23").toDate(),"ACTION3","MESSAGE_TYPE3","KEY_TYPE2","1005","Message 5");
+        AuditEventEntity event5 = new AuditEventEntity(new DateTime("2015-02-24T02:19:23").toDate(),"testuser1","ACTION3","MESSAGE_TYPE3","KEY_TYPE2","1005","Message 5");
         dao.save(event5);
 
+        // test search by action
         AuditCriterion c1 = new AuditCriterion(AuditCriterion.Field.ACTION, "ACTION2");
         AuditSearchCriteria criteria = new AuditSearchCriteria(c1);
 
         List<AuditEvent> got = dao.search(criteria);
         Assert.assertEquals(2, got.size());
+
+        // test search by principal
+        c1 = new AuditCriterion(AuditCriterion.Field.PRINCIPAL, "testuser2");
+        criteria = new AuditSearchCriteria(c1);
+
+        got = dao.search(criteria);
+        Assert.assertEquals(3, got.size());
 
         // create time range criteria
         criteria = new AuditSearchCriteria(new AuditCriterion[] {

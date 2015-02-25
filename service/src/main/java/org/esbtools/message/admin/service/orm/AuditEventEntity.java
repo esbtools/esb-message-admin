@@ -28,6 +28,9 @@ public class AuditEventEntity {
     @Column(name = "timestamp", nullable = false)
     private Date loggedTime;
 
+    @Column(name = "principal", nullable = false)
+    private String principal;
+
     @Column(name = "action", nullable = false)
     private String action;
 
@@ -49,10 +52,11 @@ public class AuditEventEntity {
     public AuditEventEntity() {
     }
 
-    public AuditEventEntity(Date loggedTime, String action, String messageType,
+    public AuditEventEntity(Date loggedTime, String principal, String action, String messageType,
             String keyType, String messageKey, String message) {
         super();
         this.loggedTime = loggedTime;
+        this.principal = principal;
         this.action = action;
         this.messageType = messageType;
         this.keyType = keyType;
@@ -67,8 +71,6 @@ public class AuditEventEntity {
         return eventId;
     }
 
-
-
     public void setEventId(Long eventId) {
         this.eventId = eventId;
     }
@@ -79,6 +81,14 @@ public class AuditEventEntity {
 
     public void setLoggedTime(Date loggedTime) {
         this.loggedTime = loggedTime;
+    }
+
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(String principal) {
+        this.principal = principal;
     }
 
     public String getAction() {
@@ -127,6 +137,7 @@ public class AuditEventEntity {
     public static AuditEventEntity convert(AuditEvent event) {
         AuditEventEntity e = new AuditEventEntity();
         e.setLoggedTime(event.getLoggedTime());
+        e.setPrincipal(event.getPrincipal());
         e.setAction(event.getAction());
         e.setMessageType(event.getMessageType());
         e.setKeyType(event.getKeyType());
@@ -138,6 +149,7 @@ public class AuditEventEntity {
     public static AuditEvent convert(AuditEventEntity entity) {
         AuditEvent event = new AuditEvent();
         event.setLoggedTime(entity.getLoggedTime());
+        event.setPrincipal(entity.getPrincipal());
         event.setAction(entity.getAction());
         event.setMessageType(entity.getMessageType());
         event.setKeyType(entity.getKeyType());

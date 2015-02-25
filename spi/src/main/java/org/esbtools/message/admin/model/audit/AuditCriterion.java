@@ -20,25 +20,26 @@ public class AuditCriterion implements Serializable {
     public enum Field {
            LOGGED_DATE_FROM("loggedTime", Date.class),
            LOGGED_DATE_TO("loggedTime", Date.class),
+           PRINCIPAL("principal", String.class),
            ACTION("action",String.class),
            MESSAGE_TYPE("messageType", String.class),
            MESSAGE_KEY("messageKey", String.class),
            KEY_TYPE("keyType", String.class);
 
-           private String valueName;
+           private String fieldName;
            private Class<?> valueType;
 
-           private Field(String valueName, Class<?> valueType) {
-               this.valueName = valueName;
+           private Field(String fieldName, Class<?> valueType) {
+               this.fieldName = fieldName;
                this.valueType = valueType;
+           }
+
+           public String getFieldName() {
+               return fieldName;
            }
 
            public Class<?> getValueType() {
                return valueType;
-           }
-
-           public String toString() {
-               return this.valueName;
            }
     }
 

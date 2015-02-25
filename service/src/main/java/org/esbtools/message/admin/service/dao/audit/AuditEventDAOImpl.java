@@ -74,27 +74,31 @@ public class AuditEventDAOImpl extends GenericDAOImpl<AuditEventEntity, Long> im
 
         for (AuditCriterion c : auditCriteria.getCriteria()) {
             if (c.getField().equals(AuditCriterion.Field.LOGGED_DATE_FROM)) {
-                Predicate condition = criteriaBuilder.greaterThanOrEqualTo(from.<Date> get("loggedTime"), c.getDateValue());
+                Predicate condition = criteriaBuilder.greaterThanOrEqualTo(from.<Date> get(c.getField().getFieldName()), c.getDateValue());
                 predicates.add(condition);
             }
             if (c.getField().equals(AuditCriterion.Field.LOGGED_DATE_TO)) {
-                Predicate condition = criteriaBuilder.lessThanOrEqualTo(from.<Date> get("loggedTime"), c.getDateValue());
+                Predicate condition = criteriaBuilder.lessThanOrEqualTo(from.<Date> get(c.getField().getFieldName()), c.getDateValue());
+                predicates.add(condition);
+            }
+            if (c.getField().equals(AuditCriterion.Field.PRINCIPAL)) {
+                Predicate condition = criteriaBuilder.equal(from.<String> get(c.getField().getFieldName()), c.getStringValue());
                 predicates.add(condition);
             }
             if (c.getField().equals(AuditCriterion.Field.ACTION)) {
-                Predicate condition = criteriaBuilder.equal(from.<String> get("action"), c.getStringValue());
+                Predicate condition = criteriaBuilder.equal(from.<String> get(c.getField().getFieldName()), c.getStringValue());
                 predicates.add(condition);
             }
             if (c.getField().equals(AuditCriterion.Field.MESSAGE_TYPE)) {
-                Predicate condition = criteriaBuilder.equal(from.<String> get("messageType"), c.getStringValue());
+                Predicate condition = criteriaBuilder.equal(from.<String> get(c.getField().getFieldName()), c.getStringValue());
                 predicates.add(condition);
             }
             if (c.getField().equals(AuditCriterion.Field.KEY_TYPE)) {
-                Predicate condition = criteriaBuilder.equal(from.<String> get("keyType"), c.getStringValue());
+                Predicate condition = criteriaBuilder.equal(from.<String> get(c.getField().getFieldName()), c.getStringValue());
                 predicates.add(condition);
             }
             if (c.getField().equals(AuditCriterion.Field.MESSAGE_KEY)) {
-                Predicate condition = criteriaBuilder.equal(from.<String> get("messageKey"), c.getStringValue());
+                Predicate condition = criteriaBuilder.equal(from.<String> get(c.getField().getFieldName()), c.getStringValue());
                 predicates.add(condition);
             }
         }

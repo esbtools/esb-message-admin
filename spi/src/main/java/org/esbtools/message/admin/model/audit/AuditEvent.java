@@ -3,7 +3,7 @@ package org.esbtools.message.admin.model.audit;
 import java.util.Date;
 
 /**
- * An autit event model object.
+ * An audit event model object.
  *
  * @author ykoer
  *
@@ -11,6 +11,7 @@ import java.util.Date;
 public class AuditEvent {
 
     private Date loggedTime;
+    private String principal;
     private String action;
     private String messageType;
     private String keyType;
@@ -23,6 +24,14 @@ public class AuditEvent {
 
     public void setLoggedTime(Date loggedTime) {
         this.loggedTime = loggedTime;
+    }
+
+    public String getPrincipal() {
+        return principal;
+    }
+
+    public void setPrincipal(String principal) {
+        this.principal = principal;
     }
 
     public String getAction() {
