@@ -277,7 +277,8 @@ esbMessageAdminControllers.controller('SearchKeysCtrl', ['$scope', '$rootScope',
       };
 
       $scope.cantHaveChild = function(field) {
-          if( field.type==="Suggestion" || field.type==="XPATH" )
+
+          if( field==null || field.type==null || field.type==="Suggestion" || field.type==="XPATH" )
               return true;
       };
 
