@@ -15,13 +15,16 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
+import org.esbtools.message.admin.model.audit.AuditEvent;
 import org.esbtools.message.admin.service.dao.ConversionUtility;
 import org.esbtools.message.admin.service.dao.EsbErrorDAO;
 import org.esbtools.message.admin.service.dao.EsbErrorDAOImpl;
 import org.esbtools.message.admin.service.dao.MetadataDAO;
 import org.esbtools.message.admin.service.dao.MetadataDAOImpl;
-import org.esbtools.message.admin.service.extractor.KeyExtractorException;
+import org.esbtools.message.admin.service.dao.audit.AuditEventDAO;
+import org.esbtools.message.admin.service.dao.audit.AuditEventDAOImpl;
 import org.esbtools.message.admin.service.extractor.KeyExtractorUtil;
+import org.esbtools.message.admin.service.orm.AuditEventEntity;
 import org.esbtools.message.admin.spi.Provider;
 
 @Named
@@ -35,6 +38,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
+    transient AuditEventDAO auditEventDAO;
     transient static KeyExtractorUtil extractor;
     transient static boolean isMapdirty = false;
 
@@ -48,6 +52,11 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private MetadataDAO getMetadataDAO() {
         return metadataDao == null ? new MetadataDAOImpl(metadataEntityMgr) : metadataDao;
+    }
+    
+    // TODO: inject DAO
+    private AuditEventDAO getAuditEventDAO() {
+        return auditEventDAO == null ? new AuditEventDAOImpl(errorEntityMgr) : auditEventDAO;
     }
 
     void setMetadataEntityManager(EntityManager entityMgr) {
@@ -137,4 +146,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     }
 
+    // ------------------ Audit methods ---------------------------
+
+    public void audit(AuditEvent event) {
+    	getAuditEventDAO().save(AuditEventEntity.convert(event));
+    }
 }

@@ -6,6 +6,7 @@
       <class>org.esbtools.message.admin.service.orm.EsbMessageEntity</class>
       <class>org.esbtools.message.admin.service.orm.EsbMessageHeaderEntity</class>
       <class>org.esbtools.message.admin.service.orm.MetadataEntity</class>
+      <class>org.esbtools.message.admin.service.orm.AuditEventEntity</class>
        <properties>
          <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
          <property name="hibernate.connection.driver_class" value="org.hsqldb.jdbcDriver"/>
