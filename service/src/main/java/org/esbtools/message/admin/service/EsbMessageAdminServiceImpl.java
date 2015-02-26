@@ -30,11 +30,8 @@ import org.esbtools.message.admin.spi.Provider;
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
 
-    @PersistenceContext(unitName = "EsbMessageAdminErrorPU")
-    private EntityManager errorEntityMgr;
-
-    @PersistenceContext(unitName = "EsbMessageAdminMetadataPU")
-    private EntityManager metadataEntityMgr;
+    @PersistenceContext(unitName = "EsbMessageAdminPU")
+    private EntityManager entityMgr;
 
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
@@ -43,24 +40,20 @@ public class EsbMessageAdminServiceImpl implements Provider {
     transient static boolean isMapdirty = false;
 
     private EsbErrorDAO getErrorDAO() {
-        return errorDao == null ? new EsbErrorDAOImpl(errorEntityMgr) : errorDao;
+        return errorDao == null ? new EsbErrorDAOImpl(entityMgr) : errorDao;
     }
 
     void setErrorEntityManager(EntityManager entityMgr) {
-        this.errorEntityMgr = entityMgr;
+        this.entityMgr = entityMgr;
     }
 
     private MetadataDAO getMetadataDAO() {
-        return metadataDao == null ? new MetadataDAOImpl(metadataEntityMgr) : metadataDao;
+        return metadataDao == null ? new MetadataDAOImpl(entityMgr) : metadataDao;
     }
     
     // TODO: inject DAO
     private AuditEventDAO getAuditEventDAO() {
-        return auditEventDAO == null ? new AuditEventDAOImpl(errorEntityMgr) : auditEventDAO;
-    }
-
-    void setMetadataEntityManager(EntityManager entityMgr) {
-        this.metadataEntityMgr = entityMgr;
+        return auditEventDAO == null ? new AuditEventDAOImpl(entityMgr) : auditEventDAO;
     }
 
     private KeyExtractorUtil getKeyExtractor() {

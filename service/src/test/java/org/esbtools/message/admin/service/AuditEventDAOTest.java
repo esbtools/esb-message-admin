@@ -28,7 +28,7 @@ public class AuditEventDAOTest {
 
     @BeforeClass
     public static void createEntityManagerFactory() {
-        emf = Persistence.createEntityManagerFactory("EsbMessageAdminTestErrorPU");
+        emf = Persistence.createEntityManagerFactory("EsbMessageAdminTestPU");
     }
 
     @Before

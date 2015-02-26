@@ -53,7 +53,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
     private MetadataField fetchMetadataField(String name, String value, MetadataType type) {
         MetadataField result = null;
-        Query query = getMetadataEntityManager().createQuery("select f from MetadataEntity f where f.name = :name and f.type = :type and f.value = :value");
+        Query query = getEntityManager().createQuery("select f from MetadataEntity f where f.name = :name and f.type = :type and f.value = :value");
         query.setParameter("name", name);
         query.setParameter("type", type);
         query.setParameter("value", value);
@@ -197,7 +197,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     public void childWithMissingParentTest() {
         // ensure that having a child without a parent does not throw NPE
         MetadataEntity entity = new MetadataEntity(MetadataType.Entity, "missingParent", "missingParent", 3L);
-        getMetadataEntityManager().persist(entity);
+        getEntityManager().persist(entity);
         MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
     }
 
