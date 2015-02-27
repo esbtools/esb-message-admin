@@ -41,11 +41,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
+import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchField;
 import org.esbtools.message.admin.model.SearchResult;
-import org.esbtools.message.admin.spi.Provider;
 
 
 /**

@@ -165,10 +165,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </dependencyManagement>
 
     <modules>
-        <module>spi</module>
+        <module>common</module>
         <module>app</module>
-        <module>service</module>
-        <module>service-client</module>
+        <module>rest-save</module>
+        <module>rest-save-client</module>
     </modules>
 
     <properties>
