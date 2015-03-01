@@ -181,16 +181,8 @@ esbMessageAdminControllers.controller('ErrorDetailsCtrl', ['$scope', '$rootScope
 
   }]);
 
-esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', 'EsbMessageService',
+esbMessageAdminControllers.controller('SearchKeysCtrl', ['$scope', '$rootScope', 'EsbMessageService',
   function($scope, $rootScope, EsbMessageService) {
-
-      EsbMessageService.getSearchKeysTree().then(function(response){
-          $scope.searchKeys = response.data.tree;
-          $scope.parent = $scope.searchKeys;
-          $scope.children = $scope.parent.children;
-          $scope.crumbs = [$scope.searchKeys];
-
-      });
 
       $scope.searchKeys = {
               "id": 0,
@@ -199,88 +191,94 @@ esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', '
               "value": "searchKeys",
               "children": []
       };
-      $scope.parent = $scope.searchKeys;
+
+      $scope.getChildTypes = function(type) {
+          if(type==="SearchKeys") {
+              return ["SearchKey"];
+          } else {
+              return ["XPATH","Suggestion"];
+          }
+      };
+
+      $scope.getPeerTypes = function(type) {
+          if(type==="SearchKey") {
+              return ["SearchKey"];
+          } else {
+              return ["XPATH","Suggestion"];
+          }
+      };
+
+      $scope.updateParent = function(parent) {
+          $scope.keyType = null;
+          $scope.parent = parent;
+          $scope.childTypes = $scope.getChildTypes($scope.parent.type);
+          $scope.childKeyType = $scope.childTypes[0];
+          $scope.peerTypes = $scope.getPeerTypes($scope.parent.type);
+          $scope.peerKeyType = $scope.peerTypes[0];
+      };
+
+      $scope.updateParent($scope.searchKeys);
+
       $scope.crumbs = [$scope.searchKeys];
       $scope.addMode = false;
       $scope.updateMode = false;
 
-      $scope.getNextType = function(currType, grandChild) {
-          if(currType==="SearchKeys") {
-              if(grandChild) {
-                  if($scope.children===$scope.parent.acceptableValues) {
-                      return "values";
-                  } else {
-                      return "paths";
-                  }
-              } else {
-                  return "search key";
-              }
-          } else if(currType==="SearchKey") {
-              if(!grandChild) {
-                  if($scope.children===$scope.parent.acceptableValues) {
-                      return "value";
-                  } else {
-                      return "path";
-                  }
-              }
-          }
-      };
+      EsbMessageService.getSearchKeysTree().then(function(response){
+          $scope.searchKeys = response.data.tree;
+          $scope.updateParent($scope.searchKeys);
+          $scope.crumbs = [$scope.searchKeys];
+      });
 
-      $scope.createChildField = function(parent) {
+      $scope.addChild = function(parent) {
           $scope.addMode = true;
-          $scope.parent = parent;
-          var newCrumb = { "name": "Add new "+ $scope.getNextType(parent.type) };
+          $scope.updateParent(parent);
+          var newCrumb = { "value": "Add new child" };
           $scope.crumbs.push(newCrumb);
-          //alert("add child of  :"+JSON.stringify(parent));
       };
 
       $scope.requestAdd = function() {
-          $scope.crumbs.pop();
-          alert("add child of  :"+JSON.stringify($scope.parent.name)+" "+$scope.addFormName+" "+$scope.addFormValue);
-          $scope.addMode = false;
 
+          var name = $scope.parent.type;
+          EsbMessageService.addKey($scope.parent.id, name, $scope.childKeyType, $scope.addFormValue).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
+          $scope.addFormValue = "";
+          $scope.addMode = false;
+          $scope.crumbs.pop();
       };
 
       $scope.editChild = function(field) {
           $scope.updateMode = true;
-          $scope.parent = field;
+          $scope.updateParent(field);
           $scope.crumbs.push(field);
-          //alert("service call to update :"+JSON.stringify(field));
       };
 
       $scope.requestUpdate = function() {
-          alert("update :"+$scope.parent.id+" "+$scope.parent.name+" "+$scope.parent.value+" "+$scope.parent.type);
-          $scope.updateMode = false;
 
+          EsbMessageService.updateKey($scope.parent.id, $scope.peerKeyType, $scope.peerKeyType, $scope.parent.value).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
+          $scope.crumbs.pop();
+          $scope.updateMode = false;
+      };
+
+      $scope.deleteChild = function(field) {
+          EsbMessageService.deleteKey(field.id).then(function(response){
+              $scope.searchKeys = response.data.tree;
+              $scope.updateParent(response.data.result);
+          });
       };
 
       $scope.manageChildren = function(field) {
-          $scope.parent = field;
+          $scope.updateParent(field);
           $scope.crumbs.push(field);
       };
 
-      $scope.manageValues = function(field) {
-          $scope.parent = field;
-          $scope.crumbs.push(field);
-      };
+      $scope.cantHaveChild = function(field) {
 
-      $scope.hideType = function() {
-          if( $scope.parent.type!=="SearchKey" || $scope.children===$scope.parent.acceptableValues)
-              return true;
-      };
-
-      $scope.hideName = function() {
-          if( $scope.parent.type==="SearchKey" && $scope.children===$scope.parent.children)
-              return true;
-      };
-
-      $scope.hideValues = function() {
-          if( $scope.parent.type!=="SearchKeys")
-              return true
-      }
-
-      $scope.cantHaveChild = function() {
-          if( $scope.parent.type==="SearchKey")
+          if( field==null || field.type==null || field.type==="Suggestion" || field.type==="XPATH" )
               return true;
       };
 
@@ -290,13 +288,13 @@ esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', '
           $scope.updateMode = false;
 
           if(crumb.type==="SearchKeys") {
-              $scope.parent = $scope.searchKeys;
+              $scope.updateParent($scope.searchKeys);
           } else {
               var currChildren = $scope.searchKeys.children;
               for(i=1; i<$scope.crumbs.length;i++) {
                   for(j=0;j<currChildren.length;j++) {
                       if(crumb.id==currChildren[j].id) {
-                          $scope.parent = currChildren[j];
+                          $scope.updateParent(currChildren[j]);
                           // exit all loops
                           j = currChildren.length+1;
                           i = $scope.crumbs.length+1;
@@ -318,14 +316,13 @@ esbMessageAdminControllers.controller('MetadataCtrl', ['$scope', '$rootScope', '
 
   }]);
 
-esbMessageAdminControllers.controller('ErrorsSyncCtrl', ['$scope', '$rootScope', 'EsbMessageService',
+esbMessageAdminControllers.controller('SyncKeysCtrl', ['$scope', '$rootScope', 'EsbMessageService',
   function($scope, $rootScope, EsbMessageService) {
 
     EsbMessageService.getSyncKeysTree().then(function(response){
+        $scope.parent = response.data.tree;
         $scope.entities = response.data.tree;
-        $scope.parent = $scope.entities;
         $scope.crumbs = [$scope.entities];
-
     });
 
     $scope.entities = {
@@ -336,61 +333,23 @@ esbMessageAdminControllers.controller('ErrorsSyncCtrl', ['$scope', '$rootScope',
             "children": []
     };
 
-    $scope.keys = [];
-    $scope.systems = [];
-
-    $scope.syncEntity = "";
-    $scope.syncKey = "";
-    $scope.syncSystem = "";
-    $scope.syncValues = [];
-
     $scope.crumbs = [$scope.entities];
 
     $scope.parent = $scope.entities;
 
     $scope.addMode = false;
     $scope.updateMode = false;
-    $scope.isRoot = true;
 
-    $scope.enableSubmit = function() {
-        if( $scope.syncEntity=="" || $scope.syncKey =="" || $scope.syncSystem=="" || $scope.syncValues.length<=0 )
+    $scope.cantHaveChild = function(field) {
+        if( field.type==="SyncKey")
             return true;
     };
 
-    $scope.hideForm = function() {
-        if( $scope.syncEntity==="" )
-            return true;
-    };
-
-    $scope.isRoot = function() {
-        if( $scope.parent.type == "Entities" )
-            return true;
-    };
-
-    $scope.sync = function() {
-        alert("create sync req:"+$scope.syncEntity.value+" "+$scope.syncSystem.value+" "+$scope.syncKey.value+" "+$scope.syncValues);
-    };
-
-    $scope.entityChange = function() {
-        $scope.systems = $scope.syncEntity.children;
-        $scope.keys = [];
-    };
-
-    $scope.systemChange = function() {
-        $scope.keys = $scope.syncSystem.children;
-    };
-
-    $scope.cantHaveChild = function() {
-        if( $scope.parent.type==="SyncKey")
-            return true;
-    };
-
-    $scope.createChildField = function(parent) {
+    $scope.addChild = function(parent) {
         $scope.addMode = true;
         $scope.parent = parent;
         var newCrumb = { "name": "Add new "+ $scope.getNextType(parent.type) };
         $scope.crumbs.push(newCrumb);
-        //alert("add child of  :"+JSON.stringify(parent));
     };
 
     $scope.requestAdd = function() {
@@ -408,10 +367,9 @@ esbMessageAdminControllers.controller('ErrorsSyncCtrl', ['$scope', '$rootScope',
             break;
 
         }
-        EsbMessageService.addMetadata($scope.parent.id, $scope.addFormName, type, $scope.addFormValue).then(function(response){
+        EsbMessageService.addKey($scope.parent.id, $scope.addFormName, type, $scope.addFormValue).then(function(response){
             $scope.entities = response.data.tree;
             $scope.parent = response.data.result;
-            //$scope.crumbs = [$scope.entities];
         });
         $scope.addFormName = "";
         $scope.addFormValue = "";
@@ -424,24 +382,21 @@ esbMessageAdminControllers.controller('ErrorsSyncCtrl', ['$scope', '$rootScope',
         $scope.updateMode = true;
         $scope.parent = field;
         $scope.crumbs.push(field);
-        //alert("service call to update :"+JSON.stringify(field));
     };
 
     $scope.requestUpdate = function() {
-        EsbMessageService.updateMetadata($scope.parent.id, $scope.parent.name, $scope.parent.type, $scope.parent.value).then(function(response){
+        EsbMessageService.updateKey($scope.parent.id, $scope.parent.name, $scope.parent.type, $scope.parent.value).then(function(response){
             $scope.entities = response.data.tree;
             $scope.parent = response.data.result;
-            //$scope.crumbs = [$scope.entities];
         });
         $scope.crumbs.pop();
         $scope.updateMode = false;
     };
 
     $scope.deleteChild = function(field) {
-        EsbMessageService.deleteMetadata(field.id).then(function(response){
+        EsbMessageService.deleteKey(field.id).then(function(response){
             $scope.entities = response.data.tree;
             $scope.parent = response.data.result;
-            //$scope.crumbs = [$scope.entities];
         });
     };
 
@@ -503,4 +458,47 @@ esbMessageAdminControllers.controller('ErrorsSyncCtrl', ['$scope', '$rootScope',
         }
     };
 
-}]);
+  }]);
+
+esbMessageAdminControllers.controller('SyncCtrl', ['$scope', '$rootScope', 'EsbMessageService',
+  function($scope, $rootScope, EsbMessageService) {
+
+    EsbMessageService.getSyncKeysTree().then(function(response){
+        $scope.entities = response.data.tree;
+    });
+
+    $scope.entities = {
+            "id": 0,
+            "name": "Entities",
+            "type": "Entities",
+            "value": "entities",
+            "children": []
+    };
+
+    $scope.keys = [];
+    $scope.systems = [];
+
+    $scope.syncEntity = "";
+    $scope.syncSystem = "";
+    $scope.syncKey = "";
+    $scope.syncValues = [];
+
+    $scope.enableSubmit = function() {
+        if( $scope.syncEntity=="" || $scope.syncKey =="" || $scope.syncSystem=="" || $scope.syncValues.length<=0 )
+            return true;
+    };
+
+    $scope.sync = function() {
+        alert("create sync req:"+$scope.syncEntity.value+" "+$scope.syncSystem.value+" "+$scope.syncKey.value+" "+$scope.syncValues);
+    };
+
+    $scope.entityChange = function() {
+        $scope.systems = $scope.syncEntity.children;
+        $scope.keys = [];
+    };
+
+    $scope.systemChange = function() {
+        $scope.keys = $scope.syncSystem.children;
+    };
+  }]);
+
