@@ -11,10 +11,14 @@ esbMessageAdminApp.config(['$routeProvider',
         title: "Sync",
         templateUrl: 'partials/sync.html',
       }).
-      when('/metadata', {
-        title: "Metadata",
-        templateUrl: 'partials/metadata.html',
-      }).
+      when('/synckeys', {
+          title: "Sync Keys",
+          templateUrl: 'partials/synckeys.html',
+        }).
+      when('/searchkeys', {
+            title: "Search Keys",
+            templateUrl: 'partials/searchkeys.html',
+          }).
       when('/users', {
           title: "Users",
           templateUrl: 'partials/users.html',

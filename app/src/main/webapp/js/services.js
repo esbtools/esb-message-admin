@@ -49,7 +49,7 @@ esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', 
         return $http({method: 'GET', url: "api/key/tree/SearchKeys"});
     };
 
-    self.addMetadata = function(argParentId, argName, argType, argValue) {
+    self.addKey = function(argParentId, argName, argType, argValue) {
 
         return $http({method: 'PUT', url: "api/key/addChild/{parentId}?name={name}&type={type}&value={value}".
             supplant({parentId: argParentId, name: argName, type: argType, value: argValue })}).
@@ -60,7 +60,7 @@ esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', 
             // todo error handling
     };
 
-    self.updateMetadata = function(argId, argName, argType, argValue) {
+    self.updateKey = function(argId, argName, argType, argValue) {
 
         return $http({method: 'PUT', url: "api/key/update/{id}?name={name}&type={type}&value={value}".
             supplant({id: argId, name: argName, type: argType, value: argValue })}).
@@ -71,7 +71,7 @@ esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', 
             // todo error handling
     };
 
-    self.deleteMetadata = function(argId) {
+    self.deleteKey = function(argId) {
 
         return $http({method: 'PUT', url: "api/key/delete/{id}".
             supplant({id: argId })}).
