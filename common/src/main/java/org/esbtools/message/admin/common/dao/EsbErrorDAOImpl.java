@@ -140,23 +140,23 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private Query getQueryFromCriteria(SearchCriteria criteria, Date fromDate, Date toDate, boolean countQuery) {
         String projection = (countQuery) ? " count( distinct e.id) " : " distinct e.id, e.timestamp, e.messageType, e.sourceSystem, e.errorSystem, e.occurrenceCount ";
-        int totalCustomKeys = numberOfCustomKeys(criteria);
         StringBuilder queryBuilder = new StringBuilder("select" + projection + "from EsbMessageEntity e ");
-        for (int i = 0; i < totalCustomKeys; i++) {
-            queryBuilder.append("join e.errorHeaders h" + i + " ");
-        }
-        queryBuilder.append("where e.timestamp between :fromDate AND :toDate ");
-        for (Criterion crit : criteria.getCriteria()) {
-            if (!crit.isCustom())
-                queryBuilder.append("and e." + crit.getKeyString() + " = :" + crit.getField().name() + " ");
-        }
+
         int i = 0;
+        StringBuilder predefWhereClause = new StringBuilder(""), customWhereClause = new StringBuilder(""), customJoins = new StringBuilder("");
         for (Criterion crit : criteria.getCriteria()) {
-            if (crit.isCustom()) {
-                queryBuilder.append("and h" + i + ".name ='" + crit.getKeyString() + "' and h" + i + ".value = '" + crit.getStringValue() + "' ");
+            if (!crit.isCustom()) {
+                predefWhereClause.append("and e." + crit.getKeyString() + " = :" + crit.getField().name() + " ");
+            } else {
+                customJoins.append("join e.errorHeaders h" + i + " ");
+                customWhereClause.append("and h" + i + ".name ='" + crit.getKeyString() + "' and h" + i + ".value = '" + crit.getStringValue() + "' ");
                 i++;
             }
         }
+        queryBuilder.append(customJoins.toString());
+        queryBuilder.append("where e.timestamp between :fromDate AND :toDate ");
+        queryBuilder.append(predefWhereClause.toString());
+        queryBuilder.append(customWhereClause.toString());
         log.info(queryBuilder.toString());
         Query query = mgr.createQuery(queryBuilder.toString());
         query.setParameter("fromDate", fromDate);
@@ -172,15 +172,6 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         }
 
         return query;
-    }
-
-    private int numberOfCustomKeys(SearchCriteria criteria) {
-        int result = 0;
-        for (Criterion critieron : criteria.getCriteria()) {
-            if (critieron.isCustom())
-                result++;
-        }
-        return result;
     }
 
     @Override
