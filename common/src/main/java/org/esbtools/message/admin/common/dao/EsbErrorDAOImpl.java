@@ -112,11 +112,12 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
             resultQuery.setFirstResult(start);
             resultQuery.setMaxResults(maxResults);
+            @SuppressWarnings("rawtypes")
+            List searchResult = resultQuery.getResultList();
 
-            EsbMessage[] resultMessages = new EsbMessage[resultQuery.getResultList().size()];
-
-            for (int i = 0; i < resultQuery.getResultList().size(); i++) {
-                Object[] cols = (Object[]) resultQuery.getResultList().get(i);
+            EsbMessage[] resultMessages = new EsbMessage[searchResult.size()];
+            for (int i = 0; i < resultMessages.length; i++) {
+                Object cols[] = (Object[]) searchResult.get(i);
                 EsbMessage msg = new EsbMessage();
                 msg.setId((Long) cols[0]);
                 msg.setTimestamp((Date) cols[1]);
