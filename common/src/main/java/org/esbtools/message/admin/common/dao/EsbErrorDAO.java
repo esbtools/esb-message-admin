@@ -29,7 +29,7 @@ public interface EsbErrorDAO {
     /**
      * Returns error message of the given queue
      */
-    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, Integer start, Integer maxResults);
+    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults);
 
     /**
      * Returns the error message given the id

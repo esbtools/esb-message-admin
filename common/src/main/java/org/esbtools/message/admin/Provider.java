@@ -36,7 +36,7 @@ public interface Provider {
      * @param maxResults        sets the maximum number of results to retrieve
      * @return SearchResult     results matching the search criteria
      */
-    public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, int start, int maxResults);
+    public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults);
 
     /**
      * Returns details for a specific message

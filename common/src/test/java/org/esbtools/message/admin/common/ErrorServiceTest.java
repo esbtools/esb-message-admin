@@ -56,7 +56,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         SearchCriteria criteria1 = new SearchCriteria();
         Criterion[] c1 = {new Criterion(SearchField.sourceSystem, "SRC")};
         criteria1.setCriteria(c1);
-        SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
 
         Assert.assertEquals(2, result.getTotalResults());
         Assert.assertEquals(1, result.getMessages()[0].getOccurrenceCount());
@@ -78,7 +78,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         SearchCriteria criteria1 = new SearchCriteria();
         Criterion[] c1 = {new Criterion(SearchField.messageGuid, "MessageGuid0")};
         criteria1.setCriteria(c1);
-        SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
         Assert.assertEquals(1, result.getTotalResults());
 
         // test searching by Message Guid and Queue
@@ -88,7 +88,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
                 new Criterion(SearchField.sourceSystem, "SourceSystem0")
         };
         criteria2.setCriteria(c2);
-        result = service.searchMessagesByCriteria(criteria2, null, null, 0, 10);
+        result = service.searchMessagesByCriteria(criteria2, null, null, null, true, 0, 10);
         Assert.assertEquals(1, result.getTotalResults());
 
         // test searching by header name and value
@@ -97,9 +97,48 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
                 new Criterion("header0_0", "value0_0"),
         };
         criteria3.setCriteria(c3);
-        result = service.searchMessagesByCriteria(criteria3, null, null, 0, 10);
+        result = service.searchMessagesByCriteria(criteria3, null, null, null, true, 0, 10);
         Assert.assertEquals(1, result.getTotalResults());
 
+    }
+
+    @Test
+    public void testSorting() {
+        EsbMessage esbMessage0 = createTestMessage(9, 0);
+        EsbMessage esbMessage1 = createTestMessage(9, 0);
+        EsbMessage esbMessage2 = createTestMessage(9, 0);
+        EsbMessage esbMessage3 = createTestMessage(9, 0);
+        esbMessage0.setSourceSystem("SourceSystem0");
+        esbMessage1.setSourceSystem("SourceSystem1");
+        esbMessage2.setSourceSystem("SourceSystem2");
+        esbMessage3.setSourceSystem("SourceSystem3");
+
+        // persist the messages
+        try {
+            service.persist(esbMessage3);
+            service.persist(esbMessage2);
+            service.persist(esbMessage1);
+            service.persist(esbMessage0);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
+         Criterion[] c1 = {new Criterion(SearchField.messageGuid, "MessageGuid9")};
+         SearchCriteria criteria1 = new SearchCriteria();
+         criteria1.setCriteria(c1);
+         SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, "sourceSystem", true, 0, 10);
+
+         Assert.assertEquals("SourceSystem0", result.getMessages()[0].getSourceSystem());
+         Assert.assertEquals("SourceSystem1", result.getMessages()[1].getSourceSystem());
+         Assert.assertEquals("SourceSystem2", result.getMessages()[2].getSourceSystem());
+         Assert.assertEquals("SourceSystem3", result.getMessages()[3].getSourceSystem());
+
+         result = service.searchMessagesByCriteria(criteria1, null, null, "sourceSystem", false, 0, 10);
+
+         Assert.assertEquals("SourceSystem0", result.getMessages()[3].getSourceSystem());
+         Assert.assertEquals("SourceSystem1", result.getMessages()[2].getSourceSystem());
+         Assert.assertEquals("SourceSystem2", result.getMessages()[1].getSourceSystem());
+         Assert.assertEquals("SourceSystem3", result.getMessages()[0].getSourceSystem());
     }
 
     private EsbMessage createTestMessage(int i, int headerCount) {

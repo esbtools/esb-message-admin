@@ -81,7 +81,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     @Override
-    public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, int start, int maxResults) {
+    public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults) {
 
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
@@ -92,7 +92,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         if (toDate == null) {
             toDate = new Date();
         }
-        return getErrorDAO().findMessagesBySearchCriteria(criteria, fromDate, toDate, start, maxResults);
+        return getErrorDAO().findMessagesBySearchCriteria(criteria, fromDate, toDate, sortField, sortAsc, start, maxResults);
     }
 
     @Override

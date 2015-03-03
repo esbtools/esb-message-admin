@@ -84,7 +84,7 @@ public class SearchErrorResourceBean {
                                              @QueryParam("start") Integer start,
                                              @QueryParam("results") Integer maxResults) throws IOException {
         SearchCriteria criteria = new SearchCriteria(SearchField.errorQueue, queue);
-        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), start, maxResults);
+        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), null, true, start, maxResults);
     }
 
     @GET
@@ -93,11 +93,19 @@ public class SearchErrorResourceBean {
     public SearchResult getErrorsByCriteria(@PathParam("search_criteria") PathSegment argCriteria,
                                             @QueryParam("fromDate") String fromDate,
                                             @QueryParam("toDate") String toDate,
+                                            @QueryParam("sortField") String sortField,
+                                            @QueryParam("sortAsc") Boolean sortAsc,
                                             @QueryParam("start") Integer start,
                                             @QueryParam("results") Integer maxResults) {
         SearchCriteria criteria = getCriteria(argCriteria);
-        log.info("result:" + criteria);
-        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), start, maxResults);
+        if(sortField==null || sortField.isEmpty()) {
+            sortField = "timestamp";
+        }
+        if(sortAsc==null) {
+            sortAsc = true;
+        }
+        log.info("search criteria:" + criteria+" sortBy"+sortField+" asc="+sortAsc);
+        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortField, sortAsc, start, maxResults);
     }
 
     @GET

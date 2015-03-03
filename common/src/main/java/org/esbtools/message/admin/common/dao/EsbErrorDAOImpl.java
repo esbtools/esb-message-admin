@@ -11,6 +11,7 @@
 package org.esbtools.message.admin.common.dao;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
     private Properties config;
-
+    List<String> sortingFields;
     public EsbErrorDAOImpl(EntityManager mgr) {
         this.mgr=mgr;
 
@@ -50,6 +51,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             config = new Properties();
             InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
             config.load(in);
+            sortingFields = Arrays.asList(config.getProperty("sortingFields").split("\\s*,\\s*"));
             in.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -96,19 +98,23 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     }
 
     @Override
-    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, Integer start, Integer maxResults) {
+    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults) {
 
         SearchResult result = new SearchResult();
 
+        // allow sorting only by display fields, choose time stamp if proper field is not set.
+        if(sortField==null || !sortingFields.contains(sortField)) {
+            sortField = "timestamp";
+        }
         if (maxResults > 0) {
-            Query countQuery = getQueryFromCriteria(criteria, fromDate, toDate, true);
+            Query countQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, true);
             try {
                 result.setTotalResults((Long) countQuery.getSingleResult());
             } catch (NoResultException e) {
                 return SearchResult.empty();
             }
 
-            Query resultQuery = getQueryFromCriteria(criteria, fromDate, toDate, false);
+            Query resultQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, false);
 
             resultQuery.setFirstResult(start);
             resultQuery.setMaxResults(maxResults);
@@ -139,7 +145,8 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         return result;
     }
 
-    private Query getQueryFromCriteria(SearchCriteria criteria, Date fromDate, Date toDate, boolean countQuery) {
+    private Query getQueryFromCriteria(SearchCriteria criteria, String sortField, boolean sortAsc, Date fromDate, Date toDate, boolean countQuery) {
+        // to do : read display fields from a config file and set select fields only on result object.
         String projection = (countQuery) ? " count( distinct e.id) " : " distinct e.id, e.timestamp, e.messageType, e.sourceSystem, e.errorSystem, e.occurrenceCount ";
         StringBuilder queryBuilder = new StringBuilder("select" + projection + "from EsbMessageEntity e ");
 
@@ -158,6 +165,14 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         queryBuilder.append("where e.timestamp between :fromDate AND :toDate ");
         queryBuilder.append(predefWhereClause.toString());
         queryBuilder.append(customWhereClause.toString());
+        if(!countQuery) {
+            queryBuilder.append("order by e."+sortField);
+            if(sortAsc) {
+                queryBuilder.append(" asc");
+            } else {
+                queryBuilder.append(" desc");
+            }
+        }
         log.info(queryBuilder.toString());
         Query query = mgr.createQuery(queryBuilder.toString());
         query.setParameter("fromDate", fromDate);
