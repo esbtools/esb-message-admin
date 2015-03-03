@@ -23,12 +23,12 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     @Test
     public void testAddingFields() {
         long id = -1L;
-        service.addChildMetadataField(id, "Entities", MetadataType.Entities, "entitiesAddTest");
+        service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
 
         MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
         assertSuccess(result);
-        MetadataField field = fetchMetadataField("Entities", "entitiesAddTest", MetadataType.Entities);
-        assertfieldAssertions("Entities", "entitiesAddTest", MetadataType.Entities, result.getTree());
+        MetadataField field = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
+        assertfieldAssertions("Entities", "Entities", MetadataType.Entities, result.getTree());
         Assert.assertEquals(result.getTree().getId().longValue(), field.getId().longValue());
 
         for (int i = 1; i < 10; i++) {
@@ -67,15 +67,15 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     @Test
     public void testUpdatingFields() {
         long id = -1L;
-        service.addChildMetadataField(id, "Entities", MetadataType.Entities, "entitiesUpdateTest");
-        MetadataField parent = fetchMetadataField("Entities", "entitiesUpdateTest", MetadataType.Entities);
+        service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
+        MetadataField parent = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
         service.addChildMetadataField(parent.getId(), "EntityPreUpdate", MetadataType.Entity, "entityPreUpdate");
         MetadataField child = fetchMetadataField("EntityPreUpdate", "entityPreUpdate", MetadataType.Entity);
         assertfieldAssertions("EntityPreUpdate", "entityPreUpdate", MetadataType.Entity, child);
         MetadataResponse result = service.updateMetadataField(child.getId(), "EntityPostUpdate", MetadataType.Entity, "entityPostUpdate");
         assertSuccess(result);
-        assertfieldAssertions("Entities", "entitiesUpdateTest", MetadataType.Entities, result.getResult());
-        assertfieldAssertions("Entities", "entitiesUpdateTest", MetadataType.Entities, result.getTree());
+        assertfieldAssertions("Entities", "Entities", MetadataType.Entities, result.getResult());
+        assertfieldAssertions("Entities", "Entities", MetadataType.Entities, result.getTree());
         child = fetchMetadataField("EntityPreUpdate", "entityPreUpdate", MetadataType.Entity);
         Assert.assertNull(child);
         child = fetchMetadataField("EntityPostUpdate", "entityPostUpdate", MetadataType.Entity);
@@ -135,14 +135,14 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     @Test
     public void getEntitiesMetadataTreeTest() {
         long id = -1L;
-        MetadataResponse result = service.addChildMetadataField(id, "Entities", MetadataType.Entities, "entitiesTreeTest");
+        MetadataResponse result = service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
         assertSuccess(result);
-        MetadataField entities = fetchMetadataField("Entities", "entitiesTreeTest", MetadataType.Entities);
+        MetadataField entities = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
 
         for (int i = 0; i < 5; i++) {
             result = service.addChildMetadataField(entities.getId(), "Entity" + i, MetadataType.Entity, "entityTreeTest" + i);
             assertSuccess(result);
-            assertfieldAssertions("Entities", "entitiesTreeTest", MetadataType.Entities, result.getResult());
+            assertfieldAssertions("Entities", "Entities", MetadataType.Entities, result.getResult());
             MetadataField entity = fetchMetadataField("Entity" + i, "entityTreeTest" + i, MetadataType.Entity);
 
             for (int j = 0; j < 3; j++) {

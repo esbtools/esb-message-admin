@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -35,6 +36,7 @@ public class MetadataDAOImpl implements MetadataDAO {
 
     private final EntityManager mgr;
     private final static Logger log = Logger.getLogger(MetadataDAOImpl.class.getName());
+    private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
 
     private Properties config;
 
@@ -51,6 +53,34 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
     }
 
+    private String getMetadataHash(MetadataType type) {
+        String hash = "";
+        if(type==MetadataType.SearchKeys || type==MetadataType.Entities) {
+            Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
+            List<MetadataEntity> result = query.getResultList();
+            if(result!=null && result.size()>0) {
+                hash = (String) result.get(0).getValue();
+            }
+        }
+        return hash;
+    }
+
+    private String markTreeDirty(MetadataType type) {
+        String hash = null;
+        if(type.isSearchKeyType()) {
+            type = MetadataType.SearchKeys;
+        } else {
+            type = MetadataType.Entities;
+        }
+        Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
+        List<MetadataEntity> result = query.getResultList();
+        if(result!=null && result.size()>0) {
+            hash = UUID.randomUUID().toString();
+            result.get(0).setValue(hash);
+        }
+        return hash;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -65,19 +95,30 @@ public class MetadataDAOImpl implements MetadataDAO {
     @Override
     public MetadataResponse getMetadataTree(MetadataType type) {
 
-        MetadataResponse result = new MetadataResponse();
-        String inClause = null;
-        if (type == MetadataType.Entities) {
-            inClause = "('Entities', 'Entity', 'System', 'SyncKey')";
-        } else if (type == MetadataType.SearchKeys) {
-            inClause = "('SearchKeys', 'SearchKey', 'XPATH', 'Suggestion')";
+        MetadataResponse result;
+        if(type == MetadataType.Entities || type == MetadataType.SearchKeys) {
+            String hash = getMetadataHash(type);
+            if(treeCache.containsKey(type) && hash.contentEquals(treeCache.get(type).getHash())) {
+                return treeCache.get(type);
+            } else {
+                result = new MetadataResponse();
+                String inClause = null;
+                if (type == MetadataType.Entities) {
+                    inClause = "('Entities', 'Entity', 'System', 'SyncKey')";
+                } else {
+                    inClause = "('SearchKeys', 'SearchKey', 'XPATH', 'Suggestion')";
+                }
+                if (inClause != null) {
+                    Query query = mgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
+                    List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
+                    result.setTree(makeTree(queryResult));
+                    result.setHash(hash);
+                    treeCache.put(type, result);
+                }
+            }
         } else {
+            result = new MetadataResponse();
             result.setErrorMessage("Illegal Argument:" + type + ", Expected: Entities or SearchKeys");
-        }
-        if (inClause != null) {
-            Query query = mgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
-            List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
-            result.setTree(makeTree(queryResult));
         }
         return result;
     }
@@ -93,8 +134,10 @@ public class MetadataDAOImpl implements MetadataDAO {
         for (MetadataEntity entity : entities) {
             i++;
             MetadataField field = ConversionUtility.convertToMetadataField(entity);
-            if (entity.getType() == MetadataType.Entities || entity.getType() == MetadataType.SearchKeys)
+            if (entity.getType() == MetadataType.Entities || entity.getType() == MetadataType.SearchKeys) {
                 root = field;
+                root.setValue(entity.getType().toString());
+            }
             map.put(field.getId(), field);
         }
         for (MetadataEntity entity : entities) {
@@ -129,6 +172,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             if (type != MetadataType.Entities && type != MetadataType.SearchKeys) {
                 result.setErrorMessage("Illegal Argument:" + type + ", If parent = -1, Expected: Entities or SearchKeys");
             } else {
+                markTreeDirty(type);
                 mgr.persist(curr);
                 result = getMetadataTree(type);
             }
@@ -139,6 +183,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             } else if (!curr.canBeChildOf(parent.getType())) {
                 result.setErrorMessage("Illegal Argument: " + type + " can not be a child of " + parent.getType());
             } else {
+                markTreeDirty(type);
                 mgr.persist(curr);
                 result = createMetadataResult(parent);
             }
@@ -176,6 +221,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 entity.setName(name);
                 entity.setType(type);
                 entity.setValue(value);
+                markTreeDirty(type);
                 result = createMetadataResult(parent);
             }
         }
@@ -191,6 +237,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         mgr.remove(entity);
         if (entity.getParentId() != -1L) {
             MetadataField parent = getMetadataField(entity.getParentId());
+            markTreeDirty(parent.getType());
             result = createMetadataResult(parent);
         }
         return result;

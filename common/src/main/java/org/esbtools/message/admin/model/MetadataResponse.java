@@ -7,6 +7,7 @@ public class MetadataResponse {
     };
     private MetadataField tree;
     private MetadataField resultField;
+    private String hash;
     private Status status = Status.Success;
     private String errorMessage;
 
@@ -39,6 +40,18 @@ public class MetadataResponse {
     @Override
     public String toString() {
         return "MetadataResult [root=" + tree + ", resultField=" + resultField + "]";
+    }
+    /**
+     * @return the hash
+     */
+    public String getHash() {
+        return hash;
+    }
+    /**
+     * @param hash the hash to set
+     */
+    public void setHash(String hash) {
+        this.hash = hash;
     }
     /**
      * @return the status
