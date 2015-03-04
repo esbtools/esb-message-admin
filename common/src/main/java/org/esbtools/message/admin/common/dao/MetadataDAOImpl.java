@@ -312,14 +312,17 @@ public class MetadataDAOImpl implements MetadataDAO {
 
         Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
         Set<String> headersWithSuggestions = getHeadersWithSuggestedValues();
-        for (MetadataField searchKey : searchKeysTree.getChildren()) {
-            List<String> values = new ArrayList<String>();
-            if (headersWithSuggestions.contains(searchKey.getValue())) {
-                for (MetadataField suggestion : searchKey.getSuggestions()) {
-                    values.add(suggestion.getValue());
+
+        if(searchKeysTree!=null && searchKeysTree.getChildren().size()>0) {
+            for (MetadataField searchKey : searchKeysTree.getChildren()) {
+                List<String> values = new ArrayList<String>();
+                if (headersWithSuggestions.contains(searchKey.getValue())) {
+                    for (MetadataField suggestion : searchKey.getSuggestions()) {
+                        values.add(suggestion.getValue());
+                    }
                 }
+                newSuggestions.put(searchKey.getValue(), values);
             }
-            newSuggestions.put(searchKey.getValue(), values);
         }
         suggestionsCache = newSuggestions;
     }
