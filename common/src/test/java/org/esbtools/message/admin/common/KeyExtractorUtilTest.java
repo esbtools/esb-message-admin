@@ -54,32 +54,32 @@ public class KeyExtractorUtilTest {
 
         List<MetadataField> extractors = new ArrayList<MetadataField>();
 
-        MetadataField searchKey1 = new MetadataField(MetadataType.SearchKey, "email", "The confirmed email address");
+        MetadataField searchKey1 = new MetadataField(MetadataType.SearchKey, "The confirmed email address", "email");
         MetadataField field1 = new MetadataField(MetadataType.XPATH, "", "/Person/Email[@confirmed='true']");
         searchKey1.addDescendant(field1);
         extractors.add(searchKey1);
 
-        MetadataField searchKey2 = new MetadataField(MetadataType.SearchKey, "systemBId", "The System B Identifier");
+        MetadataField searchKey2 = new MetadataField(MetadataType.SearchKey, "The System B Identifier", "systemBId");
         MetadataField field2 = new MetadataField(MetadataType.XPATH, "", "/Person/References/Id[@system='SystemB']");
         searchKey2.addDescendant(field2);
         extractors.add(searchKey2);
 
-        MetadataField searchKey3 = new MetadataField(MetadataType.SearchKey, "emailConfirmed", "Is email is confirmed?");
+        MetadataField searchKey3 = new MetadataField(MetadataType.SearchKey, "Is email is confirmed?", "emailConfirmed");
         MetadataField field3 = new MetadataField(MetadataType.XPATH, "", "/Person/Email/@confirmed");
         searchKey3.addDescendant(field3);
         extractors.add(searchKey3);
 
-        MetadataField searchKey4 = new MetadataField(MetadataType.SearchKey, "addressType", "The address type");
+        MetadataField searchKey4 = new MetadataField(MetadataType.SearchKey, "The address type", "addressType");
         MetadataField field4 = new MetadataField(MetadataType.XPATH, "", "/Person/Addresses/Address/@type");
         searchKey4.addDescendant(field4);
         extractors.add(searchKey4);
 
-        MetadataField searchKey5 = new MetadataField(MetadataType.SearchKey, "addressCount", "Number of addresses");
+        MetadataField searchKey5 = new MetadataField(MetadataType.SearchKey, "Number of addresses", "addressCount");
         MetadataField field5 = new MetadataField(MetadataType.XPATH, "", "count(/Person/Addresses/Address)");
         searchKey5.addDescendant(field5);
         extractors.add(searchKey5);
 
-        MetadataField searchKey6 = new MetadataField(MetadataType.SearchKey, "name", "Person name");
+        MetadataField searchKey6 = new MetadataField(MetadataType.SearchKey, "Person name", "name");
         MetadataField field6 = new MetadataField(MetadataType.XPATH, "", "concat(/Person/FirstName,' ',/Person/LastName)");
         searchKey6.addDescendant(field6);
         extractors.add(searchKey6);
