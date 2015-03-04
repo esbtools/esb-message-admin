@@ -37,6 +37,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     private final EntityManager mgr;
     private final static Logger log = Logger.getLogger(MetadataDAOImpl.class.getName());
     private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
+    private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
 
     private Properties config;
 
@@ -114,6 +115,9 @@ public class MetadataDAOImpl implements MetadataDAO {
                     result.setTree(makeTree(queryResult));
                     result.setHash(hash);
                     treeCache.put(type, result);
+                    if(type == MetadataType.SearchKeys) {
+                        updateSuggestions(result.getTree());
+                    }
                 }
             }
         } else {
@@ -299,20 +303,25 @@ public class MetadataDAOImpl implements MetadataDAO {
     @Override
     public Map<String, List<String>> getSearchKeyValueSuggestions() {
 
-        Map<String, List<String>> suggestions = new HashMap<String, List<String>>();
-        MetadataField searchKeysTree = getMetadataTree(MetadataType.SearchKeys).getTree();
+        // ensure cache exists and is upto date.
+        getMetadataTree(MetadataType.SearchKeys).getTree();
+        return suggestionsCache;
+    }
+
+    private void updateSuggestions(MetadataField searchKeysTree) {
+
+        Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
         Set<String> headersWithSuggestions = getHeadersWithSuggestedValues();
         for (MetadataField searchKey : searchKeysTree.getChildren()) {
-
             List<String> values = new ArrayList<String>();
             if (headersWithSuggestions.contains(searchKey.getValue())) {
                 for (MetadataField suggestion : searchKey.getSuggestions()) {
                     values.add(suggestion.getValue());
                 }
             }
-            suggestions.put(searchKey.getValue(), values);
+            newSuggestions.put(searchKey.getValue(), values);
         }
-        return suggestions;
+        suggestionsCache = newSuggestions;
     }
 
     private Set<String> getHeadersWithSuggestedValues() {
