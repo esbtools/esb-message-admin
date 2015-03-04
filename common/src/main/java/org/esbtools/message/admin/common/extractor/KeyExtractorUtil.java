@@ -52,14 +52,14 @@ public class KeyExtractorUtil {
                 }
 
                 if (expressionMap != null) {
-                    if (!expressionMap.containsKey(searchKey.getName())) {
-                        expressionMap.put(searchKey.getName(), new LinkedList<XPathExpression>());
+                    if (!expressionMap.containsKey(searchKey.getValue())) {
+                        expressionMap.put(searchKey.getValue(), new LinkedList<XPathExpression>());
                     }
                     XPathExpression expr;
                     try {
                         expr = xpath.compile(path.getValue());
-                        expressionMap.get(searchKey.getName()).add(expr);
-                        log.info("adding key:" + searchKey.getName() + " with path:" + path.getValue());
+                        expressionMap.get(searchKey.getValue()).add(expr);
+                        log.info("adding key:" + searchKey.getValue() + " with path:" + path.getValue());
                     } catch (XPathExpressionException e) {
                         log.warning("XPATH: " + path.getValue() + " is invalid. Ignoring it!");
                     }
