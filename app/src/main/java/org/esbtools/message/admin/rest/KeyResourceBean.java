@@ -37,9 +37,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
-import org.esbtools.message.admin.spi.Provider;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
