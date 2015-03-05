@@ -85,7 +85,7 @@ public class KeyExtractorUtilTest {
         extractors.add(searchKey6);
 
         try {
-            KeyExtractorUtil util = new KeyExtractorUtil(extractors);
+            KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
             Map<String,List<String>> extractedData = util.getEntriesFromPayload(payload);
 
             assertEquals(1, extractedData.get("email").size());
@@ -146,7 +146,7 @@ public class KeyExtractorUtilTest {
         extractors.add(searchKey1);
 
         try {
-            KeyExtractorUtil util = new KeyExtractorUtil(extractors);
+            KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
             Map<String,List<String>> extractedData = util.getEntriesFromPayload(badPayload);
             fail();
 
@@ -179,7 +179,7 @@ public class KeyExtractorUtilTest {
         extractors.add(searchKey1);
 
         try {
-            KeyExtractorUtil util = new KeyExtractorUtil(extractors);
+            KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
             Map<String,List<String>> extractedData = util.getEntriesFromPayload(payload);
 
             // invalid xpath are ignored.

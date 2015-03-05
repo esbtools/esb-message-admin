@@ -1,5 +1,6 @@
 package org.esbtools.message.admin.common;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -7,6 +8,7 @@ import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.ConversionUtility;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
+import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -202,7 +204,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void suggestionsTest() {
+    public void suggestionsLoadTest() {
 
         long id = -1L;
         service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
@@ -218,12 +220,10 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
         Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
 
-        Assert.assertEquals("two search keys should be suggested!", 2, suggestions.keySet().size());
-        Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
-        List<String> suggestionList = suggestions.get("suggestionLessKey");
-        Assert.assertEquals("suggestionLessKey cannot have suggestions!", 0, suggestionList.size());
+        Assert.assertEquals("only 1 search key should have suggestion!", 1, suggestions.keySet().size());
+        Assert.assertFalse(suggestions.containsKey("suggestionLessKey"));
         Assert.assertTrue(suggestions.containsKey("SourceSystem"));
-        suggestionList = suggestions.get("SourceSystem");
+        List<String> suggestionList = suggestions.get("SourceSystem");
         Assert.assertEquals("SourceSystem should have 1 suggestion!", 1, suggestionList.size());
         Assert.assertEquals("suggestion2", suggestionList.get(0));
     }
@@ -243,5 +243,75 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals(name, field.getName());
         Assert.assertEquals(type, field.getType());
     }
+
+    @Test
+    public void addSuggestionsToMetadataTest() {
+
+    String payload =
+            "<Person>\n" +
+            " <Id>12345</Id>\n" +
+            " <SourceSystem>SystemA</SourceSystem>\n" +
+            " <FirstName>John</FirstName>\n" +
+            " <LastName>Doe</LastName>\n" +
+            " <Email confirmed=\"true\">john.doe@example.com</Email>\n" +
+            " <Addresses>\n" +
+            " <Address type=\"Private\">\n" +
+            " <Line>123 Main St</Line>\n" +
+            " <City>Anytown</City>\n" +
+            " <State>AS</State>\n" +
+            " <Country>US</Country>\n" +
+            " <ZIP>98765</ZIP>\n" +
+            " </Address>\n" +
+            " <Address type=\"Work\">\n" +
+            " <Line>Strasse 123</Line>\n" +
+            " <City>Stadt</City>\n" +
+            " <Country>DE</Country>\n" +
+            " <ZIP>12345</ZIP>\n" +
+            " </Address>\n" +
+            " </Addresses>\n" +
+            "</Person>";
+
+    long id = -1L;
+    service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
+    MetadataField searchKeys = fetchMetadataField("SearchKeys", "suggestionsTest", MetadataType.SearchKeys);
+
+    service.addChildMetadataField(searchKeys.getId(), "Email", MetadataType.SearchKey, "suggestionLessKey");
+    MetadataField suggestionLessKey = fetchMetadataField("Email", "suggestionLessKey", MetadataType.SearchKey);
+    service.addChildMetadataField(suggestionLessKey.getId(), "", MetadataType.XPATH, "/Person/Email[@confirmed='true']");
+
+    service.addChildMetadataField(searchKeys.getId(), "SourceSystem", MetadataType.SearchKey, "SourceSystem");
+    MetadataField sourceSystem = fetchMetadataField("SourceSystem", "SourceSystem", MetadataType.SearchKey);
+    service.addChildMetadataField(sourceSystem.getId(), "", MetadataType.XPATH, "/Person/SourceSystem");
+    service.addChildMetadataField(sourceSystem.getId(), "SystemB", MetadataType.Suggestion, "SystemB");
+
+    service.addChildMetadataField(searchKeys.getId(), "Country", MetadataType.SearchKey, "Country");
+    MetadataField country = fetchMetadataField("Country", "Country", MetadataType.SearchKey);
+    service.addChildMetadataField(country.getId(), "", MetadataType.XPATH, "/Person/Addresses/Address/Country");
+    //
+
+    Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
+    Assert.assertEquals("Expecting only 1 existing suggestion",1, suggestions.size());
+    // persist message and check suggestion again
+    try {
+        EsbMessage message = new EsbMessage();
+        message.setPayload(payload);
+        service.persist(message);
+    } catch (IOException e) {
+        Assert.fail();
+    }
+
+    suggestions = service.getSearchKeyValueSuggestions();
+
+    Assert.assertNotNull(suggestions.get("SourceSystem"));
+    Assert.assertEquals("Expecting 2 suggestions after persistence",2,suggestions.get("SourceSystem").size());
+    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemA"));
+    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
+
+    Assert.assertNull(suggestions.get("Email"));
+
+    // County codes can not be suggested
+    Assert.assertNull(suggestions.get("Country"));
+    }
+
 
 }

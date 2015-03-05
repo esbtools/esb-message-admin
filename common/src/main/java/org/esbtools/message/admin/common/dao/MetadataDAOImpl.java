@@ -10,7 +10,6 @@
  */
 package org.esbtools.message.admin.common.dao;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +30,6 @@ import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 
-
 public class MetadataDAOImpl implements MetadataDAO {
 
     private final EntityManager mgr;
@@ -39,19 +37,11 @@ public class MetadataDAOImpl implements MetadataDAO {
     private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
 
-    private Properties config;
+    private Set<String> suggestedFields;
 
-    public MetadataDAOImpl(EntityManager mgr) {
+    public MetadataDAOImpl(EntityManager mgr, Properties config) {
         this.mgr=mgr;
-
-        try {
-            config = new Properties();
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
-            config.load(in);
-            in.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        suggestedFields = new HashSet<String>(Arrays.asList(config.getProperty("headersWithSuggestedValues").split(",")));
     }
 
     private String getMetadataHash(MetadataType type) {
@@ -311,21 +301,57 @@ public class MetadataDAOImpl implements MetadataDAO {
     private void updateSuggestions(MetadataField searchKeysTree) {
 
         Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
-        Set<String> headersWithSuggestions = getHeadersWithSuggestedValues();
-        for (MetadataField searchKey : searchKeysTree.getChildren()) {
-            List<String> values = new ArrayList<String>();
-            if (headersWithSuggestions.contains(searchKey.getValue())) {
-                for (MetadataField suggestion : searchKey.getSuggestions()) {
-                    values.add(suggestion.getValue());
+        if(searchKeysTree!=null && searchKeysTree.getChildren().size()>0) {
+            for (MetadataField searchKey : searchKeysTree.getChildren()) {
+                if (suggestedFields.contains(searchKey.getValue())) {
+                    List<String> values = new ArrayList<String>();
+                    for (MetadataField suggestion : searchKey.getSuggestions()) {
+                        values.add(suggestion.getValue());
+                    }
+                    newSuggestions.put(searchKey.getValue(), values);
                 }
             }
-            newSuggestions.put(searchKey.getValue(), values);
         }
         suggestionsCache = newSuggestions;
     }
 
-    private Set<String> getHeadersWithSuggestedValues() {
-        return new HashSet<String>(Arrays.asList(config.getProperty("headersWithSuggestedValues").split(",")));
+    @Override
+    public void ensureSuggestionsArePresent(Map<String, List<String>> extractedHeaders) {
+
+        for(String suggestedField: suggestedFields) {
+
+            List<String> extractedValues = extractedHeaders.get(suggestedField);
+            if(extractedValues!=null && extractedValues.size()>0) {
+                if(!suggestionsCache.containsKey(suggestedField)) {
+                    Long parentId = treeCache.get(MetadataType.SearchKeys).getTree().getId();
+                    addChildMetadataField(parentId, suggestedField, MetadataType.SearchKey, suggestedField);
+                }
+                for(String extractedValue: extractedValues) {
+                    Long searchKeyId = null;
+                    if(!suggestionsCache.get(suggestedField).contains(extractedValue)) {
+                        if(searchKeyId==null) {
+                            searchKeyId = fetchSearchKeyId(suggestedField);
+                        }
+                        // fetch method can return null
+                        if(searchKeyId!=null) {
+                            addChildMetadataField(searchKeyId, extractedValue, MetadataType.Suggestion, extractedValue);
+                        } else {
+                            log.severe("unable to find search key to add suggestion!");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private Long fetchSearchKeyId(String suggestedField) {
+        Query query = mgr.createQuery("select f from MetadataEntity f where f.value = :value");
+        query.setParameter("value", suggestedField);
+        List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
+        if (queryResult != null && queryResult.size() != 0) {
+            return queryResult.get(0).getId();
+        }
+        return null;
     }
 
 }

@@ -10,7 +10,6 @@
  */
 package org.esbtools.message.admin.common.dao;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -24,8 +23,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.ConversionUtility;
-import org.esbtools.message.admin.common.extractor.KeyExtractorException;
-import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.model.Criterion;
@@ -42,41 +39,26 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
-    private Properties config;
     List<String> sortingFields;
-    public EsbErrorDAOImpl(EntityManager mgr) {
+    public EsbErrorDAOImpl(EntityManager mgr, Properties config) {
         this.mgr=mgr;
-
-        try {
-            config = new Properties();
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
-            config.load(in);
-            sortingFields = Arrays.asList(config.getProperty("sortingFields").split("\\s*,\\s*"));
-            in.close();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        sortingFields = Arrays.asList(config.getProperty("sortingFields").split("\\s*,\\s*"));
     }
 
     /**
      * {@inheritDoc}
      */
-    public void create(EsbMessageEntity eme, KeyExtractorUtil extractor) {
+    public void create(EsbMessageEntity eme, Map<String, List<String>> extractedHeaders) {
 
-        try {
-            Map<String, List<String>> extractedHeaders = extractor.getEntriesFromPayload(eme.getPayload());
-            for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
-                for(String value : headerSet.getValue()) {
-                    EsbMessageHeaderEntity extractedHeader= new EsbMessageHeaderEntity();
-                    extractedHeader.setName(headerSet.getKey());
-                    extractedHeader.setType(HeaderType.METADATA);
-                    extractedHeader.setValue(value);
-                    extractedHeader.setEsbMessage(eme);
-                    eme.getErrorHeaders().add(extractedHeader);
-                }
+        for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
+            for(String value : headerSet.getValue()) {
+                EsbMessageHeaderEntity extractedHeader= new EsbMessageHeaderEntity();
+                extractedHeader.setName(headerSet.getKey());
+                extractedHeader.setType(HeaderType.METADATA);
+                extractedHeader.setValue(value);
+                extractedHeader.setEsbMessage(eme);
+                eme.getErrorHeaders().add(extractedHeader);
             }
-        } catch (KeyExtractorException e) {
-            log.warning("Could not extract metadata! " + e);
         }
 
         // check if message(s) with the same payload hash exists already
