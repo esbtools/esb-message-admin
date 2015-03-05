@@ -50,4 +50,9 @@ public interface MetadataDAO {
      */
     public void sync(String entity, String system, String key, String... values);
 
+    /*
+     * ensure all new suggestions are set for specific keys
+     */
+    public void ensureSuggestionsArePresent(Map<String, List<String>> extractedHeaders);
+
 }

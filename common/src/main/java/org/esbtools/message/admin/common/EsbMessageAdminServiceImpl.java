@@ -1,10 +1,14 @@
 package org.esbtools.message.admin.common;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 import javax.inject.Named;
 import javax.persistence.EntityManager;
@@ -17,6 +21,7 @@ import org.esbtools.message.admin.common.dao.MetadataDAO;
 import org.esbtools.message.admin.common.dao.MetadataDAOImpl;
 import org.esbtools.message.admin.common.dao.audit.AuditEventDAO;
 import org.esbtools.message.admin.common.dao.audit.AuditEventDAOImpl;
+import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.common.orm.AuditEventEntity;
 import org.esbtools.message.admin.model.EsbMessage;
@@ -32,14 +37,27 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @PersistenceContext(unitName = "EsbMessageAdminPU")
     private EntityManager entityMgr;
 
+    private final static Logger log = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
+    private Properties config;
+
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
     transient AuditEventDAO auditEventDAO;
     transient static KeyExtractorUtil extractor;
-    transient static boolean isMapdirty = false;
+
+    {
+        try {
+            config = new Properties();
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
+            config.load(in);
+            in.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private EsbErrorDAO getErrorDAO() {
-        return errorDao == null ? new EsbErrorDAOImpl(entityMgr) : errorDao;
+        return errorDao == null ? new EsbErrorDAOImpl(entityMgr,config) : errorDao;
     }
 
     void setErrorEntityManager(EntityManager entityMgr) {
@@ -47,7 +65,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private MetadataDAO getMetadataDAO() {
-        return metadataDao == null ? new MetadataDAOImpl(entityMgr) : metadataDao;
+        return metadataDao == null ? new MetadataDAOImpl(entityMgr, config) : metadataDao;
     }
     
     // TODO: inject DAO
@@ -57,9 +75,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private KeyExtractorUtil getKeyExtractor() {
 
-        if (isMapdirty || extractor == null) {
-            extractor = new KeyExtractorUtil(getMetadataDAO().getMetadataTree(MetadataType.SearchKeys).getTree().getChildren());
-            isMapdirty = false;
+        MetadataResponse searchKeyResponse = getMetadataDAO().getMetadataTree(MetadataType.SearchKeys);
+        if (extractor == null || !extractor.getHash().contentEquals(searchKeyResponse.getHash())) {
+            extractor = new KeyExtractorUtil(searchKeyResponse.getTree().getChildren(), searchKeyResponse.getHash());
         }
         return extractor;
     }
@@ -70,7 +88,19 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Override
     public void persist(EsbMessage esbMessage) throws IOException {
-        getErrorDAO().create(ConversionUtility.convertFromEsbMessage(esbMessage), getKeyExtractor());
+
+        Map<String, List<String>> extractedHeaders = null;
+
+        try {
+            extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
+        } catch (KeyExtractorException e) {
+            log.warning("Could not extract metadata! " + e);
+            extractedHeaders = new HashMap<>();
+        }
+
+        getErrorDAO().create(ConversionUtility.convertFromEsbMessage(esbMessage), extractedHeaders);
+        getMetadataDAO().ensureSuggestionsArePresent(extractedHeaders);
+
     }
 
     @Override
@@ -112,24 +142,17 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Override
     public MetadataResponse addChildMetadataField(Long parentId, String name, MetadataType type, String value) {
-        if (type.isSearchKeyType())
-            isMapdirty = true;
         return getMetadataDAO().addChildMetadataField(parentId, name, type, value);
     }
 
     @Override
     public MetadataResponse updateMetadataField(Long id, String name, MetadataType type, String value) {
-        if (type.isSearchKeyType())
-            isMapdirty = true;
         return getMetadataDAO().updateMetadataField(id, name, type, value);
     }
 
     @Override
     public MetadataResponse deleteMetadataField(Long id) {
-        MetadataResponse response = getMetadataDAO().deleteMetadataField(id);
-        if (response.getTree().getType().isSearchKeyType())
-            isMapdirty = true;
-        return response;
+        return getMetadataDAO().deleteMetadataField(id);
     }
 
     @Override

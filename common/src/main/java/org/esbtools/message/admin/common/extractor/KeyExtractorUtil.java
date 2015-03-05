@@ -2,10 +2,12 @@ package org.esbtools.message.admin.common.extractor;
 
 import java.io.StringReader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -37,36 +39,36 @@ import org.xml.sax.InputSource;
 public class KeyExtractorUtil {
 
     private static final Logger log = Logger.getLogger(KeyExtractorUtil.class.getName());
+    private String hash;
     private Map<String, List<XPathExpression>> expressions;
 
-    public KeyExtractorUtil(List<MetadataField> searchKeys) {
+    public KeyExtractorUtil(List<MetadataField> searchKeys, String argHash) {
         expressions = new HashMap<String, List<XPathExpression>>();
+        hash = argHash;
 
         XPath xpath = XPathFactory.newInstance().newXPath();
         for (MetadataField searchKey : searchKeys) {
 
             for (MetadataField path : searchKey.getChildren()) {
-                Map<String, List<XPathExpression>> expressionMap = null;
                 if (path.getType() == MetadataType.XPATH) {
-                    expressionMap = expressions;
-                }
-
-                if (expressionMap != null) {
-                    if (!expressionMap.containsKey(searchKey.getValue())) {
-                        expressionMap.put(searchKey.getValue(), new LinkedList<XPathExpression>());
+                    if (!expressions.containsKey(searchKey.getValue())) {
+                        expressions.put(searchKey.getValue(), new LinkedList<XPathExpression>());
                     }
                     XPathExpression expr;
                     try {
                         expr = xpath.compile(path.getValue());
-                        expressionMap.get(searchKey.getValue()).add(expr);
+                        expressions.get(searchKey.getValue()).add(expr);
                         log.info("adding key:" + searchKey.getValue() + " with path:" + path.getValue());
                     } catch (XPathExpressionException e) {
                         log.warning("XPATH: " + path.getValue() + " is invalid. Ignoring it!");
                     }
                 }
-
             }
         }
+    }
+
+    public String getHash() {
+        return hash;
     }
 
     private void addToMap(Map<String, List<String>> keysMap, String key, String value) {

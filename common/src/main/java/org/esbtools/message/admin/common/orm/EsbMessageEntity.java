@@ -12,6 +12,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -74,7 +75,8 @@ public class EsbMessageEntity implements Serializable {
     @Column(name = "occurrence_count")
     private Integer occurrenceCount;
 
-    @Column(name="payload")
+    @Lob
+    @Column(columnDefinition="TEXT")
     private String payload;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage") //,fetch=FetchType.LAZY

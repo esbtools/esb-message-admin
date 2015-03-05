@@ -11,6 +11,8 @@
 package org.esbtools.message.admin.common.dao;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
@@ -24,7 +26,7 @@ public interface EsbErrorDAO {
     /**
      * Creates a new EsbError entity
      */
-    public void create(EsbMessageEntity ee, KeyExtractorUtil searchKeys);
+    public void create(EsbMessageEntity ee, Map<String, List<String>> extractedHeaders);
 
     /**
      * Returns error message of the given queue
