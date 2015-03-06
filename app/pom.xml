@@ -62,7 +62,7 @@
         </dependency>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
-            <artifactId>esb-message-admin-service</artifactId>
+            <artifactId>esb-message-admin-common</artifactId>
             <version>0.1.4-SNAPSHOT</version>
         </dependency>
     </dependencies>
