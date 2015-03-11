@@ -10,12 +10,12 @@
  */
 package org.esbtools.message.admin.common.dao;
 
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -30,6 +30,8 @@ import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.HeaderType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
 public class EsbErrorDAOImpl implements EsbErrorDAO {
@@ -39,10 +41,15 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
-    List<String> sortingFields;
-    public EsbErrorDAOImpl(EntityManager mgr, Properties config) {
+    Set<String> sortingFields = new HashSet<>();
+    public EsbErrorDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
-        sortingFields = Arrays.asList(config.getProperty("sortingFields").split("\\s*,\\s*"));
+        JSONArray sortFields = (JSONArray) config.get("sortingFields");
+        if(sortFields!=null) {
+            for(int i=0;i<sortFields.size();i++) {
+                sortingFields.add(sortFields.get(i).toString());
+            }
+        }
     }
 
     /**

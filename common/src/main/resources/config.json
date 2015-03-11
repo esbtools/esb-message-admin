@@ -1,0 +1,16 @@
+{
+	"suggestedFields":[
+		"SourceSystem",
+		"ErrorSystem",
+		"MessageType",
+		"SourceQueue"
+	],
+	"sortingFields":[
+		"id",
+		"timestamp",
+		"messageType",
+		"sourceSystem",
+		"errorSystem",
+		"occurrenceCount"
+	]
+}

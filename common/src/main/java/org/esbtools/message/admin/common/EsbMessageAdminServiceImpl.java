@@ -2,6 +2,7 @@ package org.esbtools.message.admin.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 import org.esbtools.message.admin.model.audit.AuditEvent;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -38,7 +41,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private EntityManager entityMgr;
 
     private final static Logger log = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
-    private Properties config;
+    private JSONObject config;
 
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
@@ -47,9 +50,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     {
         try {
-            config = new Properties();
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.properties");
-            config.load(in);
+            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.json");
+            JSONParser parser = new JSONParser();
+            config = (JSONObject) parser.parse(new InputStreamReader(in));
             in.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
