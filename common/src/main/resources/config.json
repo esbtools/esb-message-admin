@@ -12,5 +12,14 @@
 		"sourceSystem",
 		"errorSystem",
 		"occurrenceCount"
+	],
+	"nonViewableMessages":[
+		{
+			"messageType":"EntityOne",
+			"sourceSystem":"SourceSystemOne",
+		}
+		{
+			"sourceSystem":"SourceSystemTwo"
+		}
 	]
 }

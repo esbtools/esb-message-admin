@@ -12,6 +12,8 @@ package org.esbtools.message.admin.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
@@ -19,6 +21,8 @@ import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.MetadataField;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
 /**
@@ -102,6 +106,20 @@ public class ConversionUtility {
         }
         return esbMessage;
     }
+
+   public static List<List<String>> getCriteria(JSONArray matchCriteria) {
+
+       List<List<String>> result = new ArrayList<>();
+       for(int i=0; i<matchCriteria.size(); i++) {
+           List<String> criterion = new ArrayList<String>();
+           JSONObject matchCritierion = (JSONObject) matchCriteria.get(i);
+           for(Entry<String,String> entry : (Set<Entry<String,String>>)matchCritierion.entrySet()) {
+               criterion.add(entry.toString().toLowerCase());
+           }
+           result.add(criterion);
+       }
+       return result;
+   }
 
    public static List<EsbMessageEntity> convertFromEsbMessageArray(EsbMessage[] esbMessages) {
 

@@ -103,6 +103,84 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
+    public void testFetchPayload() {
+        EsbMessage esbMessage = createTestMessage(12, 0);
+        esbMessage.setPayload("<Payload>Payload</Payload>");
+        esbMessage.setSourceSystem("SourceSystem12");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
+        Criterion[] c1 = {new Criterion(SearchField.sourceSystem, "SourceSystem12")};
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCriteria(c1);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+
+        Assert.assertEquals(1, result.getMessages().length);
+        Assert.assertEquals("SourceSystem12",result.getMessages()[0].getSourceSystem());
+        Assert.assertNull(result.getMessages()[0].getPayload());
+
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("SourceSystem12",result.getMessages()[0].getSourceSystem());
+        Assert.assertEquals("<Payload>Payload</Payload>",result.getMessages()[0].getPayload());
+    }
+
+
+    @Test
+    public void testHiddenPayload() {
+        EsbMessage esbMessage = createTestMessage(14, 0);
+        esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
+        esbMessage.setSourceSystem("SourceSystemTwo");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
+        SearchCriteria criteria = new SearchCriteria();
+        Criterion[] c1 = {new Criterion(SearchField.sourceSystem, "SourceSystemTwo")};
+        criteria.setCriteria(c1);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+
+        // if the match criterion has just one condition, and the message satisfies it, payload should be hidden
+        Assert.assertEquals(1, result.getMessages().length);
+        Assert.assertEquals("SourceSystemTwo",result.getMessages()[0].getSourceSystem());
+        Assert.assertNull(result.getMessages()[0].getPayload());
+
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("SourceSystemTwo",result.getMessages()[0].getSourceSystem());
+        Assert.assertEquals("Payload has been hidden",result.getMessages()[0].getPayload());
+
+        // if the match criterion has more than one condition, and the message satisfies only some of the conditions, payload should NOT be hidden
+        esbMessage.setSourceSystem("SourceSystemOne");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Criterion[] c2 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne")};
+        criteria.setCriteria(c2);
+        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("<Payload>NotHiddenPayload</Payload>",result.getMessages()[0].getPayload());
+
+        // if the match criterion has more than one condition, and the message satisfies ALL of the conditions, payload should be hidden
+        esbMessage.setMessageType("EntityOne");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Criterion[] c3 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne"),new Criterion(SearchField.messageType, "EntityOne")};
+        criteria.setCriteria(c3);
+        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("Payload has been hidden",result.getMessages()[0].getPayload());
+    }
+
+    @Test
     public void testSorting() {
         EsbMessage esbMessage0 = createTestMessage(9, 0);
         EsbMessage esbMessage1 = createTestMessage(9, 0);

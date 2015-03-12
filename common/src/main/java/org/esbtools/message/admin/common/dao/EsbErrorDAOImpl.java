@@ -40,8 +40,10 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
+    private static final String payloadHiddenText = "Payload has been hidden";
 
-    Set<String> sortingFields = new HashSet<>();
+    private Set<String> sortingFields = new HashSet<>();
+    private List<List<String>> nonViewableCriteria = null;
     public EsbErrorDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
         JSONArray sortFields = (JSONArray) config.get("sortingFields");
@@ -50,6 +52,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 sortingFields.add(sortFields.get(i).toString());
             }
         }
+        nonViewableCriteria = ConversionUtility.getCriteria((JSONArray) config.get("nonViewableMessages"));
     }
 
     /**
@@ -192,9 +195,29 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
+            if(matchesCriteria(messageArray[0], nonViewableCriteria)) {
+                messageArray[0].setPayload(payloadHiddenText);
+            }
             result.setMessages(messageArray);
         }
         return result;
+    }
+
+    private boolean matchesCriteria(EsbMessage message, List<List<String>> criteria) {
+        String messageString = message.toString().toLowerCase();
+        for(List<String> criterion: criteria) {
+            boolean matched = true;
+            for(String matchCondition: criterion) {
+                if(!messageString.contains(matchCondition)) {
+                    matched = false;
+                    break;
+                }
+            }
+            if(matched) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<EsbMessageEntity> getMessagesByPayloadHash(String payloadHash) {
