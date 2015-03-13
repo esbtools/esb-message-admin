@@ -1,0 +1,25 @@
+{
+	"suggestedFields":[
+		"SourceSystem",
+		"ErrorSystem",
+		"MessageType",
+		"SourceQueue"
+	],
+	"sortingFields":[
+		"id",
+		"timestamp",
+		"messageType",
+		"sourceSystem",
+		"errorSystem",
+		"occurrenceCount"
+	],
+	"nonViewableMessages":[
+		{
+			"messageType":"EntityOne",
+			"sourceSystem":"SourceSystemOne",
+		}
+		{
+			"sourceSystem":"SourceSystemTwo"
+		}
+	]
+}

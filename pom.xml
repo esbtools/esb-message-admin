@@ -140,6 +140,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <artifactId>joda-time</artifactId>
                 <version>2.7</version>
             </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>1.1.1</version>
+	    </dependency>
 
             <!-- Test dependencies -->
             <dependency>

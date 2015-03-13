@@ -10,12 +10,12 @@
  */
 package org.esbtools.message.admin.common.dao;
 
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -30,6 +30,8 @@ import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.HeaderType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
 public class EsbErrorDAOImpl implements EsbErrorDAO {
@@ -38,11 +40,19 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
+    private static final String payloadHiddenText = "Payload has been hidden";
 
-    List<String> sortingFields;
-    public EsbErrorDAOImpl(EntityManager mgr, Properties config) {
+    private Set<String> sortingFields = new HashSet<>();
+    private List<List<String>> nonViewableCriteria = null;
+    public EsbErrorDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
-        sortingFields = Arrays.asList(config.getProperty("sortingFields").split("\\s*,\\s*"));
+        JSONArray sortFields = (JSONArray) config.get("sortingFields");
+        if(sortFields!=null) {
+            for(int i=0;i<sortFields.size();i++) {
+                sortingFields.add(sortFields.get(i).toString());
+            }
+        }
+        nonViewableCriteria = ConversionUtility.getCriteria((JSONArray) config.get("nonViewableMessages"));
     }
 
     /**
@@ -185,9 +195,29 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
+            if(matchesCriteria(messageArray[0], nonViewableCriteria)) {
+                messageArray[0].setPayload(payloadHiddenText);
+            }
             result.setMessages(messageArray);
         }
         return result;
+    }
+
+    private boolean matchesCriteria(EsbMessage message, List<List<String>> criteria) {
+        String messageString = message.toString().toLowerCase();
+        for(List<String> criterion: criteria) {
+            boolean matched = true;
+            for(String matchCondition: criterion) {
+                if(!messageString.contains(matchCondition)) {
+                    matched = false;
+                    break;
+                }
+            }
+            if(matched) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<EsbMessageEntity> getMessagesByPayloadHash(String payloadHash) {

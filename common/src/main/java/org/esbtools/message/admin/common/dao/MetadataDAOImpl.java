@@ -11,12 +11,10 @@
 package org.esbtools.message.admin.common.dao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -29,6 +27,8 @@ import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class MetadataDAOImpl implements MetadataDAO {
 
@@ -37,11 +37,16 @@ public class MetadataDAOImpl implements MetadataDAO {
     private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
 
-    private Set<String> suggestedFields;
+    private Set<String> suggestedFields = new HashSet<>();
 
-    public MetadataDAOImpl(EntityManager mgr, Properties config) {
+    public MetadataDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
-        suggestedFields = new HashSet<String>(Arrays.asList(config.getProperty("headersWithSuggestedValues").split(",")));
+        JSONArray suggestConfigs = (JSONArray) config.get("suggestedFields");
+        if(suggestConfigs!=null) {
+            for(int i=0;i<suggestConfigs.size();i++) {
+                suggestedFields.add(suggestConfigs.get(i).toString());
+            }
+        }
     }
 
     private String getMetadataHash(MetadataType type) {
