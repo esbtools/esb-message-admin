@@ -138,6 +138,14 @@ public class KeyResourceBean {
                                @PathParam("system") String system,
                                @PathParam("key") String key,
                                @QueryParam("values") String values) {
+
+        if(entity!=null && entity.length()>0 &&
+           system!=null && system.length()>0 &&
+           key!=null && key.length()>0 &&
+           values!=null && values.length()>0) {
+           String valueArray[] = values.split(",");
+           client.get().sync(entity, system, key, valueArray);
+        }
     }
 
     @GET

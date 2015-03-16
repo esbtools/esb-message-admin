@@ -489,7 +489,14 @@ esbMessageAdminControllers.controller('SyncCtrl', ['$scope', '$rootScope', 'EsbM
     };
 
     $scope.sync = function() {
-        alert("create sync req:"+$scope.syncEntity.value+" "+$scope.syncSystem.value+" "+$scope.syncKey.value+" "+$scope.syncValues);
+
+        var values = '';
+        for (var value in $scope.syncValues) {
+            values+=$scope.syncValues[value]+",";
+        }
+        EsbMessageService.sync($scope.syncEntity.value, $scope.syncSystem.value, $scope.syncKey.value, values).then(function(response){
+            alert("successfull!");
+        });
     };
 
     $scope.entityChange = function() {

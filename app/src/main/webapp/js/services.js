@@ -82,4 +82,11 @@ esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', 
             // todo error handling
     };
 
+    self.sync = function(argEntity, argSystem, argKey, argValues) {
+        return $http({method: 'POST', url: "api/key/sync/{entity}/{system}/{key}?values={values}".
+            supplant({entity: argEntity, system: argSystem, key: argKey, values: argValues })}).
+            then(function(results) {
+                return results;
+            });
+    };
 }]);

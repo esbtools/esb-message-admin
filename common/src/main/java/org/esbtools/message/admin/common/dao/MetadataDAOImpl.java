@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -291,8 +292,23 @@ public class MetadataDAOImpl implements MetadataDAO {
 
     @Override
     public void sync(String entity, String system, String key, String... values) {
-        // TODO Auto-generated method stub
 
+        // create JMS Payload
+        StringBuilder message = new StringBuilder("");
+        message.append("<SyncRequest><EntityName>");
+        message.append(entity);
+        message.append("</EntityName><KeyName>");
+        message.append(key);
+        message.append("</KeyName>");
+        for(String value: values) {
+            if(value!=null && value.length()>0) {
+                message.append("<KeyValue>");
+                message.append(value);
+                message.append("</KeyValue>");
+            }
+        }
+        message.append("</SyncRequest>");
+        log.log(Level.INFO, message.toString());
     }
 
     @Override
