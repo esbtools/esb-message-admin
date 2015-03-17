@@ -134,7 +134,7 @@ public class KeyResourceBean {
     @POST
     @Path("/sync/{entity}/{system}/{key}")
     @Produces({MediaType.APPLICATION_JSON})
-    public void sync(@PathParam("entity") String entity,
+    public MetadataResponse sync(@PathParam("entity") String entity,
                                @PathParam("system") String system,
                                @PathParam("key") String key,
                                @QueryParam("values") String values) {
@@ -144,8 +144,9 @@ public class KeyResourceBean {
            key!=null && key.length()>0 &&
            values!=null && values.length()>0) {
            String valueArray[] = values.split(",");
-           client.get().sync(entity, system, key, valueArray);
+           return client.get().sync(entity, system, key, valueArray);
         }
+        return null;
     }
 
     @GET

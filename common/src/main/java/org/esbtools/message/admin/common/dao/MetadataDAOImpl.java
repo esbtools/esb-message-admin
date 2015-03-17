@@ -10,6 +10,11 @@
  */
 package org.esbtools.message.admin.common.dao;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,6 +44,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
 
     private Set<String> suggestedFields = new HashSet<>();
+    private List<String> resyncRestEndpoints = new ArrayList<>();
 
     public MetadataDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
@@ -46,6 +52,12 @@ public class MetadataDAOImpl implements MetadataDAO {
         if(suggestConfigs!=null) {
             for(int i=0;i<suggestConfigs.size();i++) {
                 suggestedFields.add(suggestConfigs.get(i).toString());
+            }
+        }
+        JSONArray resyncEndPoints = (JSONArray) config.get("resyncRestEndpoints");
+        if(resyncEndPoints!=null) {
+            for(Object endPoint: resyncEndPoints) {
+                resyncRestEndpoints.add(endPoint.toString());
             }
         }
     }
@@ -291,10 +303,11 @@ public class MetadataDAOImpl implements MetadataDAO {
     }
 
     @Override
-    public void sync(String entity, String system, String key, String... values) {
+    public MetadataResponse sync(String entity, String system, String key, String... values) {
 
+        MetadataResponse result = new MetadataResponse();
         // create JMS Payload
-        StringBuilder message = new StringBuilder("");
+        StringBuilder message = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         message.append("<SyncRequest><EntityName>");
         message.append(entity);
         message.append("</EntityName><KeyName>");
@@ -308,7 +321,37 @@ public class MetadataDAOImpl implements MetadataDAO {
             }
         }
         message.append("</SyncRequest>");
-        log.log(Level.INFO, message.toString());
+        log.log(Level.INFO, "Initiating sync request:"+message.toString());
+
+        boolean foundActiveHost = false;
+        for(String restEndPoint: resyncRestEndpoints) {
+
+            try {
+                URL url = new URL(restEndPoint);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/xml");
+                OutputStream os = conn.getOutputStream();
+                os.write(message.toString().getBytes());
+                os.flush();
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    foundActiveHost = true;
+                    break;
+                } else {
+                    log.warning("unable to send resync message to:"+restEndPoint);
+                }
+                conn.disconnect();
+            } catch (MalformedURLException e) {
+                result.setErrorMessage(e.getMessage());
+            } catch (IOException e) {
+                result.setErrorMessage(e.getMessage());
+            }
+        }
+        if(!foundActiveHost && result.getStatus()==MetadataResponse.Status.Success) {
+            result.setErrorMessage("Unable to resync message");
+        }
+        return result;
     }
 
     @Override

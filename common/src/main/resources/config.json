@@ -21,5 +21,10 @@
 		{
 			"sourceSystem":"SourceSystemTwo"
 		}
+	],
+	"resyncRestEndpoints":[
+		"https://localhost/emagateway/resync",
+		"https://anotherhost/blah",
+		"https://anotherhost2/resynch"
 	]
 }
