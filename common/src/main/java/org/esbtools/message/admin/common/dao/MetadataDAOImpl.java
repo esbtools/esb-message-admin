@@ -60,6 +60,9 @@ public class MetadataDAOImpl implements MetadataDAO {
                 resyncRestEndpoints.add(endPoint.toString());
             }
         }
+        if(resyncRestEndpoints.size()<1) {
+            throw new IllegalStateException("at least one resync rest end point needs to be configured");
+        }
     }
 
     private String getMetadataHash(MetadataType type) {
@@ -305,7 +308,6 @@ public class MetadataDAOImpl implements MetadataDAO {
     @Override
     public MetadataResponse sync(String entity, String system, String key, String... values) {
 
-        MetadataResponse result = new MetadataResponse();
         // create JMS Payload
         StringBuilder message = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         message.append("<SyncRequest><EntityName>");
@@ -336,22 +338,22 @@ public class MetadataDAOImpl implements MetadataDAO {
                 os.write(message.toString().getBytes());
                 os.flush();
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    foundActiveHost = true;
-                    break;
+                    // status is Success by default
+                    return new MetadataResponse();
                 } else {
+                    // try another host
                     log.warning("unable to send resync message, recieved Http response code:"+
                             conn.getResponseCode()+ " response message:"+conn.getResponseMessage()+" from:"+restEndPoint);
                 }
                 conn.disconnect();
             } catch (MalformedURLException e) {
-                result.setErrorMessage(e.getMessage());
+                log.severe(e.getMessage());
             } catch (IOException e) {
-                result.setErrorMessage(e.getMessage());
+                log.severe(e.getMessage());
             }
         }
-        if(!foundActiveHost && result.getStatus()==MetadataResponse.Status.Success) {
-            result.setErrorMessage("Unable to resync message");
-        }
+        MetadataResponse result = new MetadataResponse();
+        result.setErrorMessage("Unable to resync message");
         return result;
     }
 
