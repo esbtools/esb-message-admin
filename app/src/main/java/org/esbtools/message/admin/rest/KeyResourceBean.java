@@ -37,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -139,10 +140,10 @@ public class KeyResourceBean {
                                @PathParam("key") String key,
                                @QueryParam("values") String values) {
 
-        if(entity!=null && entity.length()>0 &&
-           system!=null && system.length()>0 &&
-           key!=null && key.length()>0 &&
-           values!=null && values.length()>0) {
+        if(!StringUtils.isBlank(entity) &&
+           !StringUtils.isBlank(system) &&
+           !StringUtils.isBlank(key) &&
+           !StringUtils.isBlank(values)) {
            String valueArray[] = values.split(",");
            return client.get().sync(entity, system, key, valueArray);
         }
