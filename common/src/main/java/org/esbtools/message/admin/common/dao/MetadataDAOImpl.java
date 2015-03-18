@@ -339,7 +339,8 @@ public class MetadataDAOImpl implements MetadataDAO {
                     foundActiveHost = true;
                     break;
                 } else {
-                    log.warning("unable to send resync message to:"+restEndPoint);
+                    log.warning("unable to send resync message, recieved Http response code:"+
+                            conn.getResponseCode()+ " response message:"+conn.getResponseMessage()+" from:"+restEndPoint);
                 }
                 conn.disconnect();
             } catch (MalformedURLException e) {
