@@ -312,7 +312,9 @@ public class MetadataDAOImpl implements MetadataDAO {
         StringBuilder message = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         message.append("<SyncRequest><EntityName>");
         message.append(entity);
-        message.append("</EntityName><KeyName>");
+        message.append("</EntityName><System>");
+        message.append(system);
+        message.append("</System><KeyName>");
         message.append(key);
         message.append("</KeyName>");
         for(String value: values) {
