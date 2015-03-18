@@ -140,10 +140,10 @@ public class KeyResourceBean {
                                @PathParam("key") String key,
                                @QueryParam("values") String values) {
 
-        if(!StringUtils.isBlank(entity) &&
-           !StringUtils.isBlank(system) &&
-           !StringUtils.isBlank(key) &&
-           !StringUtils.isBlank(values)) {
+        if(StringUtils.isNotBlank(entity) &&
+           StringUtils.isNotBlank(system) &&
+           StringUtils.isNotBlank(key) &&
+           StringUtils.isNotBlank(values)) {
            String valueArray[] = values.split(",");
            return client.get().sync(entity, system, key, valueArray);
         }
