@@ -5,7 +5,7 @@ jdk:
 before_install:
 - cp ./settings.xml ~/.m2/
 script:
-    - mvn -B clean verify
+- mvn -B clean verify
 after_success:
 - '[[ $TRAVIS_BRANCH == "master" ]] && [[ $TRAVIS_JDK_VERSION == "openjdk7" ]] ;'
 after_script:
@@ -16,7 +16,7 @@ notifications:
     channels:
     - chat.freenode.net#esbmessageadmin
     on_success: always
-#env:
-#  global:
-#  - secure: <blah>
-#  - secure: <blah>
+env:
+  global:
+  - secure: M+N9Fy8owbwaS9iYRSZ91RWzDiA326DmxdCmXYTYt4hIUkZlAqRP01lz5ATqYBSrRodJZpXAIKoCVr3335N0LPaXFa71X/cQJhkM4Ytns6sGn7fnewqSWd1SGHaIjoDnnWDU2+JkirrBs778wGX/Tk/HNiyUGAoh9DDPZQbTFJA=
+  - secure: dKSFflfxDhgvs2KtmhDqjN+PB+NnAM58ZJUDnc9UGUpVW0gmYz0k3Jf8XstT6A3tFVxIzAsdhygWSpwJB7SDmR+/risgGVE2eD7pm+ejv0sE/921cT+hyBEBq2UoZLmnhgzTvuxy3DwhANi6/MtiVOx8ok6wu/luNGcwIxHj5Tc=
