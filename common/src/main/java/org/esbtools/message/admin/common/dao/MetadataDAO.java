@@ -48,7 +48,7 @@ public interface MetadataDAO {
     /**
      * sync an entity by enqueuing a JMS request
      */
-    public void sync(String entity, String system, String key, String... values);
+    public MetadataResponse sync(String entity, String system, String key, String... values);
 
     /*
      * ensure all new suggestions are set for specific keys

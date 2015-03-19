@@ -37,6 +37,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.lang3.StringUtils;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -134,10 +135,19 @@ public class KeyResourceBean {
     @POST
     @Path("/sync/{entity}/{system}/{key}")
     @Produces({MediaType.APPLICATION_JSON})
-    public void sync(@PathParam("entity") String entity,
+    public MetadataResponse sync(@PathParam("entity") String entity,
                                @PathParam("system") String system,
                                @PathParam("key") String key,
                                @QueryParam("values") String values) {
+
+        if(StringUtils.isNotBlank(entity) &&
+           StringUtils.isNotBlank(system) &&
+           StringUtils.isNotBlank(key) &&
+           StringUtils.isNotBlank(values)) {
+           String valueArray[] = values.split(",");
+           return client.get().sync(entity, system, key, valueArray);
+        }
+        return null;
     }
 
     @GET

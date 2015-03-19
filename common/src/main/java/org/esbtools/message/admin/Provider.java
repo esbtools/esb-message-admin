@@ -90,6 +90,6 @@ public interface Provider {
      * @param key               the key name using which to sync
      * @param values            the values of the key
      */
-    public void sync(String entity, String system, String key, String... values);
+    public MetadataResponse sync(String entity, String system, String key, String... values);
 
 }

@@ -10,6 +10,11 @@
  */
 package org.esbtools.message.admin.common.dao;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -38,6 +44,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
 
     private Set<String> suggestedFields = new HashSet<>();
+    private List<String> resyncRestEndpoints = new ArrayList<>();
 
     public MetadataDAOImpl(EntityManager mgr, JSONObject config) {
         this.mgr=mgr;
@@ -46,6 +53,15 @@ public class MetadataDAOImpl implements MetadataDAO {
             for(int i=0;i<suggestConfigs.size();i++) {
                 suggestedFields.add(suggestConfigs.get(i).toString());
             }
+        }
+        JSONArray resyncEndPoints = (JSONArray) config.get("resyncRestEndpoints");
+        if(resyncEndPoints!=null) {
+            for(Object endPoint: resyncEndPoints) {
+                resyncRestEndpoints.add(endPoint.toString());
+            }
+        }
+        if(resyncRestEndpoints.size()<1) {
+            throw new IllegalStateException("at least one resync rest end point needs to be configured");
         }
     }
 
@@ -290,9 +306,57 @@ public class MetadataDAOImpl implements MetadataDAO {
     }
 
     @Override
-    public void sync(String entity, String system, String key, String... values) {
-        // TODO Auto-generated method stub
+    public MetadataResponse sync(String entity, String system, String key, String... values) {
 
+        // create JMS Payload
+        StringBuilder message = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        message.append("<SyncRequest><EntityName>");
+        message.append(entity);
+        message.append("</EntityName><System>");
+        message.append(system);
+        message.append("</System><KeyName>");
+        message.append(key);
+        message.append("</KeyName>");
+        for(String value: values) {
+            if(value!=null && value.length()>0) {
+                message.append("<KeyValue>");
+                message.append(value);
+                message.append("</KeyValue>");
+            }
+        }
+        message.append("</SyncRequest>");
+        log.log(Level.INFO, "Initiating sync request:"+message.toString());
+
+        boolean foundActiveHost = false;
+        for(String restEndPoint: resyncRestEndpoints) {
+
+            try {
+                URL url = new URL(restEndPoint);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setDoOutput(true);
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/xml");
+                OutputStream os = conn.getOutputStream();
+                os.write(message.toString().getBytes());
+                os.flush();
+                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                    // status is Success by default
+                    return new MetadataResponse();
+                } else {
+                    // try another host
+                    log.warning("unable to send resync message, recieved Http response code:"+
+                            conn.getResponseCode()+ " response message:"+conn.getResponseMessage()+" from:"+restEndPoint);
+                }
+                conn.disconnect();
+            } catch (MalformedURLException e) {
+                log.severe(e.getMessage());
+            } catch (IOException e) {
+                log.severe(e.getMessage());
+            }
+        }
+        MetadataResponse result = new MetadataResponse();
+        result.setErrorMessage("Unable to resync message");
+        return result;
     }
 
     @Override

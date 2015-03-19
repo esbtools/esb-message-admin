@@ -159,8 +159,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     @Override
-    public void sync(String entity, String system, String key, String... values) {
-        // TODO Auto-generated method stub
+    public MetadataResponse sync(String entity, String system, String key, String... values) {
+        return getMetadataDAO().sync(entity, system, key, values);
 
     }
 

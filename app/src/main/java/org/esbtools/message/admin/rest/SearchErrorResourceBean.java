@@ -41,6 +41,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
+import org.apache.commons.lang3.StringUtils;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.SearchCriteria;
@@ -98,7 +99,7 @@ public class SearchErrorResourceBean {
                                             @QueryParam("start") Integer start,
                                             @QueryParam("results") Integer maxResults) {
         SearchCriteria criteria = getCriteria(argCriteria);
-        if(sortField==null || sortField.isEmpty()) {
+        if(StringUtils.isBlank(sortField)) {
             sortField = "timestamp";
         }
         if(sortAsc==null) {
