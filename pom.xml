@@ -34,10 +34,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         </license>
     </licenses>
     <scm>
-        <connection></connection>
-        <developerConnection></developerConnection>
-        <url></url>
+        <connection>scm:git:https://github.com/esbtools/esb-message-admin.git</connection>
+        <developerConnection>scm:git:git@github.com:esbtools/esb-message-admin.git</developerConnection>
+        <url>https://github.com/esbtools/esb-message-admin</url>
+      <tag>HEAD</tag>
     </scm>
+    <distributionManagement>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
     <developers>
         <developer>
             <id>ykoer</id>
