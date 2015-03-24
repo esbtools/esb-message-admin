@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.esbtools.message.admin</groupId>
+        <artifactId>esb-message-admin-pom</artifactId>
+        <version>0.1.4-SNAPSHOT</version>
+    </parent>
+    <groupId>org.esbtools.message.admin</groupId>
+    <artifactId>esb-message-admin-api</artifactId>
+    <version>0.1.4-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
+    <licenses>
+        <license>
+            <name>GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection></connection>
+        <developerConnection></developerConnection>
+        <url></url>
+        <tag></tag>
+    </scm>
+    <distributionManagement></distributionManagement>
+</project>
