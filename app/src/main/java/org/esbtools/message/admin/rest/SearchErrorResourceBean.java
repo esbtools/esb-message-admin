@@ -1,7 +1,7 @@
 /*
- Copyright 2014 Red Hat, Inc. and/or its affiliates.
+ Copyright 2015 esbtools Contributors and/or its affiliates.
 
- This file is part of ESB Message Admin.
+ This file is part of esbtools.
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

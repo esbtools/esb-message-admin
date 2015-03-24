@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--
-Copyright 2013 Red Hat, Inc. and/or its affiliates.
-
-This file is part of ESB MESSAGE ADMIN.
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
         <groupId>org.sonatype.oss</groupId>
@@ -193,13 +175,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <hsqldb.version>2.2.8</hsqldb.version>
         <entitymanager.version>4.2.2.Final</entitymanager.version>
         <jackson.version>2.4.4</jackson.version>
-        
+
         <sonar.exclusions>**/*Test.java,**/*Exception.java</sonar.exclusions>
-        <sonar.jdbc.url>jdbc:mysql://127.0.0.1:3306/sonar?useUnicode=true&amp;characterEncoding=utf8&amp;rewriteBatchedStatements=true</sonar.jdbc.url>
+        <sonar.jdbc.url>jdbc:postgresql://127.0.0.1:5432/sonar?useUnicode=true&amp;characterEncoding=utf8&amp;rewriteBatchedStatements=true</sonar.jdbc.url>
         <sonar.jdbc.username>sonar</sonar.jdbc.username>
         <sonar.jdbc.password>sonar</sonar.jdbc.password>
         <sonar.host.url>http://127.0.0.1:8080</sonar.host.url>
-        <sonar.projectName>lightblue-rest</sonar.projectName>
+        <sonar.projectName>esb-message-admin</sonar.projectName>
         <rpm.install.basedir>/usr/share/jbossas/standalone/deployments</rpm.install.basedir>
 
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
@@ -209,15 +191,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </properties>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
+						<plugin>
+								<groupId>org.apache.maven.plugins</groupId>
+								<artifactId>maven-compiler-plugin</artifactId>
+								<version>2.3.2</version>
+								<configuration>
+										<source>1.7</source>
+										<target>1.7</target>
+								</configuration>
+						</plugin>
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
