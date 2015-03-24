@@ -164,6 +164,7 @@
     </dependencyManagement>
 
     <modules>
+        <module>api</module>
         <module>common</module>
         <module>app</module>
         <module>rest-save</module>
