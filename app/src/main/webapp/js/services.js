@@ -1,6 +1,6 @@
 var esbMessageAdminServices = angular.module('esbMessageAdminServices', []);
 
-esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', '$log', '$filter', function($http, $q, Globals, $log, $filter) {
+esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', '$log', '$filter', 'messageCenterService', function($http, $q, Globals, $log, $filter, messageCenterService) {
 
     var self = this;
 
@@ -42,51 +42,84 @@ esbMessageAdminServices.service('EsbMessageService', ['$http', '$q', 'Globals', 
     };
 
     self.getSyncKeysTree = function() {
-        return $http({method: 'GET', url: "api/key/tree/Entities"});
+        return self.getTree("Entities");
     };
 
     self.getSearchKeysTree = function() {
-        return $http({method: 'GET', url: "api/key/tree/SearchKeys"});
+        return self.getTree("SearchKeys");
+    };
+
+    self.respondSuccess = function(argResponse) {
+        if(argResponse.status==="Success") {
+            return argResponse.tree;
+        } else {
+            messageCenterService.add('danger', argResponse.errorMessage, {status: messageCenterService.status.permanent});
+            return null;
+        }
+    }
+
+    self.respondError= function()  {
+        messageCenterService.add('danger', 'Unable to contact server!', {status: messageCenterService.status.permanent});
+        return null;
+    }
+
+    self.getTree = function(argType) {
+        return $http.get("api/key/tree/"+argType).
+        success(function(response){
+            self.respondSuccess(response);
+        }).
+        error(function(){
+            self.respondError();
+        });
     };
 
     self.addKey = function(argParentId, argName, argType, argValue) {
 
-        return $http({method: 'PUT', url: "api/key/addChild/{parentId}?name={name}&type={type}&value={value}".
-            supplant({parentId: argParentId, name: argName, type: argType, value: argValue })}).
-            then(function(results) {
-
-                return results;
+        return $http.put("api/key/addChild/{parentId}?name={name}&type={type}&value={value}".
+            supplant({parentId: argParentId, name: argName, type: argType, value: argValue })).
+            success(function(response) {
+                self.respondSuccess(response);
+            }).
+            error(function(){
+                self.respondError();
             });
-            // todo error handling
     };
 
     self.updateKey = function(argId, argName, argType, argValue) {
 
-        return $http({method: 'PUT', url: "api/key/update/{id}?name={name}&type={type}&value={value}".
-            supplant({id: argId, name: argName, type: argType, value: argValue })}).
-            then(function(results) {
-
-                return results;
+        return $http.put("api/key/update/{id}?name={name}&type={type}&value={value}".
+            supplant({id: argId, name: argName, type: argType, value: argValue })).
+            success(function(response) {
+                self.respondSuccess(response);
+            }).
+            error(function(){
+                self.respondError();
             });
-            // todo error handling
     };
 
     self.deleteKey = function(argId) {
 
-        return $http({method: 'PUT', url: "api/key/delete/{id}".
-            supplant({id: argId })}).
-            then(function(results) {
-
-                return results;
+        return $http.put("api/key/delete/{id}".
+            supplant({id: argId })).
+            success(function(response) {
+                self.respondSuccess(response);
+            }).
+            error(function(){
+                self.respondError();
             });
-            // todo error handling
     };
 
     self.sync = function(argEntity, argSystem, argKey, argValues) {
         return $http({method: 'POST', url: "api/key/sync/{entity}/{system}/{key}?values={values}".
             supplant({entity: argEntity, system: argSystem, key: argKey, values: argValues })}).
             then(function(results) {
-                return results;
+                if(results.data.status==="Success") {
+                    messageCenterService.add('success', 'Sync was triggered succesfully!', { timeout: 3000 });
+                } else {
+                    messageCenterService.add('danger', response.data.errorMessage, {status: messageCenterService.status.permanent});
+                }
+            }, function(err) {
+                self.respondError();
             });
     };
 }]);

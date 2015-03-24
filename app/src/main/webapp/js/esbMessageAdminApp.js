@@ -1,4 +1,4 @@
-var esbMessageAdminApp = angular.module('esbMessageAdminApp', ['ui.bootstrap', 'ngRoute', 'ngGrid', 'esbMessageAdminControllers', 'esbMessageAdminServices', 'angucomplete', 'angular-loading-bar', 'ngQuickDate']);
+var esbMessageAdminApp = angular.module('esbMessageAdminApp', ['ui.bootstrap', 'ngRoute', 'ngGrid', 'esbMessageAdminControllers', 'esbMessageAdminServices', 'angucomplete', 'angular-loading-bar', 'ngQuickDate', 'MessageCenterModule']);
 
 esbMessageAdminApp.config(['$routeProvider',
   function($routeProvider) {
