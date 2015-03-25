@@ -45,6 +45,10 @@ div#details {
   height:500px
 }
 
+div#messageCenter {
+  margin-top: 80px;
+}
+
 textarea.payload {
   width: 100%;
   height: 430px;
