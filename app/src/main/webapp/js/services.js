@@ -129,7 +129,7 @@ esbMessageAdminServices
                             self.addKey = function(argParentId, argName,
                                     argType, argValue) {
 
-                                return $http.put(
+                                return $http.post(
                                         "api/key/addChild/{parentId}?name={name}&type={type}&value={value}"
                                                 .supplant({
                                                     parentId : argParentId,
@@ -162,8 +162,8 @@ esbMessageAdminServices
 
                             self.deleteKey = function(argId) {
 
-                                return $http.put(
-                                        "api/key/delete/{id}".supplant({
+                                return $http.delete(
+                                        "api/key/{id}".supplant({
                                             id : argId
                                         })).success(function(response) {
                                     self.respondSuccess(response);

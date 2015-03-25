@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -83,7 +84,7 @@ public class KeyResourceBean {
      * @param value             the value of the child
      * @return MetadataResult   the entire keys tree and the parent field
      */
-    @PUT
+    @POST
     @Path("/addChild/{parent_id}")
     @Produces({MediaType.APPLICATION_JSON})
     public MetadataResponse addChild(@PathParam("parent_id") Long parentId,
@@ -117,8 +118,8 @@ public class KeyResourceBean {
      * @param id                the id of the MetadataField to delete
      * @return MetadataResult   the entire keys tree and the parent field
      */
-    @PUT
-    @Path("/delete/{id}")
+    @DELETE
+    @Path("/{id}")
     @Produces({MediaType.APPLICATION_JSON})
     public MetadataResponse delete(@PathParam("id") Long id) {
         return client.get().deleteMetadataField(id);
