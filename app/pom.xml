@@ -131,7 +131,7 @@
                             <goal>karma</goal>
                         </goals>
                         <configuration>
-                            <karmaConfPath>src/test/resources/karma.conf.js</karmaConfPath>
+                            <karmaConfPath>src/test/resources/karma.conf.headless.js</karmaConfPath>
                         </configuration>
                     </execution>
                 </executions>
