@@ -386,6 +386,8 @@ public class MetadataDAOImpl implements MetadataDAO {
                         values.add(suggestion.getValue());
                     }
                     newSuggestions.put(searchKey.getValue(), values);
+                } else {
+                    newSuggestions.put(searchKey.getValue(), null);
                 }
             }
         }

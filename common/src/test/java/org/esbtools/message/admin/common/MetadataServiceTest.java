@@ -237,13 +237,12 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         MetadataField Suggestion2 = fetchMetadataField("Suggestion2", "suggestion2", MetadataType.Suggestion);
 
         Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-
-        Assert.assertEquals("only 1 search key should have suggestion!", 1, suggestions.keySet().size());
-        Assert.assertFalse(suggestions.containsKey("suggestionLessKey"));
+        Assert.assertEquals("all search keys should be listed ", 2, suggestions.keySet().size());
+        Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
         Assert.assertTrue(suggestions.containsKey("SourceSystem"));
         List<String> suggestionList = suggestions.get("SourceSystem");
         Assert.assertEquals("SourceSystem should have 1 suggestion!", 1, suggestionList.size());
-        Assert.assertEquals("suggestion2", suggestionList.get(0));
+        Assert.assertNull("suggestion less key should be listed, but its suggestions, even if it has any , should be ignored", suggestions.get("suggestionLessKey"));
     }
 
     private void assertSuccess(MetadataResponse result) {
@@ -308,7 +307,12 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     //
 
     Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-    Assert.assertEquals("Expecting only 1 existing suggestion",1, suggestions.size());
+    Assert.assertEquals("Expecting only 3 existing suggestions for keys",3, suggestions.size());
+
+    Assert.assertNotNull(suggestions.get("SourceSystem"));
+    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
+    Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
+    Assert.assertTrue(suggestions.containsKey("Country"));
     // persist message and check suggestion again
     try {
         EsbMessage message = new EsbMessage();
@@ -320,15 +324,15 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
     suggestions = service.getSearchKeyValueSuggestions();
 
+    Assert.assertEquals("Expecting only 3 existing suggestions for keys",3, suggestions.size());
+
     Assert.assertNotNull(suggestions.get("SourceSystem"));
     Assert.assertEquals("Expecting 2 suggestions after persistence",2,suggestions.get("SourceSystem").size());
     Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemA"));
     Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
 
-    Assert.assertNull(suggestions.get("Email"));
-
-    // County codes can not be suggested
-    Assert.assertNull(suggestions.get("Country"));
+    Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
+    Assert.assertTrue(suggestions.containsKey("Country"));
     }
 
 
