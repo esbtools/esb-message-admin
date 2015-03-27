@@ -25,6 +25,7 @@ module.exports = function(config) {
     "src/main/webapp/bower_components/angucomplete-keyvalue/angucomplete.js",
     "src/main/webapp/bower_components/angular-loading-bar/build/loading-bar.min.js",
     "src/main/webapp/bower_components/ngQuickDate/dist/ng-quick-date.min.js",
+    "src/main/webapp/bower_components/message-center/message-center.js",
     "src/main/webapp/js/*.js",
     "src/test/js/*.js"
     ],
