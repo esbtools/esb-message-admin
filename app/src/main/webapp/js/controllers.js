@@ -625,6 +625,7 @@ esbMessageAdminControllers.controller('SyncCtrl', [
                         || $scope.syncSystem == ""
                         || $scope.syncValues.length <= 0)
                     return true;
+                return false;
             };
 
             $scope.sync = function() {
