@@ -620,7 +620,7 @@ esbMessageAdminControllers.controller('SyncCtrl', [
             $scope.syncKey = "";
             $scope.syncValues = [];
 
-            $scope.enableSubmit = function() {
+            $scope.disableSubmit = function() {
                 if ($scope.syncEntity == "" || $scope.syncKey == ""
                         || $scope.syncSystem == ""
                         || $scope.syncValues.length <= 0)

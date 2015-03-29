@@ -48,9 +48,9 @@ describe('SyncCtrl', function() {
         scope.syncEntity = entitiesSuccessResponse.tree.children[0];
         scope.syncSystem = scope.syncEntity.children[0];
         scope.syncKey = scope.syncSystem.children[0];
-        expect(scope.enableSubmit()).toEqual(true);
+        expect(scope.disableSubmit()).toEqual(true);
         scope.syncValues = [ "12" ];
-        expect(scope.enableSubmit()).toEqual(false);
+        expect(scope.disableSubmit()).toEqual(false);
 
     });
 
