@@ -104,6 +104,93 @@ var entitiesSuccessResponse = {
     "result" : null
 };
 
+var syncKeysSuccessResponse = {
+          "tree": {
+                "id": 1,
+                "name": "Entities",
+                "type": "Entities",
+                "value": "Entities",
+                "children": [
+                  {
+                    "id": 112,
+                    "name": "Entity201",
+                    "type": "Entity",
+                    "value": "ENTITY201",
+                    "children": [
+                      {
+                        "id": 1510,
+                        "name": "System 4",
+                        "type": "System",
+                        "value": "SYSTEM_FOUR",
+                        "children": [
+                          {
+                            "id": 1511,
+                            "name": "Key 4",
+                            "type": "SyncKey",
+                            "value": "KEY_4",
+                            "children": [],
+                            "suggestions": []
+                          }
+                        ],
+                        "suggestions": []
+                      }
+                    ],
+                    "suggestions": []
+                  }
+                ]
+              },
+              "hash": "e148e17a-8308-42a0-8666-43879dc78eb1",
+              "status": "Success",
+              "errorMessage": null,
+              "result": {
+                "id": 1511,
+                "name": "Key 4",
+                "type": "SyncKey",
+                "value": "KEY_4",
+                "children": [],
+                "suggestions": []
+              }
+            };
+
+var searchKeysSuccessResponse = {
+          "tree": {
+                "id": 1,
+                "name": "SearchKeys",
+                "type": "SearchKeys",
+                "value": "SearchKeys",
+                "children": [
+                  {
+                    "id": 534,
+                    "name": "SearchKey123",
+                    "type": "SearchKey",
+                    "value": "SearchKey123",
+                    "children": [
+                      {
+                        "id": 897,
+                        "name": "XPATH1232",
+                        "type": "XPATH",
+                        "value": "XPATH1232",
+                        "children": [],
+                        "suggestions": []
+                      }
+                    ],
+                    "suggestions": []
+                  }
+                ]
+              },
+              "hash": "814d8307-d4e1-4f14-aab4-a240868b8b33",
+              "status": "Success",
+              "errorMessage": null,
+              "result": {
+                "id": 867,
+                "name": "Key 4",
+                "type": "SearchKey",
+                "value": "KEY_4",
+                "children": [],
+                "suggestions": []
+              }
+            };
+
 var syncSuccessResponse = {
     "tree" : null,
     "hash" : null,
