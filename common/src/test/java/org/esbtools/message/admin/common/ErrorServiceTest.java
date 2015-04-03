@@ -80,44 +80,113 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals(1, result.getMessages()[0].getOccurrenceCount());
         Assert.assertEquals(3, result.getMessages()[1].getOccurrenceCount());
     }
-
+    
     @Test
-    public void testSearchByFields() {
+    public void testSearchByMessageGuidFieldWithSameCase() {
         EsbMessage esbMessage = createTestMessage(0, 1);
-
-        // persist the message
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        
+        SearchCriteria criteria1 = new SearchCriteria();
+        Criterion[] c1 = {new Criterion(SearchField.messageGuid, "MessageGuid0")};
+        criteria1.setCriteria(c1);
+        SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
+        
+        Assert.assertEquals(1, result.getTotalResults());
+    }
+    
+    @Test
+    public void testSearchByMessageGuidAndQueueFieldsWithSameCase() {
+        EsbMessage esbMessage = createTestMessage(0, 1);
         try {
             service.persist(esbMessage);
         } catch (IOException e) {
             Assert.fail();
         }
 
-        // test searching by Message Guid
+        SearchCriteria criteria2 = new SearchCriteria();
+        Criterion[] c2 = { new Criterion(SearchField.messageGuid, "MessageGuid0"), new Criterion(SearchField.sourceSystem, "SourceSystem0") };
+        criteria2.setCriteria(c2);
+        SearchResult result = service.searchMessagesByCriteria(criteria2, null, null, null, true, 0, 10);
+
+        Assert.assertEquals(1, result.getTotalResults());
+    }
+    
+    @Test
+    public void testSearchByHeaderFieldsWithSameCase() {
+        EsbMessage esbMessage = createTestMessage(0, 1);
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
+        SearchCriteria criteria3 = new SearchCriteria();
+        Criterion[] c3 = { new Criterion("header0_0", "value0_0"), };
+        criteria3.setCriteria(c3);
+        SearchResult result = service.searchMessagesByCriteria(criteria3, null, null, null, true, 0, 10);
+
+        Assert.assertEquals(1, result.getTotalResults());
+    }
+    
+    
+    @Test
+    public void testSearchByMessageGuidFieldCaseInsensitive() {
+        EsbMessage esbMessage = createTestMessage(0, 1);
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
         SearchCriteria criteria1 = new SearchCriteria();
-        Criterion[] c1 = {new Criterion(SearchField.messageGuid, "MessageGuid0")};
+        Criterion[] c1 = {new Criterion(SearchField.messageGuid, "messageguid0")};
         criteria1.setCriteria(c1);
         SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
-        Assert.assertEquals(1, result.getTotalResults());
 
-        // test searching by Message Guid and Queue
+        Assert.assertEquals(1, result.getTotalResults());        
+    }
+    
+    @Test
+    public void testSearchByMessageGuidAndQueueFieldsCaseInsensitive() {
+        EsbMessage esbMessage = createTestMessage(0, 1);
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+
         SearchCriteria criteria2 = new SearchCriteria();
         Criterion[] c2 = {
-                new Criterion(SearchField.messageGuid, "MessageGuid0"),
-                new Criterion(SearchField.sourceSystem, "SourceSystem0")
+                new Criterion(SearchField.messageGuid, "messageguid0"),
+                new Criterion(SearchField.sourceSystem, "sourcesystem0")
         };
         criteria2.setCriteria(c2);
-        result = service.searchMessagesByCriteria(criteria2, null, null, null, true, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria2, null, null, null, true, 0, 10);
+        
         Assert.assertEquals(1, result.getTotalResults());
-
-        // test searching by header name and value
+    }
+    
+    @Test
+    public void testSearchByHeaderFieldsCaseInsensitive() {
+        EsbMessage esbMessage = createTestMessage(0, 1);
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        
         SearchCriteria criteria3 = new SearchCriteria();
         Criterion[] c3 = {
-                new Criterion("header0_0", "value0_0"),
+                new Criterion("HEADER0_0", "VALUE0_0"),
         };
         criteria3.setCriteria(c3);
-        result = service.searchMessagesByCriteria(criteria3, null, null, null, true, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria3, null, null, null, true, 0, 10);
+        
         Assert.assertEquals(1, result.getTotalResults());
-
     }
 
     @Test
