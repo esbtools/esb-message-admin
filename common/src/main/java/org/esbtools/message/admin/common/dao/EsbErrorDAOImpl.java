@@ -216,7 +216,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         for(List<String> criterion: criteria) {
             boolean matched = true;
             for(String matchCondition: criterion) {
-                if(!messageString.toLowerCase().contains(matchCondition.toLowerCase())) {
+                if(!messageString.contains(matchCondition)) {
                     matched = false;
                     break;
                 }
