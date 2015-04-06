@@ -60,12 +60,12 @@ public enum SearchField {
     public static boolean isPreDefined(String key) {
         return lookup.contains(key.toUpperCase()) ? true : false;
     }
-
-    public static List<String> find(String pattern) {
-        List<String> match = new ArrayList<String>();
+    
+    public static SearchField match(String pattern) {
+        SearchField match = null;
         for (SearchField field : SearchField.values()) {
-            if (field.name().toLowerCase().contains(pattern.toLowerCase())) {
-                match.add(field.name());
+            if (field.name().equalsIgnoreCase(pattern)) {
+                match = field; 
             }
         }
         return match;

@@ -74,11 +74,9 @@ public class SearchFieldTest {
     }
     
     @Test
-    public void testFind() {
-        List<String> expectedResults = Arrays.asList("id","messageId", "messageGuid");
-        List<String> findResults = SearchField.find("id");
-        assertEquals(expectedResults, findResults);
-        //fail("Not yet implemented");
+    public void testMatch() {
+        SearchField matchResult = SearchField.match("messageid");
+        assertEquals(SearchField.messageId, matchResult);
     }
 
 }
