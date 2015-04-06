@@ -44,8 +44,9 @@ public enum SearchField {
     // Reverse-lookup map
     private static final Set<String> lookup = new HashSet<String>();
     static {
-        for (SearchField f : SearchField.values())
-            lookup.add(f.name());
+        for (SearchField f : SearchField.values()) {
+            lookup.add(f.name().toUpperCase());
+        }
     }
 
     private SearchField(Class type) {
@@ -57,9 +58,7 @@ public enum SearchField {
     }
 
     public static boolean isPreDefined(String key) {
-        if(lookup.contains(key))
-            return true;
-        return false;
+        return lookup.contains(key.toUpperCase()) ? true : false;
     }
 
     public static List<String> find(String pattern) {
