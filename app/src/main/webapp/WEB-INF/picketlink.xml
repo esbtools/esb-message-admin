@@ -1,0 +1,21 @@
+<PicketLink xmlns="urn:picketlink:identity-federation:config:2.1">
+    <PicketLinkSP xmlns="urn:picketlink:identity-federation:config:1.0" ServerEnvironment="tomcat" BindingType="POST" SupportsSignatures="true">
+        <IdentityURL>${IdentityURL}</IdentityURL>
+        <ServiceURL>${ServiceURL}</ServiceURL>
+        <KeyProvider ClassName="org.picketlink.identity.federation.core.impl.KeyStoreKeyManager">
+            <Auth Key="KeyStoreURL" Value="${KeyStoreURL}" />
+            <Auth Key="KeyStorePass" Value="${KeyStorePass}"/>
+            <Auth Key="SigningKeyPass" Value="${SigningKeyPass}"/>
+            <Auth Key="SigningKeyAlias" Value="${SigningKeyAlias}" />
+            <ValidatingAlias Key="${ValidatingAliasKey}" Value="${ValidatingAliasValue}" />
+        </KeyProvider>
+    </PicketLinkSP>
+    <Handlers xmlns="urn:picketlink:identity-federation:handler:config:2.1">
+        <Handler class="org.picketlink.identity.federation.web.handlers.saml2.SAML2LogOutHandler" />
+        <Handler class="org.picketlink.identity.federation.web.handlers.saml2.SAML2AuthenticationHandler">
+            <Option Key="ASSERTION_CONSUMER_URL" Value="${ServiceURL}"/>
+        </Handler>
+        <Handler class="org.picketlink.identity.federation.web.handlers.saml2.RolesGenerationHandler" />
+        <Handler class="org.picketlink.identity.federation.web.handlers.saml2.SAML2SignatureValidationHandler" />
+    </Handlers>
+</PicketLink>
