@@ -167,6 +167,7 @@
         <module>api</module>
         <module>common</module>
         <module>app</module>
+        <module>app-saml-auth</module>
         <module>rest-save</module>
         <module>rest-save-client</module>
     </modules>
