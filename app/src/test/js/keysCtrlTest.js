@@ -32,18 +32,39 @@ describe(
 
             }));
 
+            it('loads Sync and Search Keys Tab', function() {
+                loadTest(syncKeysScope, syncKeysSuccessResponse);
+                loadTest(searchKeysScope, searchKeysSuccessResponse);
+            });
+
             function loadTest(scope, response) {
                 expect(scope.entities || scope.searchKeys).toEqual(
                         response.tree);
                 expect(scope.parent).toEqual(response.tree);
             }
 
-            it('loads Sync and Search Keys Tab', function() {
-                loadTest(syncKeysScope, syncKeysSuccessResponse);
-                loadTest(searchKeysScope, searchKeysSuccessResponse);
+            it('crumb tests', function() {
+                crumbTest(syncKeysScope, syncKeysSuccessResponse);
+                crumbTest(searchKeysScope, searchKeysSuccessResponse);
             });
 
             function crumbTest(scope, response) {
+                expect(scope.crumbs.length).toEqual(1);
+                expect(scope.crumbs[0]).toEqual(response.tree);
+                expect(scope.parent).toEqual(response.tree);
+
+                scope.gotoCrumb(scope.crumbs[0]);
+                expect(scope.crumbs.length).toEqual(1);
+                expect(scope.crumbs[0]).toEqual(response.tree);
+                expect(scope.parent).toEqual(response.tree);
+            }
+
+            it('manage chidren tests', function() {
+                manageChildrenTest(syncKeysScope, syncKeysSuccessResponse);
+                manageChildrenTest(searchKeysScope, searchKeysSuccessResponse);
+            });
+
+            function manageChildrenTest(scope, response) {
                 expect(scope.crumbs.length).toEqual(1);
                 expect(scope.crumbs[0]).toEqual(response.tree);
                 expect(scope.parent).toEqual(response.tree);
@@ -62,16 +83,13 @@ describe(
                         response.tree.children[0].children[0]);
                 expect(scope.parent).toEqual(
                         response.tree.children[0].children[0]);
-
-                scope.gotoCrumb(scope.crumbs[0]);
-                expect(scope.crumbs.length).toEqual(1);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.parent).toEqual(response.tree);
             }
 
-            it('crumb and manage chidren tests', function() {
-                crumbTest(syncKeysScope, syncKeysSuccessResponse);
-                crumbTest(searchKeysScope, searchKeysSuccessResponse);
+            it('add tests', function() {
+                addTest(syncKeysScope, syncKeysSuccessResponse, "testName",
+                        "Entity", "testValue");
+                addTest(searchKeysScope, searchKeysSuccessResponse,
+                        "SearchKeys", "SearchKey", "testValue");
             });
 
             function addTest(scope, response, name, type, value) {
@@ -93,11 +111,11 @@ describe(
                         response.tree);
             }
 
-            it('add tests', function() {
-                addTest(syncKeysScope, syncKeysSuccessResponse, "testName",
+            it('update tests', function() {
+                updateTests(syncKeysScope, syncKeysSuccessResponse, "testName",
                         "Entity", "testValue");
-                addTest(searchKeysScope, searchKeysSuccessResponse,
-                        "SearchKeys", "SearchKey", "testValue");
+                updateTests(searchKeysScope, searchKeysSuccessResponse,
+                        "SearchKey", "SearchKey", "testValue");
             });
 
             function updateTests(scope, response, name, type, value) {
@@ -120,11 +138,9 @@ describe(
                         response.tree);
             }
 
-            it('update tests', function() {
-                updateTests(syncKeysScope, syncKeysSuccessResponse, "testName",
-                        "Entity", "testValue");
-                updateTests(searchKeysScope, searchKeysSuccessResponse,
-                        "SearchKey", "SearchKey", "testValue");
+            it('delete tests', function() {
+                deleteTests(syncKeysScope, syncKeysSuccessResponse);
+                deleteTests(searchKeysScope, searchKeysSuccessResponse);
             });
 
             function deleteTests(scope, response) {
@@ -139,11 +155,6 @@ describe(
                 expect(scope.entities || scope.searchKeys).toEqual(
                         response.tree);
             }
-
-            it('delete tests', function() {
-                deleteTests(syncKeysScope, syncKeysSuccessResponse);
-                deleteTests(searchKeysScope, searchKeysSuccessResponse);
-            });
 
             afterEach(function() {
                 // Ensure that all expects set on the $httpBackend
