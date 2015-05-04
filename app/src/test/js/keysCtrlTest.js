@@ -2,12 +2,14 @@ describe(
         'SyncKeysCtrl and SearchKeysCtrl',
         function() {
 
-            beforeEach(module('esbMessageAdminApp'));
+            beforeEach(module('esbMessageAdminApp', function($provide) {
+                $provide.value("EsbMessageService", mockService);
+            }));
 
             var syncKeysCtrl, searchKeysCtrl, http, globals, scope, rootScope, esbMessageService, filter;
 
             beforeEach(inject(function($rootScope, $controller, $httpBackend,
-                    Globals, EsbMessageService, $filter) {
+                    Globals, EsbMessageService, $filter, _$q_) {
                 rootScope = $rootScope;
                 syncKeysScope = $rootScope.$new();
                 searchKeysScope = $rootScope.$new();
@@ -15,20 +17,17 @@ describe(
                 globals = Globals;
                 esbMessageService = EsbMessageService;
                 filter = $filter;
-
+                $q = _$q_;
                 (syncKeysCtrl) = $controller('SyncKeysCtrl', {
                     '$scope' : syncKeysScope
                 });
-                http.expectGET("api/key/tree/Entities").respond(
-                        syncKeysSuccessResponse);
-                http.flush();
+                deferred.resolve(syncKeysSuccessResponse);
 
                 (searchKeysCtrl) = $controller('SearchKeysCtrl', {
                     '$scope' : searchKeysScope
                 });
-                http.expectGET("api/key/tree/SearchKeys").respond(
-                        searchKeysSuccessResponse);
-                http.flush();
+                deferred.resolve(searchKeysSuccessResponse);
+                $rootScope.$apply();
 
             }));
 
@@ -39,8 +38,8 @@ describe(
 
             function loadTest(scope, response) {
                 expect(scope.entities || scope.searchKeys).toEqual(
-                        response.tree);
-                expect(scope.parent).toEqual(response.tree);
+                        response.data.tree);
+                expect(scope.parent).toEqual(response.data.tree);
             }
 
             it('crumb tests', function() {
@@ -50,13 +49,13 @@ describe(
 
             function crumbTest(scope, response) {
                 expect(scope.crumbs.length).toEqual(1);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.parent).toEqual(response.tree);
+                expect(scope.crumbs[0]).toEqual(response.data.tree);
+                expect(scope.parent).toEqual(response.data.tree);
 
                 scope.gotoCrumb(scope.crumbs[0]);
                 expect(scope.crumbs.length).toEqual(1);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.parent).toEqual(response.tree);
+                expect(scope.crumbs[0]).toEqual(response.data.tree);
+                expect(scope.parent).toEqual(response.data.tree);
             }
 
             it('manage chidren tests', function() {
@@ -66,23 +65,23 @@ describe(
 
             function manageChildrenTest(scope, response) {
                 expect(scope.crumbs.length).toEqual(1);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.parent).toEqual(response.tree);
+                expect(scope.crumbs[0]).toEqual(response.data.tree);
+                expect(scope.parent).toEqual(response.data.tree);
                 scope.manageChildren(scope.parent.children[0]);
 
                 expect(scope.crumbs.length).toEqual(2);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.crumbs[1]).toEqual(response.tree.children[0]);
-                expect(scope.parent).toEqual(response.tree.children[0]);
+                expect(scope.crumbs[0]).toEqual(response.data.tree);
+                expect(scope.crumbs[1]).toEqual(response.data.tree.children[0]);
+                expect(scope.parent).toEqual(response.data.tree.children[0]);
 
                 scope.manageChildren(scope.parent.children[0]);
                 expect(scope.crumbs.length).toEqual(3);
-                expect(scope.crumbs[0]).toEqual(response.tree);
-                expect(scope.crumbs[1]).toEqual(response.tree.children[0]);
+                expect(scope.crumbs[0]).toEqual(response.data.tree);
+                expect(scope.crumbs[1]).toEqual(response.data.tree.children[0]);
                 expect(scope.crumbs[2]).toEqual(
-                        response.tree.children[0].children[0]);
+                        response.data.tree.children[0].children[0]);
                 expect(scope.parent).toEqual(
-                        response.tree.children[0].children[0]);
+                        response.data.tree.children[0].children[0]);
             }
 
             it('add tests', function() {
@@ -101,14 +100,11 @@ describe(
                 scope.addFormName = name;
                 scope.addFormValue = value;
                 scope.requestAdd();
-                http.expectPOST(
-                        "api/key/addChild/" + scope.parent.id + "?name=" + name
-                                + "&type=" + type + "&value=" + value).respond(
-                        response);
-                http.flush();
-                expect(scope.parent).toEqual(response.result);
+                deferred.resolve(response);
+                rootScope.$apply();
+                expect(scope.parent).toEqual(response.data.result);
                 expect(scope.entities || scope.searchKeys).toEqual(
-                        response.tree);
+                        response.data.tree);
             }
 
             it('update tests', function() {
@@ -124,18 +120,15 @@ describe(
                 scope.editChild(scope.parent.children[0]);
                 expect(scope.updateMode).toEqual(true);
                 expect(scope.crumbs.length).toEqual(2);
-                expect(scope.parent).toEqual(response.tree.children[0]);
+                expect(scope.parent).toEqual(response.data.tree.children[0]);
                 scope.parent.name = name;
                 scope.parent.value = value;
                 scope.requestUpdate();
-                http.expectPUT(
-                        "api/key/update/" + scope.parent.id + "?name=" + name
-                                + "&type=" + type + "&value=" + value).respond(
-                        response);
-                http.flush();
-                expect(scope.parent).toEqual(response.result);
+                deferred.resolve(response);
+                rootScope.$apply();
+                expect(scope.parent).toEqual(response.data.result);
                 expect(scope.entities || scope.searchKeys).toEqual(
-                        response.tree);
+                        response.data.tree);
             }
 
             it('delete tests', function() {
@@ -145,15 +138,14 @@ describe(
 
             function deleteTests(scope, response) {
                 expect(scope.entities || scope.searchKeys).toEqual(
-                        response.tree);
-                expect(scope.parent).toEqual(response.tree);
-                scope.deleteChild(response.tree.children[0]);
-                http.expectDELETE("api/key/" + response.tree.children[0].id)
-                        .respond(response);
-                http.flush();
-                expect(scope.parent).toEqual(response.result);
+                        response.data.tree);
+                expect(scope.parent).toEqual(response.data.tree);
+                scope.deleteChild(response.data.tree.children[0]);
+                deferred.resolve(response);
+                rootScope.$apply();
+                expect(scope.parent).toEqual(response.data.result);
                 expect(scope.entities || scope.searchKeys).toEqual(
-                        response.tree);
+                        response.data.tree);
             }
 
             afterEach(function() {
