@@ -182,7 +182,7 @@ esbMessageAdminServices
                                                     }))
                                         .success(
                                                 function(response) {
-                                                    if (response.data.status === "Success") {
+                                                    if (response.status === "Success") {
                                                         messageCenterService
                                                                 .add(
                                                                         'success',
@@ -194,7 +194,7 @@ esbMessageAdminServices
                                                         messageCenterService
                                                                 .add(
                                                                         'danger',
-                                                                        response.data.errorMessage,
+                                                                        response.errorMessage,
                                                                         {
                                                                             status : messageCenterService.status.permanent
                                                                         });
