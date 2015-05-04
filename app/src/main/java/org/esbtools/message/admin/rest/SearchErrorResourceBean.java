@@ -136,7 +136,7 @@ public class SearchErrorResourceBean {
                     criterion.setCustomKey(entry.getKey());
                     criterion.setValue(value);
                 } else {
-                    criterion.setField(SearchField.valueOf(entry.getKey()));
+                    criterion.setField(SearchField.match(entry.getKey()));
                     if (criterion.getField().getValueType() == String.class) {
                         criterion.setValue(value);
                     } else {

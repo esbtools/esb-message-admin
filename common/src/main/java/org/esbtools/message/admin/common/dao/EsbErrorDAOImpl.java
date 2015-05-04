@@ -154,10 +154,10 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         StringBuilder predefWhereClause = new StringBuilder(""), customWhereClause = new StringBuilder(""), customJoins = new StringBuilder("");
         for (Criterion crit : criteria.getCriteria()) {
             if (!crit.isCustom()) {
-                predefWhereClause.append("and e." + crit.getKeyString() + " = :" + crit.getField().name() + " ");
+                predefWhereClause.append("and UPPER(e." + crit.getKeyString() + ") = :" + crit.getField().name() + " ");
             } else {
                 customJoins.append("join e.errorHeaders h" + i + " ");
-                customWhereClause.append("and h" + i + ".name ='" + crit.getKeyString() + "' and h" + i + ".value = '" + crit.getStringValue() + "' ");
+                customWhereClause.append("and UPPER(h" + i + ".name) = '" + crit.getKeyString().toUpperCase() + "' and UPPER(h" + i + ".value) = '" + crit.getStringValue().toUpperCase() + "' ");
                 i++;
             }
         }
@@ -180,7 +180,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         for (Criterion crit : criteria.getCriteria()) {
             if (!crit.isCustom()) {
                 if (crit.getField().getValueType() == String.class) {
-                    query.setParameter(crit.getField().name(), crit.getStringValue());
+                    query.setParameter(crit.getField().name(), crit.getStringValue().toUpperCase());
                 } else {
                     query.setParameter(crit.getField().name(), crit.getLongValue());
                 }
