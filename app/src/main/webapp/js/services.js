@@ -174,20 +174,15 @@ esbMessageAdminServices
 
                             self.sync = function(argEntity, argSystem, argKey,
                                     argValues) {
-                                return $http(
-                                        {
-                                            method : 'POST',
-                                            url : "api/key/sync/{entity}/{system}/{key}?values={values}"
-                                                    .supplant({
+                                return $http.post("api/key/sync/{entity}/{system}/{key}?values={values}".supplant({
                                                         entity : argEntity,
                                                         system : argSystem,
                                                         key : argKey,
                                                         values : argValues
-                                                    })
-                                        })
-                                        .then(
-                                                function(results) {
-                                                    if (results.data.status === "Success") {
+                                                    }))
+                                        .success(
+                                                function(response) {
+                                                    if (response.data.status === "Success") {
                                                         messageCenterService
                                                                 .add(
                                                                         'success',
@@ -204,7 +199,7 @@ esbMessageAdminServices
                                                                             status : messageCenterService.status.permanent
                                                                         });
                                                     }
-                                                }, function(err) {
+                                                }).error(function(err) {
                                                     self.respondError();
                                                 });
                             };
