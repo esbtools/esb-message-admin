@@ -7,18 +7,13 @@ describe(
                 $provide.value("EsbMessageService", mockService);
             }));
 
-            var syncCtrl, http, globals, scope, rootScope, esbMessageService, filter;
+            var syncCtrl, scope, rootScope;
 
-            beforeEach(inject(function($rootScope, $controller, $httpBackend,
-                    Globals, EsbMessageService, $filter, _$q_) {
+            beforeEach(inject(function($rootScope, $controller, _$q_) {
                 rootScope = $rootScope;
                 scope = $rootScope.$new();
-                http = $httpBackend;
-                globals = Globals;
-                esbMessageService = EsbMessageService;
-                filter = $filter;
                 $q = _$q_;
-                (syncCtrl) = $controller('SyncCtrl', {
+                syncCtrl = $controller('SyncCtrl', {
                     '$scope' : scope
                 });
 
@@ -79,15 +74,5 @@ describe(
                                 scope.syncEntity.value, scope.syncSystem.value,
                                 scope.syncKey.value, '12,21,');
                     });
-
-            afterEach(function() {
-                // Ensure that all expects set on the $httpBackend
-                // were actually called
-                http.verifyNoOutstandingExpectation();
-
-                // Ensure that all requests to the server
-                // have actually responded (using flush())
-                http.verifyNoOutstandingRequest();
-            });
 
         });
