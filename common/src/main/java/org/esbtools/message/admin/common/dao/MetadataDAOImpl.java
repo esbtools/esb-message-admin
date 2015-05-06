@@ -47,6 +47,7 @@ import org.json.simple.JSONObject;
 public class MetadataDAOImpl implements MetadataDAO {
 
     private final EntityManager mgr;
+    private final AuditEventDAO auditDAO;
     private final static Logger log = Logger.getLogger(MetadataDAOImpl.class.getName());
     private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
@@ -54,8 +55,9 @@ public class MetadataDAOImpl implements MetadataDAO {
     private Set<String> suggestedFields = new HashSet<>();
     private List<String> resyncRestEndpoints = new ArrayList<>();
 
-    public MetadataDAOImpl(EntityManager mgr, JSONObject config) {
+    public MetadataDAOImpl(EntityManager mgr, AuditEventDAO auditDAO, JSONObject config) {
         this.mgr=mgr;
+        this.auditDAO = auditDAO;
         JSONArray suggestConfigs = (JSONArray) config.get("suggestedFields");
         if(suggestConfigs!=null) {
             for(int i=0;i<suggestConfigs.size();i++) {
@@ -211,6 +213,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 result = createMetadataResult(parent);
             }
         }
+        auditDAO.save("someUser", "ADD", "metadata", type.toString(), value, curr.toString());
         return result;
     }
 
@@ -248,6 +251,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 result = createMetadataResult(parent);
             }
         }
+        auditDAO.save("someUser", "UPDATE", "metadata", type.toString(), value, entity.toString());
         return result;
 
     }
@@ -263,6 +267,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             markTreeDirty(parent.getType());
             result = createMetadataResult(parent);
         }
+        auditDAO.save("someUser", "DELETE", "metadata", entity.getType().toString(), entity.getValue(), entity.toString());
         return result;
     }
 
@@ -334,6 +339,8 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
         message.append("</SyncRequest>");
         log.log(Level.INFO, "Initiating sync request:"+message.toString());
+
+        auditDAO.save("someUser", "SYNC", "metadata", entity, key, message.toString());
 
         boolean foundActiveHost = false;
         for(String restEndPoint: resyncRestEndpoints) {

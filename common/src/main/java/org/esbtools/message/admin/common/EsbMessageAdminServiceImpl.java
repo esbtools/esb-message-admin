@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
@@ -34,21 +33,19 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.esbtools.message.admin.Provider;
+import org.esbtools.message.admin.common.dao.AuditEventDAO;
+import org.esbtools.message.admin.common.dao.AuditEventDAOImpl;
 import org.esbtools.message.admin.common.dao.EsbErrorDAO;
 import org.esbtools.message.admin.common.dao.EsbErrorDAOImpl;
 import org.esbtools.message.admin.common.dao.MetadataDAO;
 import org.esbtools.message.admin.common.dao.MetadataDAOImpl;
-import org.esbtools.message.admin.common.dao.audit.AuditEventDAO;
-import org.esbtools.message.admin.common.dao.audit.AuditEventDAOImpl;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
-import org.esbtools.message.admin.common.orm.AuditEventEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
-import org.esbtools.message.admin.model.audit.AuditEvent;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -63,7 +60,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
-    transient AuditEventDAO auditEventDAO;
+    transient AuditEventDAO auditDao;
     transient static KeyExtractorUtil extractor;
 
     {
@@ -78,7 +75,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private EsbErrorDAO getErrorDAO() {
-        return errorDao == null ? new EsbErrorDAOImpl(entityMgr,config) : errorDao;
+        return errorDao == null ? new EsbErrorDAOImpl(entityMgr, getAuditEventDAO(), config) : errorDao;
     }
 
     void setErrorEntityManager(EntityManager entityMgr) {
@@ -86,12 +83,11 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private MetadataDAO getMetadataDAO() {
-        return metadataDao == null ? new MetadataDAOImpl(entityMgr, config) : metadataDao;
+        return metadataDao == null ? new MetadataDAOImpl(entityMgr, getAuditEventDAO(), config) : metadataDao;
     }
-    
-    // TODO: inject DAO
+
     private AuditEventDAO getAuditEventDAO() {
-        return auditEventDAO == null ? new AuditEventDAOImpl(entityMgr) : auditEventDAO;
+        return auditDao == null ? new AuditEventDAOImpl(entityMgr) : auditDao;
     }
 
     private KeyExtractorUtil getKeyExtractor() {
@@ -182,9 +178,4 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     }
 
-    // ------------------ Audit methods ---------------------------
-
-    public void audit(AuditEvent event) {
-    	getAuditEventDAO().save(AuditEventEntity.convert(event));
-    }
 }

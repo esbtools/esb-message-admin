@@ -18,9 +18,7 @@
  */
 package org.esbtools.message.admin.common.orm;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,8 +26,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import org.esbtools.message.admin.model.audit.AuditEvent;
 
 @Entity
 @Table(name="AUDIT_EVENT")
@@ -149,38 +145,4 @@ public class AuditEventEntity {
         this.message = message;
     }
 
-    // ~ Conversion helper methods
-    // ----------------------------------------------------------------
-
-    public static AuditEventEntity convert(AuditEvent event) {
-        AuditEventEntity e = new AuditEventEntity();
-        e.setLoggedTime(event.getLoggedTime());
-        e.setPrincipal(event.getPrincipal());
-        e.setAction(event.getAction());
-        e.setMessageType(event.getMessageType());
-        e.setKeyType(event.getKeyType());
-        e.setMessageKey(event.getMessageKey());
-        e.setMessage(event.getMessage());
-        return e;
-    }
-
-    public static AuditEvent convert(AuditEventEntity entity) {
-        AuditEvent event = new AuditEvent();
-        event.setLoggedTime(entity.getLoggedTime());
-        event.setPrincipal(entity.getPrincipal());
-        event.setAction(entity.getAction());
-        event.setMessageType(entity.getMessageType());
-        event.setKeyType(entity.getKeyType());
-        event.setMessageKey(entity.getMessageKey());
-        event.setMessage(entity.getMessage());
-        return event;
-    }
-
-    public static List<AuditEvent> convert(List<AuditEventEntity> entities) {
-        List<AuditEvent> result = new ArrayList<AuditEvent>(entities.size());
-        for (AuditEventEntity entity : entities) {
-            result.add(convert(entity));
-        }
-        return result;
-    }
 }
