@@ -27,6 +27,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -100,6 +101,8 @@ public class EsbMessageEntity implements Serializable {
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage") //,fetch=FetchType.LAZY
     private List<EsbMessageHeaderEntity> errorHeaders;
 
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage" , fetch=FetchType.LAZY)
+    private List<EsbMessageSensitiveInfoEntity> errorSensitiveInfo;
 
     public Long getId() {
         return id;
@@ -243,6 +246,14 @@ public class EsbMessageEntity implements Serializable {
 
     public void setErrorHeaders(List<EsbMessageHeaderEntity> errorHeaders) {
         this.errorHeaders = errorHeaders;
+    }
+
+    public List<EsbMessageSensitiveInfoEntity> getErrorSensitiveInfo() {
+        return errorSensitiveInfo;
+    }
+
+    public void setErrorSensitiveInfo(List<EsbMessageSensitiveInfoEntity> errorSensitiveInfo) {
+        this.errorSensitiveInfo = errorSensitiveInfo;
     }
 
     public EsbMessageHeaderEntity getHeader(String headerName) {

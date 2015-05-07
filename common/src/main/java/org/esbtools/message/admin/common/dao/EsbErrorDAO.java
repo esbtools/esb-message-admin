@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.esbtools.message.admin.common.orm.EsbMessageEntity;
+import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 
@@ -33,7 +33,7 @@ public interface EsbErrorDAO {
     /**
      * Creates a new EsbError entity
      */
-    public void create(EsbMessageEntity ee, Map<String, List<String>> extractedHeaders);
+    public void create(EsbMessage ee, Map<String, List<String>> extractedHeaders);
 
     /**
      * Returns error message of the given queue

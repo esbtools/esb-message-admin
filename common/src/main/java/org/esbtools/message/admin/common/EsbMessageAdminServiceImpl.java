@@ -119,7 +119,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             extractedHeaders = new HashMap<>();
         }
 
-        getErrorDAO().create(ConversionUtility.convertFromEsbMessage(esbMessage), extractedHeaders);
+        getErrorDAO().create(esbMessage, extractedHeaders);
         getMetadataDAO().ensureSuggestionsArePresent(extractedHeaders);
 
     }
