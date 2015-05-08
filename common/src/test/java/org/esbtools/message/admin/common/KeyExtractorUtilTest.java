@@ -40,7 +40,7 @@ import org.junit.Test;
 public class KeyExtractorUtilTest {
 
     @Test
-    public void testKeyExtractorGood() {
+    public void testKeyHappyPathExtraction() {
 
         String payload =
                 "<Person>\n" +
@@ -126,7 +126,7 @@ public class KeyExtractorUtilTest {
     }
 
     @Test
-    public void testKeyExtractorBadPayload() {
+    public void testKeyExtractorExceptionWithMalformedPayload() {
 
         String badPayload =
                 "<Person>\n" +
@@ -175,7 +175,7 @@ public class KeyExtractorUtilTest {
     }
 
     @Test
-    public void testKeyExtractorBadXpath() {
+    public void testKeyExtractorWithMalformedXpath() {
 
         String payload =
                 "<Person>\n" +
