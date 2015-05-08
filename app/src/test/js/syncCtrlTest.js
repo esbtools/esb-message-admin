@@ -13,11 +13,11 @@ describe(
                 rootScope = $rootScope;
                 scope = $rootScope.$new();
                 $q = _$q_;
+                spyOn(mockService, "getSyncKeysTree").and.returnValue($q
+                        .when(entitiesSuccessResponse));
                 syncCtrl = $controller('SyncCtrl', {
                     '$scope' : scope
                 });
-
-                deferred.resolve(entitiesSuccessResponse);
                 $rootScope.$apply();
             }));
 
@@ -66,9 +66,9 @@ describe(
                         scope.syncSystem = scope.syncEntity.children[0];
                         scope.syncKey = scope.syncSystem.children[0];
                         scope.syncValues = [ "12", "21" ];
-                        spyOn(mockService, 'sync').and.callThrough();
+                        spyOn(mockService, "sync").and.returnValue($q
+                                .when(syncSuccessResponse));
                         scope.sync();
-                        deferred.resolve(syncSuccessResponse);
                         rootScope.$apply();
                         expect(mockService.sync).toHaveBeenCalledWith(
                                 scope.syncEntity.value, scope.syncSystem.value,
