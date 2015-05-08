@@ -239,7 +239,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
      * segregating sensitive info and resubmit proof of concept
      */
     @Test
-    public void resubmitTest() {
+    public void resubmitWithSegregatedSensitiveInfoPOC() {
 
       String oldText = "<Payload><Hello> is it me you're looking for ?</Hello>"+
                 "<Example>I can see it in your eyes</Example>"+
@@ -275,7 +275,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void testFetchPayload() {
+    public void testFetchPayloadByMessageId() {
         EsbMessage esbMessage = createTestMessage(12, 0);
         esbMessage.setPayload("<Payload>Payload</Payload>");
         esbMessage.setSourceSystem("SourceSystem12");
@@ -299,9 +299,8 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals("<Payload>Payload</Payload>",result.getMessages()[0].getPayload());
     }
 
-
     @Test
-    public void testHiddenPayload() {
+    public void testHiddenPayloadUponSingleCriteriaMatch() {
         EsbMessage esbMessage = createTestMessage(14, 0);
         esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
         esbMessage.setSourceSystem("SourceSystemTwo");
@@ -325,7 +324,13 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals("SourceSystemTwo",result.getMessages()[0].getSourceSystem());
         Assert.assertEquals("SourceSystemTwo messages are restricted",result.getMessages()[0].getPayload());
 
-        // if the match criterion has more than one condition, and the message satisfies only some of the conditions, payload should NOT be hidden
+    }
+
+
+    @Test
+    public void testPayloadNotHiddenUponPartialCriteriaMatch() {
+        EsbMessage esbMessage = createTestMessage(14, 0);
+        esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
         esbMessage.setSourceSystem("SourceSystemOne");
         try {
             service.persist(esbMessage);
@@ -333,27 +338,36 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
             Assert.fail();
         }
         Criterion[] c2 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne")};
+        SearchCriteria criteria = new SearchCriteria();
         criteria.setCriteria(c2);
-        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
         result = service.getMessageById(result.getMessages()[0].getId());
         Assert.assertEquals("<Payload>NotHiddenPayload</Payload>",result.getMessages()[0].getPayload());
+    }
 
-        // if the match criterion has more than one condition, and the message satisfies ALL of the conditions, payload should be hidden
+
+    @Test
+    public void testHiddenPayloadUponMultipleCriteriaMatch() {
+        EsbMessage esbMessage = createTestMessage(14, 0);
+        esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
+        esbMessage.setSourceSystem("SourceSystemOne");
         esbMessage.setMessageType("EntityOne");
+        // if the match criterion has more than one condition, and the message satisfies ALL of the conditions, payload should be hidden
         try {
             service.persist(esbMessage);
         } catch (IOException e) {
             Assert.fail();
         }
         Criterion[] c3 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne"),new Criterion(SearchField.messageType, "EntityOne")};
+        SearchCriteria criteria = new SearchCriteria();
         criteria.setCriteria(c3);
-        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
         result = service.getMessageById(result.getMessages()[0].getId());
         Assert.assertEquals("EntityOne messages from SourceSystemOne are restricted",result.getMessages()[0].getPayload());
     }
 
     @Test
-    public void testSorting() {
+    public void testSortingResultsOnCriteriaSearch() {
         EsbMessage esbMessage0 = createTestMessage(9, 0);
         EsbMessage esbMessage1 = createTestMessage(9, 0);
         EsbMessage esbMessage2 = createTestMessage(9, 0);
