@@ -126,7 +126,7 @@
                             <epoch>1</epoch>
                             <buildSRPM>true</buildSRPM>
                             <requires>
-                                <require>jbossas-standalone &gt;= 7</require>
+                                <require>jboss-fsw &gt;= 6</require>
                             </requires>
                             <sourceEncoding>UTF-8</sourceEncoding>
                             <mappings>
