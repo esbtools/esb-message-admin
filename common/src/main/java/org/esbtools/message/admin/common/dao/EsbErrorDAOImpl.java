@@ -18,6 +18,7 @@
  */
 package org.esbtools.message.admin.common.dao;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,14 +26,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
+import org.esbtools.message.admin.common.Configuration;
 import org.esbtools.message.admin.common.ConversionUtility;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
+import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.HeaderType;
@@ -49,10 +54,10 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
-    private static final String payloadHiddenText = "Payload has been hidden";
 
     private Set<String> sortingFields = new HashSet<>();
-    private List<List<String>> nonViewableCriteria = null;
+    private List<Configuration> nonViewableConfiguration = null;
+    private List<Configuration> partiallyViewableConfiguration = null;
     public EsbErrorDAOImpl(EntityManager mgr, AuditEventDAO auditDAO, JSONObject config) {
         this.mgr=mgr;
         this.auditDAO = auditDAO;
@@ -62,13 +67,30 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 sortingFields.add(sortFields.get(i).toString());
             }
         }
-        nonViewableCriteria = ConversionUtility.getCriteria((JSONArray) config.get("nonViewableMessages"));
+        nonViewableConfiguration = ConversionUtility.getConfigurations((JSONArray) config.get("nonViewableMessages"));
+        partiallyViewableConfiguration = ConversionUtility.getConfigurations((JSONArray) config.get("partiallyViewableMessages"));
     }
 
     /**
      * {@inheritDoc}
      */
-    public void create(EsbMessageEntity eme, Map<String, List<String>> extractedHeaders) {
+    public void create(EsbMessage em, Map<String, List<String>> extractedHeaders) {
+
+        EsbMessageEntity eme = ConversionUtility.convertFromEsbMessage(em);
+
+        Map<String,String> matchedConfiguration = matchCriteria(em, partiallyViewableConfiguration);
+        if(matchedConfiguration!=null) {
+            String parentTag = matchedConfiguration.get("sensitiveTag");
+            Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
+            Matcher matcher = pattern.matcher(em.getPayload());
+            ArrayList<EsbMessageSensitiveInfoEntity> sensitiveInformation = new ArrayList<>();
+            while(matcher.find()) {
+                sensitiveInformation.add(new EsbMessageSensitiveInfoEntity(eme, matcher.group(0)) );
+            }
+            matcher.reset();
+            String test = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
+            eme.setPayload(test);
+        }
 
         for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
             for(String value : headerSet.getValue()) {
@@ -206,8 +228,9 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
-            if(matchesCriteria(messageArray[0], nonViewableCriteria)) {
-                messageArray[0].setPayload(payloadHiddenText);
+            Map<String,String> matchedConfiguration = matchCriteria(messageArray[0], nonViewableConfiguration);
+            if(matchedConfiguration!=null) {
+                messageArray[0].setPayload(matchedConfiguration.get("replaceMessage"));
             }
             result.setMessages(messageArray);
         }
@@ -215,21 +238,21 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         return result;
     }
 
-    private boolean matchesCriteria(EsbMessage message, List<List<String>> criteria) {
+    private Map<String,String> matchCriteria(EsbMessage message, List<Configuration> configurations) {
         String messageString = message.toString().toLowerCase();
-        for(List<String> criterion: criteria) {
+        for(Configuration conf: configurations) {
             boolean matched = true;
-            for(String matchCondition: criterion) {
-                if(!messageString.contains(matchCondition)) {
+            for(Entry<String,String> matchCondition: conf.getMatchCriteriaMap().entrySet()) {
+                if(!messageString.contains(matchCondition.toString().toLowerCase())) {
                     matched = false;
                     break;
                 }
             }
             if(matched) {
-                return true;
+                return conf.getConfigurationMap();
             }
         }
-        return false;
+        return null;
     }
 
     public List<EsbMessageEntity> getMessagesByPayloadHash(String payloadHash) {

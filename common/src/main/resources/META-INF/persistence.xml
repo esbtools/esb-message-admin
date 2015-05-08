@@ -6,6 +6,7 @@
       <jta-data-source>java:/ESBMessageAdminDS</jta-data-source>
       <class>org.esbtools.message.admin.common.orm.EsbMessageEntity</class>
       <class>org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity</class>
+      <class>org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity</class>
       <class>org.esbtools.message.admin.common.orm.AuditEventEntity</class>
       <class>org.esbtools.message.admin.common.orm.MetadataEntity</class>
       <properties>

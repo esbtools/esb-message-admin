@@ -19,7 +19,9 @@
 package org.esbtools.message.admin.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -115,21 +117,28 @@ public class ConversionUtility {
         return esbMessage;
     }
 
-   public static List<List<String>> getCriteria(JSONArray matchCriteria) {
+    public static Map<String, String> getMap(JSONObject jsonMap) {
+        Map<String,String> map = new HashMap<>();
+        for(Entry<String,String> entry : (Set<Entry<String,String>>)jsonMap.entrySet()) {
+            map.put(entry.getKey(),entry.getValue());
+        }
+        return map;
+    }
 
-       List<List<String>> result = new ArrayList<>();
-       for(int i=0; i<matchCriteria.size(); i++) {
-           List<String> criterion = new ArrayList<String>();
-           JSONObject matchCritierion = (JSONObject) matchCriteria.get(i);
-           for(Entry<String,String> entry : (Set<Entry<String,String>>)matchCritierion.entrySet()) {
-               criterion.add(entry.toString().toLowerCase());
-           }
-           result.add(criterion);
-       }
-       return result;
-   }
+    public static List<Configuration> getConfigurations(JSONArray jsonConfigurations) {
 
-   public static List<EsbMessageEntity> convertFromEsbMessageArray(EsbMessage[] esbMessages) {
+        List<Configuration> result = new ArrayList<>();
+        for(int i=0; i<jsonConfigurations.size(); i++) {
+            Configuration conf = new Configuration();
+            JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
+            conf.setMatchCriteriaMap(getMap((JSONObject) jsonConfiguration.get("matchCriteria")));
+            conf.setConfigurationMap(getMap((JSONObject) jsonConfiguration.get("configuration")));
+            result.add(conf);
+        }
+        return result;
+    }
+
+    public static List<EsbMessageEntity> convertFromEsbMessageArray(EsbMessage[] esbMessages) {
 
         if (esbMessages==null) {
             return null;

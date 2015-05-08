@@ -23,6 +23,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
@@ -190,7 +192,90 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void testFetchPayload() {
+    public void testSegregateSensitiveInfoFromXML() {
+        EsbMessage esbMessage = createTestMessage(154, 0);
+        String payload = "<Payload><Hello> is it me you're looking for ?</Hello>"+
+                "<Example>I can see it in your eyes</Example></Payload>";
+        esbMessage.setPayload(payload);
+        esbMessage.setSourceSystem("PartiaSourceSystemOne");
+        esbMessage.setMessageType("PartialEntityOne");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Criterion[] c1 = {new Criterion(SearchField.sourceSystem, "PartiaSourceSystemOne")};
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCriteria(c1);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("<Payload><Hello> is it me you're looking for ?</Hello>"+
+                "<Example>Sensitive Information is not viewable</Example></Payload>", result.getMessages()[0].getPayload());
+    }
+
+    /*
+     * TODO : fix example json regex, Does not work currently. 
+     */
+    @Test
+    public void testSegregateSensitiveInfoFromJSON() {
+        EsbMessage esbMessage = createTestMessage(154, 0);
+        esbMessage.setMessageType("PartialEntityTwo");
+        String payload = "{\"message\": { \"id\": \"blah\", \"Example\": \"My credit card number is 1234 3121 3123 3123\" }}";
+        esbMessage.setPayload(payload);
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Criterion[] c2 = {new Criterion(SearchField.messageType, "PartialEntityTwo")};
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCriteria(c2);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        result = service.getMessageById(result.getMessages()[0].getId());
+        //Assert.assertEquals("{\"message\": { \"id\": \"blah\", \"Example\": \"I will never tell you my credit card number\" }}", result.getMessages()[0].getPayload());
+    }
+
+    /*
+     * segregating sensitive info and resubmit proof of concept
+     */
+    @Test
+    public void resubmitWithSegregatedSensitiveInfoPOC() {
+
+      String oldText = "<Payload><Hello> is it me you're looking for ?</Hello>"+
+                "<Example>I can see it in your eyes</Example>"+
+              "<Example>I can see it in your soul</Example></Payload> ";
+      String text = oldText;
+      String parentTag = "Example", replaceText = "Sensitive Information is not viewable";
+
+      Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
+      Matcher matcher = pattern.matcher(text);
+
+      ArrayList<String> sensitiveInformation = new ArrayList<>();
+      while(matcher.find()) {
+          sensitiveInformation.add(matcher.group(0));
+      }
+      Assert.assertEquals(2, sensitiveInformation.size());
+      Assert.assertEquals("<Example>I can see it in your eyes</Example>", sensitiveInformation.get(0));
+      Assert.assertEquals("<Example>I can see it in your soul</Example>", sensitiveInformation.get(1));
+      matcher.reset();
+
+      text = matcher.replaceAll("<$1>"+replaceText+"</$1>");
+      Assert.assertEquals( "<Payload><Hello> is it me you're looking for ?</Hello>"+
+              "<Example>Sensitive Information is not viewable</Example>"+
+            "<Example>Sensitive Information is not viewable</Example></Payload> ", text);
+
+      String patternString2 = "<"+parentTag+">"+replaceText+"</"+parentTag+">";
+      Pattern pattern2 = Pattern.compile(patternString2);
+
+      for(String info: sensitiveInformation) {
+          text = pattern2.matcher(text).replaceFirst(info);
+      }
+      Assert.assertEquals( oldText, text);
+
+    }
+
+    @Test
+    public void testFetchPayloadByMessageId() {
         EsbMessage esbMessage = createTestMessage(12, 0);
         esbMessage.setPayload("<Payload>Payload</Payload>");
         esbMessage.setSourceSystem("SourceSystem12");
@@ -214,9 +299,8 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals("<Payload>Payload</Payload>",result.getMessages()[0].getPayload());
     }
 
-
     @Test
-    public void testHiddenPayload() {
+    public void testHiddenPayloadUponSingleCriteriaMatch() {
         EsbMessage esbMessage = createTestMessage(14, 0);
         esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
         esbMessage.setSourceSystem("SourceSystemTwo");
@@ -238,9 +322,15 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
 
         result = service.getMessageById(result.getMessages()[0].getId());
         Assert.assertEquals("SourceSystemTwo",result.getMessages()[0].getSourceSystem());
-        Assert.assertEquals("Payload has been hidden",result.getMessages()[0].getPayload());
+        Assert.assertEquals("SourceSystemTwo messages are restricted",result.getMessages()[0].getPayload());
 
-        // if the match criterion has more than one condition, and the message satisfies only some of the conditions, payload should NOT be hidden
+    }
+
+
+    @Test
+    public void testPayloadNotHiddenUponPartialCriteriaMatch() {
+        EsbMessage esbMessage = createTestMessage(14, 0);
+        esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
         esbMessage.setSourceSystem("SourceSystemOne");
         try {
             service.persist(esbMessage);
@@ -248,27 +338,36 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
             Assert.fail();
         }
         Criterion[] c2 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne")};
+        SearchCriteria criteria = new SearchCriteria();
         criteria.setCriteria(c2);
-        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
         result = service.getMessageById(result.getMessages()[0].getId());
         Assert.assertEquals("<Payload>NotHiddenPayload</Payload>",result.getMessages()[0].getPayload());
+    }
 
-        // if the match criterion has more than one condition, and the message satisfies ALL of the conditions, payload should be hidden
+
+    @Test
+    public void testHiddenPayloadUponMultipleCriteriaMatch() {
+        EsbMessage esbMessage = createTestMessage(14, 0);
+        esbMessage.setPayload("<Payload>NotHiddenPayload</Payload>");
+        esbMessage.setSourceSystem("SourceSystemOne");
         esbMessage.setMessageType("EntityOne");
+        // if the match criterion has more than one condition, and the message satisfies ALL of the conditions, payload should be hidden
         try {
             service.persist(esbMessage);
         } catch (IOException e) {
             Assert.fail();
         }
         Criterion[] c3 = {new Criterion(SearchField.sourceSystem, "SourceSystemOne"),new Criterion(SearchField.messageType, "EntityOne")};
+        SearchCriteria criteria = new SearchCriteria();
         criteria.setCriteria(c3);
-        result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
         result = service.getMessageById(result.getMessages()[0].getId());
-        Assert.assertEquals("Payload has been hidden",result.getMessages()[0].getPayload());
+        Assert.assertEquals("EntityOne messages from SourceSystemOne are restricted",result.getMessages()[0].getPayload());
     }
 
     @Test
-    public void testSorting() {
+    public void testSortingResultsOnCriteriaSearch() {
         EsbMessage esbMessage0 = createTestMessage(9, 0);
         EsbMessage esbMessage1 = createTestMessage(9, 0);
         EsbMessage esbMessage2 = createTestMessage(9, 0);
