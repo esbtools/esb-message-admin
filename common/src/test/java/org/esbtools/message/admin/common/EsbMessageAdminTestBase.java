@@ -74,6 +74,7 @@ public abstract class EsbMessageAdminTestBase {
         entityManager.createNativeQuery("truncate table METADATA").executeUpdate();
         entityManager.createNativeQuery("truncate table ESB_MESSAGE").executeUpdate();
         entityManager.createNativeQuery("truncate table ESB_MESSAGE_HEADER").executeUpdate();
+        entityManager.createNativeQuery("truncate table AUDIT_EVENT").executeUpdate();
         entityManager.getTransaction().commit();
         entityManager.close();
     }

@@ -50,6 +50,7 @@ import org.json.simple.JSONObject;
 public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private final EntityManager mgr;
+    private final AuditEventDAO auditDAO;
     private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
@@ -57,8 +58,9 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private Set<String> sortingFields = new HashSet<>();
     private List<Configuration> nonViewableConfiguration = null;
     private List<Configuration> partiallyViewableConfiguration = null;
-    public EsbErrorDAOImpl(EntityManager mgr, JSONObject config) {
+    public EsbErrorDAOImpl(EntityManager mgr, AuditEventDAO auditDAO, JSONObject config) {
         this.mgr=mgr;
+        this.auditDAO = auditDAO;
         JSONArray sortFields = (JSONArray) config.get("sortingFields");
         if(sortFields!=null) {
             for(int i=0;i<sortFields.size();i++) {
@@ -123,7 +125,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults) {
 
         SearchResult result = new SearchResult();
-
+        long start_time = System.currentTimeMillis();
         // allow sorting only by display fields, choose time stamp if proper field is not set.
         if(sortField==null || !sortingFields.contains(sortField)) {
             sortField = "timestamp";
@@ -162,7 +164,8 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setItemsPerPage(0);
             result.setPage(0);
         }
-
+        long end_time = System.currentTimeMillis();
+        auditDAO.save("someUser", "SEARCH", "error", "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(end_time-start_time));
 
         return result;
     }
@@ -231,6 +234,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             }
             result.setMessages(messageArray);
         }
+        auditDAO.save("someUser", "FETCH", "error", "", "", id.toString());
         return result;
     }
 
