@@ -132,7 +132,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void resultCreationOnCrudOperationsTest() {
+    public void testResultCreationOnCrudOperations() {
         long id = -1L;
         service.addChildMetadataField(id, "Entities", MetadataType.Entities, "resultCreationTest");
         MetadataField parent = fetchMetadataField("Entities", "resultCreationTest", MetadataType.Entities);
