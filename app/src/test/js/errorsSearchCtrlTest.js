@@ -43,7 +43,7 @@ describe(
 
                 // not testing autcompletion stuff - those unit tests belong to
                 // angucomplete-keyvalue project
-                http.expectGET("api/search/suggest/").respond(200);
+                http.expectGET("api/key/suggest/").respond(200);
                 // Simulate a server response
                 http.flush();
             }));
@@ -51,7 +51,6 @@ describe(
             it(
                     'makes a GET request with parameters built from search criteria',
                     function() {
-
                         rootScope.searchField_searchStr = 'Key="Value"; Blah=" Bleh ";   Foo="bar"  ; invalid';
                         scope.toDate = toDate;
                         scope.fromDate = fromDate;
