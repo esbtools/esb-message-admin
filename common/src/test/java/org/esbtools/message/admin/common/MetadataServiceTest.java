@@ -41,16 +41,13 @@ import org.junit.Test;
 public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
     @Test
-    public void testAddingFields() {
+    public void testAddingChildMetadataFields() {
         long id = -1L;
         service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
 
         MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
         assertSuccess(result);
         MetadataField field = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
-        assertfieldAssertions("Entities", "Entities", MetadataType.Entities, result.getTree());
-        Assert.assertEquals(result.getTree().getId().longValue(), field.getId().longValue());
-
         for (int i = 1; i < 10; i++) {
             result = service.addChildMetadataField(field.getId().longValue(), "Entity" + i, MetadataType.Entity, "entity" + i);
             assertSuccess(result);
@@ -61,13 +58,29 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
             assertfieldAssertions("Entity" + i, "entity" + i, MetadataType.Entity, child);
 
         }
+    }
+
+    @Test
+    public void testAddingMetadataFieldWithIncorrectType() {
+        long id = -1L;
+        service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
+
+        MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
+        assertSuccess(result);
+        MetadataField field = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
         result = service.addChildMetadataField(field.getId().longValue(), "System", MetadataType.System, "system");
         assertError(result, "Illegal Argument: System can not be a child of Entities");
+    }
 
-        result = service.addChildMetadataField(40L, "System", MetadataType.System, "system");
+    @Test
+    public void testAddingFieldToMissingParent() {
+        MetadataResponse result = service.addChildMetadataField(40L, "System", MetadataType.System, "system");
         assertError(result, "Illegal Argument:parent 40 not found!");
+    }
 
-        result = service.addChildMetadataField(-1L, "System", MetadataType.System, "system");
+    @Test
+    public void testAddingIllegalRootField() {
+        MetadataResponse result = service.addChildMetadataField(-1L, "System", MetadataType.System, "system");
         assertError(result, "Illegal Argument:" + MetadataType.System + ", If parent = -1, Expected: Entities or SearchKeys");
     }
 
@@ -85,7 +98,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void testUpdatingFields() {
+    public void testUpdatingMetadataFields() {
         long id = -1L;
         service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
         MetadataField parent = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
@@ -100,40 +113,26 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         Assert.assertNull(child);
         child = fetchMetadataField("EntityPostUpdate", "entityPostUpdate", MetadataType.Entity);
         assertfieldAssertions("EntityPostUpdate", "entityPostUpdate", MetadataType.Entity, child);
-
-        // todo illegal type
     }
 
     @Test
-    public void testFieldDeletion() {
+    public void testMetadataFieldDeletion() {
         long id = -1L;
         MetadataResponse result = service.addChildMetadataField(id, "Entities", MetadataType.Entities, "entitiesDeleteTest");
         assertSuccess(result);
         MetadataField parent = fetchMetadataField("Entities", "entitiesDeleteTest", MetadataType.Entities);
-        result = service.addChildMetadataField(parent.getId(), "EntityDelete1", MetadataType.Entity, "entityDelete1");
+        result = service.addChildMetadataField(parent.getId(), "EntityDelete", MetadataType.Entity, "entityDelete");
         assertSuccess(result);
-        result = service.addChildMetadataField(parent.getId(), "EntityDelete2", MetadataType.Entity, "entityDelete2");
-        assertSuccess(result);
-        MetadataField child1 = fetchMetadataField("EntityDelete1", "entityDelete1", MetadataType.Entity);
-        assertfieldAssertions("EntityDelete1", "entityDelete1", MetadataType.Entity, child1);
-        MetadataField child2 = fetchMetadataField("EntityDelete2", "entityDelete2", MetadataType.Entity);
-        assertfieldAssertions("EntityDelete2", "entityDelete2", MetadataType.Entity, child2);
-        result = service.deleteMetadataField(child1.getId());
+        MetadataField child = fetchMetadataField("EntityDelete", "entityDelete", MetadataType.Entity);
+        assertfieldAssertions("EntityDelete", "entityDelete", MetadataType.Entity, child);
+        result = service.deleteMetadataField(child.getId());
         assertSuccess(result);
         Assert.assertEquals(result.getResult().getId().longValue(), parent.getId().longValue());
-        Assert.assertNull("Child1 was not deleted!", fetchMetadataField("EntityDelete1", "entityDelete1", MetadataType.Entities));
-
-        // result = service.deleteMetadataField(parent.getId());
-        // Assert.assertNull("Entities was not deleted!",
-        // fetchMetadataField("Entities", "entitiesDeleteTest",
-        // MetadataType.Entities));
-        // ensure child2 was not deleted to preserve history
-        child2 = fetchMetadataField("EntityDelete2", "entityDelete2", MetadataType.Entity);
-        assertfieldAssertions("EntityDelete2", "entityDelete2", MetadataType.Entity, child2);
+        Assert.assertNull("Child was not deleted!", fetchMetadataField("EntityDelete1", "entityDelete1", MetadataType.Entities));
     }
 
     @Test
-    public void resultCreationTest() {
+    public void testResultCreationOnCrudOperations() {
         long id = -1L;
         service.addChildMetadataField(id, "Entities", MetadataType.Entities, "resultCreationTest");
         MetadataField parent = fetchMetadataField("Entities", "resultCreationTest", MetadataType.Entities);
@@ -153,7 +152,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void getEntitiesMetadataTreeTest() {
+    public void testEntitiesMetadataTreeCreation() {
         long id = -1L;
         MetadataResponse result = service.addChildMetadataField(id, "Entities", MetadataType.Entities, "Entities");
         assertSuccess(result);
@@ -214,15 +213,14 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void childWithMissingParentTest() {
-        // ensure that having a child without a parent does not throw NPE
+    public void testChildWithMissingParentDoesNotThrowNPE() {
         MetadataEntity entity = new MetadataEntity(MetadataType.Entity, "missingParent", "missingParent", 3L);
         getEntityManager().persist(entity);
         MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
     }
 
     @Test
-    public void suggestionsLoadTest() {
+    public void testSearchKeyAndValueSuggestionsRead() {
 
         long id = -1L;
         service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
@@ -293,27 +291,14 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     MetadataField searchKeys = fetchMetadataField("SearchKeys", "suggestionsTest", MetadataType.SearchKeys);
 
     service.addChildMetadataField(searchKeys.getId(), "Email", MetadataType.SearchKey, "suggestionLessKey");
-    MetadataField suggestionLessKey = fetchMetadataField("Email", "suggestionLessKey", MetadataType.SearchKey);
-    service.addChildMetadataField(suggestionLessKey.getId(), "", MetadataType.XPATH, "/Person/Email[@confirmed='true']");
 
     service.addChildMetadataField(searchKeys.getId(), "SourceSystem", MetadataType.SearchKey, "SourceSystem");
     MetadataField sourceSystem = fetchMetadataField("SourceSystem", "SourceSystem", MetadataType.SearchKey);
     service.addChildMetadataField(sourceSystem.getId(), "", MetadataType.XPATH, "/Person/SourceSystem");
     service.addChildMetadataField(sourceSystem.getId(), "SystemB", MetadataType.Suggestion, "SystemB");
 
-    service.addChildMetadataField(searchKeys.getId(), "Country", MetadataType.SearchKey, "Country");
-    MetadataField country = fetchMetadataField("Country", "Country", MetadataType.SearchKey);
-    service.addChildMetadataField(country.getId(), "", MetadataType.XPATH, "/Person/Addresses/Address/Country");
-    //
 
-    Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-    Assert.assertEquals("Expecting only 3 existing suggestions for keys",3, suggestions.size());
-
-    Assert.assertNotNull(suggestions.get("SourceSystem"));
-    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
-    Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
-    Assert.assertTrue(suggestions.containsKey("Country"));
-    // persist message and check suggestion again
+    // persist message and check suggestion
     try {
         EsbMessage message = new EsbMessage();
         message.setPayload(payload);
@@ -322,17 +307,16 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         Assert.fail();
     }
 
-    suggestions = service.getSearchKeyValueSuggestions();
+    Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
 
-    Assert.assertEquals("Expecting only 3 existing suggestions for keys",3, suggestions.size());
+    Assert.assertEquals("Unexpected number of keys returned",2, suggestions.size());
 
     Assert.assertNotNull(suggestions.get("SourceSystem"));
-    Assert.assertEquals("Expecting 2 suggestions after persistence",2,suggestions.get("SourceSystem").size());
+    Assert.assertEquals("Unexpected number of sugggestions returned",2,suggestions.get("SourceSystem").size());
     Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemA"));
     Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
 
     Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
-    Assert.assertTrue(suggestions.containsKey("Country"));
     }
 
 
