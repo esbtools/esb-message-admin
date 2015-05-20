@@ -31,7 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="ESB_MESSAGE_SENSITIVE_INFO", schema="asd")
+@Table(name="ESB_MESSAGE_SENSITIVE_INFO")
 public class EsbMessageSensitiveInfoEntity implements Serializable {
 
     private static final long serialVersionUID = 357984147079041238L;
