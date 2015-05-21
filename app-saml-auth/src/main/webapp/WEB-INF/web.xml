@@ -8,12 +8,12 @@
         <url-pattern>/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
-       <role-name>${AllowedRole}</role-name>
+       <role-name>ema-administrators</role-name>
     </auth-constraint>
   </security-constraint>
 
   <security-role>
-     <role-name>${AllowedRole}</role-name>
+     <role-name>ema-administrators</role-name>
   </security-role>
 
 </web-app>
