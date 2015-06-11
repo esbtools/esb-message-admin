@@ -3,11 +3,11 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>1.0.0</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-app</artifactId>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <licenses>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-common</artifactId>
-            <version>0.1.4-SNAPSHOT</version>
+            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
