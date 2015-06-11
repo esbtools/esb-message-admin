@@ -1,6 +1,6 @@
 CREATE USER 'ema'@'%' IDENTIFIED BY 'password';
 
-create database ema
+create database ema;
 
 grant all on ema.* to 'ema'@'%';
 
