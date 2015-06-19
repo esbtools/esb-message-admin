@@ -61,7 +61,7 @@
             <roles>
                 <role>developer</role>
             </roles>
-            <timezone>-5</timezone>
+            <timezone>+1</timezone>
         </developer>
     </developers>
     <dependencyManagement>
