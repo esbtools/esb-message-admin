@@ -10,7 +10,7 @@
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-pom</artifactId>
     <packaging>pom</packaging>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.9.0</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <description>ESB Error Message Management Tool</description>
     <licenses>
