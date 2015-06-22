@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
+import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
@@ -172,6 +173,16 @@ public class ConversionUtility {
         List<MetadataField> result = new ArrayList<MetadataField>(entities.size());
         for (MetadataEntity entity : entities) {
             result.add(convertToMetadataField(entity));
+        }
+        return result;
+    }
+
+    public static List<EsbMessageSensitiveInfoEntity> convertToEsbMessageSensitiveInfo(EncryptionUtil encrypter, EsbMessageEntity eme, List<String> sensitiveInfo) {
+        List<EsbMessageSensitiveInfoEntity> result = new ArrayList<EsbMessageSensitiveInfoEntity>();
+        if(sensitiveInfo!=null) {
+            for(String text: sensitiveInfo) {
+                result.add(new EsbMessageSensitiveInfoEntity(eme, encrypter.encrypt(text)));
+            }
         }
         return result;
     }

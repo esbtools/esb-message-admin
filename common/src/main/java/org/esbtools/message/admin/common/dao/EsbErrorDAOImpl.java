@@ -35,6 +35,7 @@ import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.Configuration;
 import org.esbtools.message.admin.common.ConversionUtility;
+import org.esbtools.message.admin.common.EncryptionUtil;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
@@ -51,6 +52,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
+    private final EncryptionUtil encrypter;
     private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
@@ -58,9 +60,10 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private Set<String> sortingFields = new HashSet<>();
     private List<Configuration> nonViewableConfiguration = null;
     private List<Configuration> partiallyViewableConfiguration = null;
-    public EsbErrorDAOImpl(EntityManager mgr, AuditEventDAO auditDAO, JSONObject config) {
+    public EsbErrorDAOImpl(EntityManager mgr, AuditEventDAO auditDAO, EncryptionUtil encryptionUtil, JSONObject config) {
         this.mgr=mgr;
         this.auditDAO = auditDAO;
+        this.encrypter = encryptionUtil;
         JSONArray sortFields = (JSONArray) config.get("sortingFields");
         if(sortFields!=null) {
             for(int i=0;i<sortFields.size();i++) {
@@ -83,13 +86,14 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             String parentTag = matchedConfiguration.get("sensitiveTag");
             Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
             Matcher matcher = pattern.matcher(em.getPayload());
-            ArrayList<EsbMessageSensitiveInfoEntity> sensitiveInformation = new ArrayList<>();
+            ArrayList<String> sensitiveInformation = new ArrayList<>();
             while(matcher.find()) {
-                sensitiveInformation.add(new EsbMessageSensitiveInfoEntity(eme, matcher.group(0)) );
+                sensitiveInformation.add(matcher.group(0));
             }
             matcher.reset();
-            String test = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
-            eme.setPayload(test);
+            String maskedText = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
+            eme.setErrorSensitiveInfo(ConversionUtility.convertToEsbMessageSensitiveInfo(encrypter, eme, sensitiveInformation));
+            eme.setPayload(maskedText);
         }
 
         for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
