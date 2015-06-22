@@ -19,6 +19,7 @@
 package org.esbtools.message.admin.common;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,8 @@ import javax.persistence.Query;
 import org.esbtools.message.admin.common.ConversionUtility;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
+import org.esbtools.message.admin.model.Header;
+import org.esbtools.message.admin.model.HeaderType;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -260,31 +263,25 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     }
 
     @Test
-    public void addSuggestionsToMetadataTest() {
+    public void addSuggestionsFromJMSHeadersTest() {
+        EsbMessage message = getTestMessage();
+        message.setHeaders(new ArrayList<Header>());
+        message.getHeaders().add(new Header(HeaderType.JMS, "SourceQueue", "QueueName"));
+        message.getHeaders().add(new Header(HeaderType.JMS, "Taylor", "Swift"));
+        service.addChildMetadataField(-1L, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
+        try {
+            service.persist(message);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
+        Assert.assertTrue("JMS Suggestions are no longer automatically added",suggestions.containsKey("SourceQueue"));
+        Assert.assertTrue("JMS Suggestions added with wrong value",suggestions.get("SourceQueue").contains("QueueName"));
+        Assert.assertFalse("unecessary JMS Suggestions are automatically added",suggestions.containsKey("Taylor"));
+    }
 
-    String payload =
-            "<Person>\n" +
-            " <Id>12345</Id>\n" +
-            " <SourceSystem>SystemA</SourceSystem>\n" +
-            " <FirstName>John</FirstName>\n" +
-            " <LastName>Doe</LastName>\n" +
-            " <Email confirmed=\"true\">john.doe@example.com</Email>\n" +
-            " <Addresses>\n" +
-            " <Address type=\"Private\">\n" +
-            " <Line>123 Main St</Line>\n" +
-            " <City>Anytown</City>\n" +
-            " <State>AS</State>\n" +
-            " <Country>US</Country>\n" +
-            " <ZIP>98765</ZIP>\n" +
-            " </Address>\n" +
-            " <Address type=\"Work\">\n" +
-            " <Line>Strasse 123</Line>\n" +
-            " <City>Stadt</City>\n" +
-            " <Country>DE</Country>\n" +
-            " <ZIP>12345</ZIP>\n" +
-            " </Address>\n" +
-            " </Addresses>\n" +
-            "</Person>";
+    @Test
+    public void addSuggestionsToMetadataTest() {
 
     long id = -1L;
     service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
@@ -300,9 +297,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
     // persist message and check suggestion
     try {
-        EsbMessage message = new EsbMessage();
-        message.setPayload(payload);
-        service.persist(message);
+        service.persist(getTestMessage());
     } catch (IOException e) {
         Assert.fail();
     }
@@ -317,6 +312,36 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
     Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
 
     Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
+    }
+
+    private EsbMessage getTestMessage() {
+        String payload =
+                "<Person>\n" +
+                " <Id>12345</Id>\n" +
+                " <SourceSystem>SystemA</SourceSystem>\n" +
+                " <FirstName>John</FirstName>\n" +
+                " <LastName>Doe</LastName>\n" +
+                " <Email confirmed=\"true\">john.doe@example.com</Email>\n" +
+                " <Addresses>\n" +
+                " <Address type=\"Private\">\n" +
+                " <Line>123 Main St</Line>\n" +
+                " <City>Anytown</City>\n" +
+                " <State>AS</State>\n" +
+                " <Country>US</Country>\n" +
+                " <ZIP>98765</ZIP>\n" +
+                " </Address>\n" +
+                " <Address type=\"Work\">\n" +
+                " <Line>Strasse 123</Line>\n" +
+                " <City>Stadt</City>\n" +
+                " <Country>DE</Country>\n" +
+                " <ZIP>12345</ZIP>\n" +
+                " </Address>\n" +
+                " </Addresses>\n" +
+                "</Person>";
+
+        EsbMessage message = new EsbMessage();
+        message.setPayload(payload);
+        return message;
     }
 
 

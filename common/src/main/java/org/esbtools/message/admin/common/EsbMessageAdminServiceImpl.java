@@ -116,7 +116,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         }
 
         getErrorDAO().create(esbMessage, extractedHeaders);
-        getMetadataDAO().ensureSuggestionsArePresent(extractedHeaders);
+        getMetadataDAO().ensureSuggestionsArePresent(esbMessage, extractedHeaders);
 
     }
 

@@ -38,6 +38,8 @@ import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.ConversionUtility;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
+import org.esbtools.message.admin.model.EsbMessage;
+import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -402,30 +404,39 @@ public class MetadataDAOImpl implements MetadataDAO {
     }
 
     @Override
-    public void ensureSuggestionsArePresent(Map<String, List<String>> extractedHeaders) {
+    public void ensureSuggestionsArePresent(EsbMessage message, Map<String, List<String>> extractedHeaders) {
 
+        if(message.getHeaders()!=null) {
+            for(Header header:message.getHeaders()) {
+                if(suggestedFields.contains(header.getName())) {
+                    ensureSuggestionIsPresent(header.getName(), header.getValue());
+                }
+            }
+        }
         for(String suggestedField: suggestedFields) {
-
             List<String> extractedValues = extractedHeaders.get(suggestedField);
             if(extractedValues!=null && extractedValues.size()>0) {
-                if(!suggestionsCache.containsKey(suggestedField)) {
-                    Long parentId = treeCache.get(MetadataType.SearchKeys).getTree().getId();
-                    addChildMetadataField(parentId, suggestedField, MetadataType.SearchKey, suggestedField);
-                }
                 for(String extractedValue: extractedValues) {
-                    Long searchKeyId = null;
-                    if(!suggestionsCache.get(suggestedField).contains(extractedValue)) {
-                        if(searchKeyId==null) {
-                            searchKeyId = fetchSearchKeyId(suggestedField);
-                        }
-                        // fetch method can return null
-                        if(searchKeyId!=null) {
-                            addChildMetadataField(searchKeyId, extractedValue, MetadataType.Suggestion, extractedValue);
-                        } else {
-                            log.severe("unable to find search key to add suggestion!");
-                        }
-                    }
+                    ensureSuggestionIsPresent(suggestedField, extractedValue);
                 }
+            }
+        }
+    }
+
+    // should be called only for fields defined as suggested fields
+    private void ensureSuggestionIsPresent(String suggestedField, String suggestion) {
+        if(!suggestionsCache.containsKey(suggestedField)) {
+            Long parentId = treeCache.get(MetadataType.SearchKeys).getTree().getId();
+            addChildMetadataField(parentId, suggestedField, MetadataType.SearchKey, suggestedField);
+        }
+        Long searchKeyId = null;
+        if(!suggestionsCache.get(suggestedField).contains(suggestion)) {
+            searchKeyId = fetchSearchKeyId(suggestedField);
+            // fetch method can return null
+            if(searchKeyId!=null) {
+                addChildMetadataField(searchKeyId, suggestion, MetadataType.Suggestion, suggestion);
+            } else {
+                log.severe("unable to add suggestion!");
             }
         }
     }
