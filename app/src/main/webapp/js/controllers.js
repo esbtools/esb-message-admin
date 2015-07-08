@@ -8,9 +8,10 @@ esbMessageAdminControllers
                         '$scope',
                         '$rootScope',
                         'EsbMessageService',
+                        'errorColumnPrefs',
                         '$log',
                         'Globals',
-                        function($scope, $rootScope, EsbMessageService, $log,
+                        function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log,
                                 Globals) {
 
                             // initialize autocomplete data
@@ -34,30 +35,11 @@ esbMessageAdminControllers
 
                             // ngGrid
 
-                            var standardCellTemplate = '<div class="ngCellText" ng-class="col.colIndex()" title="{{row.getProperty(col.field)}}">{{row.getProperty(col.field)}}</div>';
-                            var dateCellTempate = '<div class="ngCellText" ng-class="col.colIndex()">{{row.getProperty(col.field) | date:"M/d/yy HH:mm:ss"}}</div>';
+                            $scope.$on('ngGridEventColumns', function(event, columns) {
+                                 errorColumnPrefs.save(columns);
+                            });
 
-                            var columnDefs = [ {
-                                field : 'sourceSystem',
-                                displayName : 'Source',
-                                width : 110,
-                                cellTemplate : standardCellTemplate
-                            }, {
-                                field : 'messageType',
-                                displayName : 'Type',
-                                width : 110,
-                                cellTemplate : standardCellTemplate
-                            }, {
-                                field : 'timestamp',
-                                displayName : 'Timestamp',
-                                width : 130,
-                                cellTemplate : dateCellTempate
-                            }, {
-                                field : 'occurrenceCount',
-                                displayName : '#',
-                                width : 10,
-                                cellTemplate : standardCellTemplate
-                            } ];
+                            var columnDefs = errorColumnPrefs.load();
 
                             $scope.sortOptions = {
                                 fields : [ "timestamp" ],
@@ -84,6 +66,8 @@ esbMessageAdminControllers
                                 multiSelect : false,
                                 useExternalSorting : true,
                                 sortInfo : $scope.sortOptions,
+                                showColumnMenu: true,
+                                enableColumnReordering: true,
                             };
 
                             var parseSearchString = function(searchStr) {
