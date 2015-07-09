@@ -26,24 +26,27 @@ module.exports = function(config) {
         "main/webapp/bower_components/ngQuickDate/dist/ng-quick-date.min.js",
         "main/webapp/bower_components/angular-loading-bar/build/loading-bar.min.js",
         "main/webapp/bower_components/message-center/message-center.js",
-        "main/webapp/js/*.js",
-        "test/webapp/*.js"
+        "main/webapp/js/**/*.js",
+        "test/webapp/**/*.js"
       ],
 
       // list of files to exclude
-      exclude: [
-      ],
+      exclude: [],
 
       // preprocess matching files before serving them to the browser
-      // available preprocessors:
-      // https://npmjs.org/browse/keyword/karma-preprocessor
-      preprocessors: {},
+      // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+      preprocessors: {
+        'main/webapp/js/**/*.js': ['coverage']
+      },
 
       // test results reporter to use
       // possible values: 'dots', 'progress'
-      // available reporters:
-      // https://npmjs.org/browse/keyword/karma-reporter
-      reporters: ['progress'],
+      // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+      reporters: ['progress', 'coverage'],
+
+      coverageReporter: {
+        type: 'text-summary'
+      },
 
       // web server port
       port: 9876,
