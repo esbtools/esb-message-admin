@@ -1,20 +1,9 @@
 {
   "name": "ESBMessageAdmin",
-  "version": "0.1.4-SNAPSHOT",
-  "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "karma start src/test/resources/karma.conf.gui.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/esbtools/esb-message-admin.git"
-  },
-  "author": "",
   "license": "GPL V3",
-  "bugs": {
-    "url": "https://github.com/esbtools/esb-message-admin/issues"
-  },
   "devDependencies": {
     "jasmine-core": "^2.1.2",
     "karma": "^0.12.28",
