@@ -32,7 +32,6 @@ module.exports = function(config) {
 
       // list of files to exclude
       exclude: [
-        // "src/test/js/termsListCtrlTest.js"
       ],
 
       // preprocess matching files before serving them to the browser
