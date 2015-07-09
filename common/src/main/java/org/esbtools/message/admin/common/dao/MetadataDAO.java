@@ -21,6 +21,7 @@ package org.esbtools.message.admin.common.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 
@@ -61,6 +62,6 @@ public interface MetadataDAO {
     /*
      * ensure all new suggestions are set for specific keys
      */
-    public void ensureSuggestionsArePresent(Map<String, List<String>> extractedHeaders);
+    public void ensureSuggestionsArePresent(EsbMessage esbMessage, Map<String, List<String>> extractedHeaders);
 
 }

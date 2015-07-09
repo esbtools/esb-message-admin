@@ -1,4 +1,8 @@
 /* bootstrap override */
+body {
+    margin-top: 80px;
+}
+
 .container {
     margin-left: 50px !important;
     margin-right: 50px !important;

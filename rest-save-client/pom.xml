@@ -7,24 +7,24 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.5.0</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-rest-save-client</artifactId>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.5.0</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <dependencies>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-rest-save</artifactId>
             <type>war</type>
-	    <version>0.1.4-SNAPSHOT</version>
+	    <version>0.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-api</artifactId>
             <scope>provided</scope>
-	    <version>0.1.4-SNAPSHOT</version>
+	    <version>0.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -55,4 +55,17 @@
             <artifactId>cdi-api</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

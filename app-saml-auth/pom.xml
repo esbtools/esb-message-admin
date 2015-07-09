@@ -7,46 +7,36 @@
         <version>0.5.0</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
-    <artifactId>esb-message-admin-rest-save</artifactId>
+    <artifactId>esb-message-admin-app-saml-auth</artifactId>
     <version>0.5.0</version>
     <packaging>war</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
+    <licenses>
+        <license>
+            <name>GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <url/>
+        <tag/>
+    </scm>
+    <distributionManagement/>
     <dependencies>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
-            <artifactId>esb-message-admin-common</artifactId>
+            <artifactId>esb-message-admin-app</artifactId>
             <version>0.5.0</version>
+            <type>war</type>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <version>2.3.7.Final</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>javax.ejb</groupId>
-            <artifactId>ejb-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-            <version>1.2</version>
-        </dependency>
-
-        <!-- Test dependencies -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>
@@ -56,25 +46,12 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>2.4</version>
-                <configuration>
-                    <attachClasses>true</attachClasses>
-                    <webResources>
-                        <resource>
-                            <directory>src/main/webapp</directory>
-                            <filtering>true</filtering>
-                        </resource>
-                    </webResources>
-                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.18</version>
             </plugin>
         </plugins>
     </build>
@@ -93,6 +70,7 @@
                                 <goals>
                                     <goal>attached-rpm</goal>
                                 </goals>
+                                <phase>install</phase>
                             </execution>
                         </executions>
                         <configuration>
@@ -100,7 +78,7 @@
                             <release>${rpm.release}</release>
                             <group>ESB Message Admin</group>
                             <copyright>esbtools Contributors</copyright>
-                            <summary>ESB Message Admin Save</summary>
+                            <summary>ESB Message Admin Application</summary>
                             <epoch>1</epoch>
                             <buildSRPM>true</buildSRPM>
                             <requires>
@@ -127,4 +105,3 @@
         </profile>
     </profiles>
 </project>
-

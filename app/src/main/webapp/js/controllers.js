@@ -249,9 +249,8 @@ esbMessageAdminControllers
                 'SearchKeysCtrl',
                 [
                         '$scope',
-                        '$rootScope',
                         'EsbMessageService',
-                        function($scope, $rootScope, EsbMessageService) {
+                        function($scope, EsbMessageService) {
 
                             $scope.searchKeys = {
                                 "id" : 0,
@@ -423,9 +422,8 @@ esbMessageAdminControllers
                 'SyncKeysCtrl',
                 [
                         '$scope',
-                        '$rootScope',
                         'EsbMessageService',
-                        function($scope, $rootScope, EsbMessageService) {
+                        function($scope, EsbMessageService) {
 
                             $scope.entities = {
                                 "id" : 0,
@@ -596,9 +594,8 @@ esbMessageAdminControllers
 
 esbMessageAdminControllers.controller('SyncCtrl', [
         '$scope',
-        '$rootScope',
         'EsbMessageService',
-        function($scope, $rootScope, EsbMessageService) {
+        function($scope, EsbMessageService) {
 
             $scope.entities = {
                 "id" : 0,

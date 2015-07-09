@@ -4,11 +4,11 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.1.4-SNAPSHOT</version>
+        <version>0.5.0</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-app</artifactId>
-    <version>0.1.4-SNAPSHOT</version>
+    <version>0.5.0</version>
     <packaging>war</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <licenses>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-common</artifactId>
-            <version>0.1.4-SNAPSHOT</version>
+            <version>0.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -164,7 +164,7 @@
                             <epoch>1</epoch>
                             <buildSRPM>true</buildSRPM>
                             <requires>
-                                <require>jbossas-standalone &gt;= 7</require>
+                                <require>jboss-fsw &gt;= 6</require>
                             </requires>
                             <sourceEncoding>UTF-8</sourceEncoding>
                             <mappings>

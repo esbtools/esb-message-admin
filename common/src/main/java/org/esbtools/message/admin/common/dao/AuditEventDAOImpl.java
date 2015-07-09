@@ -19,30 +19,30 @@
 package org.esbtools.message.admin.common.dao;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
-import org.esbtools.message.admin.model.EsbMessage;
-import org.esbtools.message.admin.model.SearchCriteria;
-import org.esbtools.message.admin.model.SearchResult;
+import javax.persistence.EntityManager;
 
+import org.esbtools.message.admin.common.orm.AuditEventEntity;
 
+/**
+ * The DAO impl for audit events.
+ *
+ * @author vrjain
+ *
+ */
+public class AuditEventDAOImpl implements AuditEventDAO {
 
-public interface EsbErrorDAO {
+    private final EntityManager mgr;
 
-    /**
-     * Creates a new EsbError entity
-     */
-    public void create(EsbMessage ee, Map<String, List<String>> extractedHeaders);
+    public AuditEventDAOImpl(EntityManager mgr) {
+        this.mgr=mgr;
+    }
 
-    /**
-     * Returns error message of the given queue
-     */
-    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults);
+    @Override
+    public void save(String principal, String action, String messageType, String keyType, String messageKey, String message) {
 
-    /**
-     * Returns the error message given the id
-     */
-    public SearchResult getMessageById(Long id);
+        AuditEventEntity event = new AuditEventEntity(new Date(), principal, action, messageType, keyType, messageKey, message);
+        mgr.persist(event);
+    }
 
 }

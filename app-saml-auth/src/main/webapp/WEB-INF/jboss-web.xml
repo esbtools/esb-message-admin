@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<jboss-web>
+    <context-root>esb-message-admin</context-root>
+    <security-domain>esb-message-admin-sp</security-domain>
+    <valve>
+        <class-name>
+            org.picketlink.identity.federation.bindings.tomcat.sp.ServiceProviderAuthenticator
+        </class-name>
+        <param>
+            <param-name>issuerID</param-name>
+            <param-value>esb-message-admin</param-value>
+        </param>
+    </valve>
+</jboss-web>
