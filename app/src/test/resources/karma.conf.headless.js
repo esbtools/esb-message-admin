@@ -27,7 +27,7 @@ module.exports = function(config) {
         "main/webapp/bower_components/angular-loading-bar/build/loading-bar.min.js",
         "main/webapp/bower_components/message-center/message-center.js",
         "main/webapp/js/*.js",
-        "test/js/*.js"
+        "test/webapp/*.js"
       ],
 
       // list of files to exclude
