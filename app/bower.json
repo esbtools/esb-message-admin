@@ -1,9 +1,5 @@
 {
   "name": "ESBMessageAdmin",
-  "description": "",
-  "version": "2.0-SNAPSHOT",
-  "homepage": "none",
-  "license": "esbtools",
   "private": true,
   "dependencies": {
     "angular": "1.2.x",
