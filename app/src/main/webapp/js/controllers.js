@@ -54,8 +54,13 @@ esbMessageAdminControllers
                                 currentPage : 1
                             };
 
+                            var layoutPlugin = new ngGridLayoutPlugin();
+                            $scope.$on('errorGridResize', function() {
+                              layoutPlugin.updateGridLayout();
+                            });
+
                             $scope.gridOptions = {
-                                // plugins: [layoutPlugin],
+                                plugins: [layoutPlugin],
                                 data : 'messages',
                                 columnDefs : columnDefs,
                                 enablePaging : true,
@@ -627,3 +632,15 @@ esbMessageAdminControllers.controller('SyncCtrl', [
                 $scope.keys = $scope.syncSystem.children;
             };
         } ]);
+
+esbMessageAdminControllers.controller('gridResizeController', [
+    '$scope',
+    '$element',
+    function ($scope, $element) {
+        $scope.$watch(function() {
+            return $element.width();
+        }, function() {
+            $scope.$broadcast('errorGridResize');
+        });
+    }
+]);
