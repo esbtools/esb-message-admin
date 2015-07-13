@@ -101,13 +101,18 @@ describe("errorColumnPrefs", function() {
         '[{"field": "sourceSystem", "visible": false},' +
             '{"field": "timestamp", "visible": true}]');
 
-    errorColumnPrefs.defaults = [sourceSystem, timestamp, errorSystem];
+    errorColumnPrefs.default_map = {
+      sourceSystem: sourceSystem,
+      timestamp: timestamp,
+      errorSytem: errorSystem
+    };
+
     var loaded = errorColumnPrefs.load();
 
     expect(loaded).toContain(expectedSourceSystem);
     expect(loaded).toContain(expectedErrorSystem);
     expect(loaded).toContain(expectedTimestamp);
-    expect(loaded.size).toEqual(3);
+    expect(loaded.length).toEqual(3);
   });
 
   it("loads defaults unchanged if no column objects are saved in localStorage", function() {
