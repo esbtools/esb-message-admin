@@ -87,15 +87,12 @@ describe("errorColumnPrefs", function() {
       cellTemplate : "<div>baz</div>",
     };
 
-    var expectedSourceSystem = angular.copy(sourceSystem);
-    var expectedTimestamp = angular.copy(timestamp);
-    var expectedErrorSystem = angular.copy(errorSystem);
+    var updatedSourceSystem = angular.copy(sourceSystem);
+    var updatedTimestamp = angular.copy(timestamp);
+    var unchangedErrorSystem = angular.copy(errorSystem);
 
-    expectedSourceSystem.visible = false;
-    expectedTimestamp.visible = true;
-
-    // var foo = [{'field': 'sourceSystem', 'visible': false},
-    //     {'field': 'timestamp', 'visible': true}];
+    updatedSourceSystem.visible = false;
+    updatedTimestamp.visible = true;
 
     localStorage.setItem('esb_message_admin.error_columns',
         '[{"field": "sourceSystem", "visible": false},' +
@@ -109,13 +106,47 @@ describe("errorColumnPrefs", function() {
 
     var loaded = errorColumnPrefs.load();
 
-    expect(loaded).toContain(expectedSourceSystem);
-    expect(loaded).toContain(expectedErrorSystem);
-    expect(loaded).toContain(expectedTimestamp);
+    expect(loaded).toContain(updatedSourceSystem);
+    expect(loaded).toContain(unchangedErrorSystem);
+    expect(loaded).toContain(updatedTimestamp);
     expect(loaded.length).toEqual(3);
   });
 
   it("loads defaults unchanged if no column objects are saved in localStorage", function() {
+    var sourceSystem = {
+      field : 'sourceSystem',
+      displayName : 'Source',
+      width : '****',
+      cellTemplate : "<div>foo</div>",
+      visible: true
+    };
 
+    var timestamp = {
+      field : 'timestamp',
+      displayName : 'Timestamp',
+      width : '****',
+      cellTemplate : "<div>bar</div>",
+      visible: false
+    };
+
+    var errorSystem = {
+      field : 'errorSystem',
+      displayName : 'Error System',
+      width : '****',
+      cellTemplate : "<div>baz</div>",
+    };
+
+    var unchangedSourceSystem = angular.copy(sourceSystem);
+    var unchangedTimestamp = angular.copy(timestamp);
+    var unchangedErrorSystem = angular.copy(errorSystem);
+
+    errorColumnPrefs.defaults = [sourceSystem, timestamp, errorSystem];
+
+    var loaded = errorColumnPrefs.load();
+
+    expect(loaded).toContain(unchangedSourceSystem);
+    expect(loaded).toContain(unchangedErrorSystem);
+    expect(loaded).toContain(unchangedTimestamp);
+    expect(loaded.length).toEqual(3);
   });
 });
