@@ -35,18 +35,20 @@ div#head {
   height:60px;
 }
 
+div#errorDisplayPane {
+  min-height: 550px;
+}
+
+div#errorGridColumn {
+  overflow: hidden;
+}
+
 div#grid {
-  border: 1px solid rgb(212,212,212);
-  width:400px;
-  float:left;
-  margin:10px 0 10px 5px;
-  min-height:490px;
+  min-height:500px;
 }
 
 div#details {
-  margin:10px 0 10px 435px;
   min-height:500px;
-  height:500px
 }
 
 div#messageCenter {
@@ -86,11 +88,3 @@ textarea.payload {
         width: 1100px;
     }
 }
-
-
-
-
-
-
-
-

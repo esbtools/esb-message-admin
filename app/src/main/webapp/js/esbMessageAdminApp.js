@@ -1,7 +1,7 @@
 var esbMessageAdminApp = angular.module('esbMessageAdminApp', [ 'ui.bootstrap',
         'ngRoute', 'ngGrid', 'esbMessageAdminControllers',
         'esbMessageAdminServices', 'angucomplete', 'angular-loading-bar',
-        'ngQuickDate', 'MessageCenterModule' ]);
+        'ngQuickDate', 'MessageCenterModule', 'ui.layout' ]);
 
 esbMessageAdminApp.config([ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/errors', {
