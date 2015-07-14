@@ -11,8 +11,9 @@ esbMessageAdminControllers
                         'errorColumnPrefs',
                         '$log',
                         'Globals',
+                        'ngGridLayoutPlugin',
                         function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log,
-                                Globals) {
+                                Globals, layoutPlugin) {
 
                             // initialize autocomplete data
                             EsbMessageService
@@ -54,7 +55,6 @@ esbMessageAdminControllers
                                 currentPage : 1
                             };
 
-                            var layoutPlugin = new ngGridLayoutPlugin();
                             $scope.$on('errorGridResize', function() {
                               layoutPlugin.updateGridLayout();
                             });

@@ -325,4 +325,6 @@ esbMessageAdminServices.service('errorColumnPrefs', ['localStorage', function(lo
         }
         return self.defaults;
     }
-}])
+}]);
+
+esbMessageAdminServices.service('ngGridLayoutPlugin', ngGridLayoutPlugin);
