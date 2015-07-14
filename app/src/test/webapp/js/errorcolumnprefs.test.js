@@ -62,7 +62,7 @@ describe("errorColumnPrefs", function() {
     expect(saved.length).toEqual(2);
   });
 
-  it("loads defaults overrided with saved columns' visible' value" +
+  it("loads defaults overrided with saved columns' 'visible' value" +
       "for those columns saved in localStorage", function() {
     var sourceSystem = {
       field : 'sourceSystem',
