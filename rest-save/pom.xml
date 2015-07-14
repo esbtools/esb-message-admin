@@ -77,6 +77,19 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>deploy/*.deploy</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources/deploy</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>        
     </build>
     <profiles>
         <profile>
@@ -121,8 +134,22 @@
                                 </mapping>
                             </mappings>
                         </configuration>
+                        
                     </plugin>
                 </plugins>
+                <resources>
+                    <resource>
+                        <directory>src/main/resources</directory>
+                        <filtering>false</filtering>
+                        <excludes>
+                            <exclude>deploy/*.deploy</exclude>
+                        </excludes>
+                    </resource>
+                    <resource>
+                        <directory>src/main/resources/deploy</directory>
+                        <filtering>true</filtering>
+                    </resource>
+                </resources>
             </build>
         </profile>
     </profiles>
