@@ -130,6 +130,9 @@
                                         <source>
                                             <location>target/${project.artifactId}-${project.version}.war</location>
                                         </source>
+                                        <source>
+                                          <location>${project.build.outputDirectory}/${project.artifactId}.deploy</location>
+                                        </source>
                                     </sources>
                                 </mapping>
                             </mappings>
