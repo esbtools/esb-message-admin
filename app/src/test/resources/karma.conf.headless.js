@@ -15,19 +15,17 @@ module.exports = function(config) {
 
       // list of files / patterns to load in the browser
       files: [
-        "main/webapp/bower_components/jquery/dist/jquery.js",
-        "main/webapp/bower_components/bootstrap/dist/js/bootstrap.js",
-        "main/webapp/bower_components/angular/angular.js",
-        "main/webapp/bower_components/angular-bootstrap/ui-bootstrap-tpls.js",
-        "main/webapp/bower_components/angular-route/angular-route.js",
+        "main/webapp/bower_components/jquery/dist/jquery.min.js",
+        "main/webapp/bower_components/bootstrap/dist/js/bootstrap.min.js",
+        "main/webapp/bower_components/angular/angular.min.js",
+        "main/webapp/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js",
+        "main/webapp/bower_components/angular-route/angular-route.min.js",
         "main/webapp/bower_components/angular-mocks/angular-mocks.js",
-        "main/webapp/bower_components/ng-grid/build/ng-grid.js",
-        "main/webapp/bower_components/ng-grid/plugins/ng-grid-layout.js",
+        "main/webapp/bower_components/ng-grid/build/ng-grid.min.js",
         "main/webapp/bower_components/angucomplete-keyvalue/angucomplete.js",
-        "main/webapp/bower_components/ngQuickDate/dist/ng-quick-date.js",
-        "main/webapp/bower_components/angular-loading-bar/build/loading-bar.js",
+        "main/webapp/bower_components/ngQuickDate/dist/ng-quick-date.min.js",
+        "main/webapp/bower_components/angular-loading-bar/build/loading-bar.min.js",
         "main/webapp/bower_components/message-center/message-center.js",
-        "main/webapp/bower_components/angular-ui-layout/ui-layout.js",
         "main/webapp/js/**/*.js",
         "test/webapp/**/*.js"
       ],
