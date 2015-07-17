@@ -625,12 +625,13 @@ esbMessageAdminControllers.controller('SyncCtrl', [
 
 esbMessageAdminControllers.controller('gridResizeController', [
     '$scope',
+    '$rootScope',
     '$element',
-    function ($scope, $element) {
+    function ($scope, $rootScope, $element) {
         $scope.$watch(function() {
             return $element.width();
         }, function() {
-            $scope.$broadcast('errorGridResize');
+            $rootScope.$broadcast('errorGridResize');
         });
     }
 ]);

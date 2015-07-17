@@ -1,5 +1,5 @@
-<div id="errorpane">
-    <div ng-controller="ErrorsSearchCtrl" class="row">
+<div id="errorpane" ng-controller="ErrorsSearchCtrl">
+    <div class="row">
         <div class="col-xs-12 panel panel-default">
             <div class="panel-body">
                 <form class="form-inline" role="form" name='searchForm' style="vertical-align: middle;">
@@ -31,7 +31,7 @@
         <div class="col-xs-12" id="errorDisplayPane">
             <div ui-layout="{ flow: 'column' }" id="errorGridColumn">
                 <div ui-layout-container size="400px" ng-controller="gridResizeController">
-                    <div id="grid" ng-grid="gridOptions" ng-controller="ErrorsSearchCtrl"></div>
+                    <div id="grid" ng-grid="gridOptions"></div>
                 </div>
                 <div ui-layout-container>
                     <div id="details" ng-controller="ErrorDetailsCtrl" class="panel panel-default center-back">
