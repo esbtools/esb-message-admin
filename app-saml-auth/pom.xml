@@ -18,13 +18,10 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <url/>
-        <tag/>
-    </scm>
-    <distributionManagement/>
+    <properties>
+        <rpm.release>1</rpm.release>
+        <rpm.group>ESB Message Admin Application w/ SAML Auth</rpm.group>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
@@ -39,9 +36,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    <properties>
-        <rpm.release>1</rpm.release>
-    </properties>
     <build>
         <plugins>
             <plugin>
@@ -69,68 +63,75 @@
         </resources>
     </build>
     <profiles>
-        <profile>
-            <id>rpm</id>
-            <!-- RPM packing -->
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>rpm-maven-plugin</artifactId>
-                        <version>2.1.2</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>attached-rpm</goal>
-                                </goals>
-                                <phase>install</phase>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <name>esb-message-admin-${project.artifactId}</name>
-                            <release>${rpm.release}</release>
-                            <group>ESB Message Admin</group>
-                            <copyright>esbtools Contributors</copyright>
-                            <summary>ESB Message Admin Application</summary>
-                            <epoch>1</epoch>
-                            <buildSRPM>true</buildSRPM>
-                            <requires>
-                                <require>jboss-fsw &gt;= 6</require>
-                            </requires>
-                            <sourceEncoding>UTF-8</sourceEncoding>
-                            <mappings>
-                                <mapping>
-                                    <directory>/var/lib/jbossas/standalone/deployments</directory>
-                                    <filemode>744</filemode>
-                                    <username>jboss</username>
-                                    <groupname>jboss</groupname>
-                                    <sources>
-                                        <source>
-                                            <location>target/${project.artifactId}-${project.version}.war</location>
-                                        </source>
-                                        <source>
-                                          <location>${project.build.outputDirectory}/${project.artifactId}.deploy</location>
-                                        </source>
-                                    </sources>
-                                </mapping>
-                            </mappings>
-                        </configuration>
-                    </plugin>
-                </plugins>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                        <filtering>false</filtering>
-                        <excludes>
-                            <exclude>deploy/*.deploy</exclude>
-                        </excludes>
-                    </resource>
-                    <resource>
-                        <directory>src/main/resources/deploy</directory>
-                        <filtering>true</filtering>
-                    </resource>
-                </resources>                
-            </build>
-        </profile>
-    </profiles>
+      <profile>
+        <id>rpm</id>
+        <!-- RPM packing -->
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>rpm-maven-plugin</artifactId>
+                    <version>2.1.2</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>attached-rpm</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <name>esb-message-admin-${project.artifactId}</name>
+                        <release>${rpm.release}</release>
+                        <group>${rpm.group}</group>
+                        <copyright>${rpm.copyright}</copyright>
+                        <summary>${rpm.summary}</summary>
+                        <epoch>1</epoch>
+                        <buildSRPM>true</buildSRPM>
+                        <requires>
+                            <require>jboss-fsw &gt;= 6</require>
+                        </requires>
+                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
+                        <mappings>
+                            <mapping>
+                                <directory>${rpm.war.directory}</directory>
+                                <filemode>${rpm.filemode}</filemode>
+                                <username>${rpm.username}</username>
+                                <groupname>${rpm.groupname}</groupname>
+                                <sources>
+                                    <source>
+                                        <location>target/${project.artifactId}-${project.version}.war</location>
+                                    </source>
+                                </sources>
+                            </mapping>
+                            <mapping>
+                                <directory>${rpm.jcliff.directory}</directory>
+                                <filemode>${rpm.filemode}</filemode>
+                                <username>${rpm.username}</username>
+                                <groupname>${rpm.groupname}</groupname>
+                                <sources>
+                                    <source>
+                                      <location>${project.build.outputDirectory}/${project.artifactId}.deploy</location>
+                                    </source>
+                                </sources>
+                            </mapping>
+                        </mappings>
+                    </configuration>
+                </plugin>
+            </plugins>
+            <resources>
+                <resource>
+                    <directory>src/main/resources</directory>
+                    <filtering>false</filtering>
+                    <excludes>
+                        <exclude>deploy/*.deploy</exclude>
+                    </excludes>
+                </resource>
+                <resource>
+                    <directory>src/main/resources/deploy</directory>
+                    <filtering>true</filtering>
+                </resource>
+            </resources>
+        </build>
+    </profile>
+  </profiles>
 </project>
