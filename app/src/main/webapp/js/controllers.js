@@ -179,20 +179,10 @@ esbMessageAdminControllers
 
                             $scope.maxDate = new Date(); // now
 
-                            $scope.toDate = new Date(2014, 10, 20); // TODO:
-                            // change
-                            // this now.
-                            // Using
-                            // 11/20
-                            // because
-                            // this is
-                            // when test
-                            // data
-                            // ends.
+                            $scope.toDate = new Date(); // now
 
                             $scope.fromDate = new Date($scope.toDate.getTime());
-                            $scope.fromDate
-                                    .setDate($scope.fromDate.getDate() - 1); // yesterday
+                            $scope.fromDate.setDate($scope.fromDate.getDate() - 1); // yesterday
 
                             $scope.calendarFromOpen = function($event) {
                                 $event.preventDefault();
