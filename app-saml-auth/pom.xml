@@ -90,7 +90,7 @@
                         <requires>
                             <require>jboss-fsw &gt;= 6</require>
                         </requires>
-                        <sourceEncoding>UTF-8</sourceEncoding>
+                        <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                         <mappings>
                             <mapping>
                                 <directory>${rpm.war.directory}</directory>
