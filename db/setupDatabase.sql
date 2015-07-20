@@ -1,11 +1,11 @@
 CREATE TABLE `ESB_MESSAGE`
 (
     `id` bigint(20) NOT NULL,  `
-    'error_component` varchar(255) DEFAULT NULL,
+    `error_component` varchar(255) DEFAULT NULL,
     `error_details` text,
     `error_message` text,
     `error_queue` varchar(255) DEFAULT NULL,  `
-    'error_system` varchar(255) DEFAULT NULL,
+    `error_system` varchar(255) DEFAULT NULL,
     `error_type` varchar(255) DEFAULT NULL,
     `message_guid` varchar(255) DEFAULT NULL,
     `jms_message_id` varchar(255) DEFAULT NULL,
@@ -25,7 +25,7 @@ CREATE TABLE `ESB_MESSAGE_HEADER`
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `name` varchar(255) DEFAULT NULL,
     `type` varchar(255) DEFAULT NULL,
-    `value` varchar(255) DEFAULT NULL,
+    `value` text DEFAULT NULL,
     `message_id` bigint(20) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `FK_rrpyp9ig9g991m2ktamrcvs6b` (`message_id`),
