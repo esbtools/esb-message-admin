@@ -194,6 +194,7 @@
     <module>app</module>
     <module>app-saml-auth</module>
     <module>rest-save</module>
+    <module>rest-save-cert-auth</module>
     <module>rest-save-client</module>
   </modules>
   <build>
