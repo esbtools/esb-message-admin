@@ -18,6 +18,8 @@
  */
 package org.esbtools.message.admin.common;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -57,11 +59,12 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private final static Logger log = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
     private JSONObject config;
-
+    private String encryptionKey;
     transient EsbErrorDAO errorDao;
     transient MetadataDAO metadataDao;
     transient AuditEventDAO auditDao;
     transient static KeyExtractorUtil extractor;
+    transient static EncryptionUtil encrypter;
 
     {
         try {
@@ -69,13 +72,15 @@ public class EsbMessageAdminServiceImpl implements Provider {
             JSONParser parser = new JSONParser();
             config = (JSONObject) parser.parse(new InputStreamReader(in));
             in.close();
+            in = this.getClass().getClassLoader().getResourceAsStream("security.txt");
+            encryptionKey = new BufferedReader(new InputStreamReader(in)).readLine();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     private EsbErrorDAO getErrorDAO() {
-        return errorDao == null ? new EsbErrorDAOImpl(entityMgr, getAuditEventDAO(), config) : errorDao;
+        return errorDao == null ? new EsbErrorDAOImpl(entityMgr, getAuditEventDAO(), getEncrypter(), config) : errorDao;
     }
 
     void setErrorEntityManager(EntityManager entityMgr) {
@@ -101,6 +106,17 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     void setKeyExtractor(KeyExtractorUtil extractor) {
         this.extractor = extractor;
+    }
+
+    private EncryptionUtil getEncrypter() {
+        if (encrypter == null) {
+            encrypter = new EncryptionUtil(encryptionKey);
+        }
+        return encrypter;
+    }
+
+    void setEncrypter(EncryptionUtil encrypter) {
+        this.encrypter = encrypter;
     }
 
     @Override

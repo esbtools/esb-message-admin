@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.persistence.Query;
+
+import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
@@ -82,7 +85,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals(1, result.getMessages()[0].getOccurrenceCount());
         Assert.assertEquals(3, result.getMessages()[1].getOccurrenceCount());
     }
-    
+
     @Test
     public void testSearchByMessageGuidFieldWithSameCase() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -91,15 +94,15 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         } catch (IOException e) {
             Assert.fail();
         }
-        
+
         SearchCriteria criteria1 = new SearchCriteria();
         Criterion[] c1 = {new Criterion(SearchField.messageGuid, "MessageGuid0")};
         criteria1.setCriteria(c1);
         SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
-        
+
         Assert.assertEquals(1, result.getTotalResults());
     }
-    
+
     @Test
     public void testSearchByMessageGuidAndQueueFieldsWithSameCase() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -116,7 +119,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
 
         Assert.assertEquals(1, result.getTotalResults());
     }
-    
+
     @Test
     public void testSearchByHeaderFieldsWithSameCase() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -133,8 +136,8 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
 
         Assert.assertEquals(1, result.getTotalResults());
     }
-    
-    
+
+
     @Test
     public void testSearchByMessageGuidFieldCaseInsensitive() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -149,9 +152,9 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         criteria1.setCriteria(c1);
         SearchResult result = service.searchMessagesByCriteria(criteria1, null, null, null, true, 0, 10);
 
-        Assert.assertEquals(1, result.getTotalResults());        
+        Assert.assertEquals(1, result.getTotalResults());
     }
-    
+
     @Test
     public void testSearchByMessageGuidAndQueueFieldsCaseInsensitive() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -168,10 +171,10 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         };
         criteria2.setCriteria(c2);
         SearchResult result = service.searchMessagesByCriteria(criteria2, null, null, null, true, 0, 10);
-        
+
         Assert.assertEquals(1, result.getTotalResults());
     }
-    
+
     @Test
     public void testSearchByHeaderFieldsCaseInsensitive() {
         EsbMessage esbMessage = createTestMessage(0, 1);
@@ -180,14 +183,14 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         } catch (IOException e) {
             Assert.fail();
         }
-        
+
         SearchCriteria criteria3 = new SearchCriteria();
         Criterion[] c3 = {
                 new Criterion("HEADER0_0", "VALUE0_0"),
         };
         criteria3.setCriteria(c3);
         SearchResult result = service.searchMessagesByCriteria(criteria3, null, null, null, true, 0, 10);
-        
+
         Assert.assertEquals(1, result.getTotalResults());
     }
 
@@ -195,7 +198,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
     public void testSegregateSensitiveInfoFromXML() {
         EsbMessage esbMessage = createTestMessage(154, 0);
         String payload = "<Payload><Hello> is it me you're looking for ?</Hello>"+
-                "<Example>I can see it in your eyes</Example></Payload>";
+                "<Example>I can see it in your eyes</Example><Example>I can see it in your soul</Example></Payload>";
         esbMessage.setPayload(payload);
         esbMessage.setSourceSystem("PartiaSourceSystemOne");
         esbMessage.setMessageType("PartialEntityOne");
@@ -210,11 +213,19 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
         result = service.getMessageById(result.getMessages()[0].getId());
         Assert.assertEquals("<Payload><Hello> is it me you're looking for ?</Hello>"+
+                "<Example>Sensitive Information is not viewable</Example>"+
                 "<Example>Sensitive Information is not viewable</Example></Payload>", result.getMessages()[0].getPayload());
+        Query query = getEntityManager().createQuery("select f from EsbMessageSensitiveInfoEntity f");
+        List<EsbMessageSensitiveInfoEntity> queryResult = (List<EsbMessageSensitiveInfoEntity>) query.getResultList();
+        Assert.assertEquals("two sensitive bits expected", 2, queryResult.size());
+        EncryptionUtil util = new EncryptionUtil("passwordpassword");
+        Assert.assertEquals("<Example>I can see it in your eyes</Example>",util.decrypt(queryResult.get(0).getValue()));
+        Assert.assertEquals("<Example>I can see it in your soul</Example>",util.decrypt(queryResult.get(1).getValue()));
+        Assert.assertEquals(result.getMessages()[0].getId(),queryResult.get(1).getEsbMessage().getId().longValue());
     }
 
     /*
-     * TODO : fix example json regex, Does not work currently. 
+     * TODO : fix example json regex, Does not work currently.
      */
     @Test
     public void testSegregateSensitiveInfoFromJSON() {
