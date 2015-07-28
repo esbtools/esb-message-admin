@@ -4,11 +4,11 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.6.0</version>
+        <version>0.7.0-SHAPSHOT</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-app-saml-auth</artifactId>
-    <version>0.6.0</version>
+    <version>0.7.0-SHAPSHOT</version>
     <packaging>war</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <licenses>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-app</artifactId>
-            <version>0.6.0</version>
+            <version>0.7.0-SHAPSHOT</version>
             <type>war</type>
         </dependency>
         <dependency>
