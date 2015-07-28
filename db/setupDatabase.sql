@@ -1,10 +1,10 @@
 CREATE TABLE `ESB_MESSAGE`
 (
-    `id` bigint(20) NOT NULL,  `
+    `id` bigint(20) NOT NULL,
     `error_component` varchar(255) DEFAULT NULL,
     `error_details` text,
     `error_message` text,
-    `error_queue` varchar(255) DEFAULT NULL,  `
+    `error_queue` varchar(255) DEFAULT NULL,
     `error_system` varchar(255) DEFAULT NULL,
     `error_type` varchar(255) DEFAULT NULL,
     `message_guid` varchar(255) DEFAULT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE `AUDIT_EVENT`
     `action` varchar(255) NOT NULL,
     `key_type` varchar(255) DEFAULT NULL,
     `timestamp` datetime NOT NULL,
-    `message` varchar(255) DEFAULT NULL,
+    `message` text DEFAULT NULL,
     `message_key` varchar(255) NOT NULL,
     `message_type` varchar(255) NOT NULL,
     `principal` varchar(255) NOT NULL,  PRIMARY KEY (`event_id`)
