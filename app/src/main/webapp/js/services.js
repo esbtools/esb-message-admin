@@ -166,16 +166,6 @@ esbMessageAdminServices.service('EsbMessageService',
 
             self.sync = function(argEntity, argSystem, argKey, argValues) {
             	
-            	$http.post("api/key/addChild/{parentId}?name={name}&type={type}&value={value}".supplant(
-	            		{
-	            			parentId : argParentId,
-	            			name : argName,
-	                        type : argType,
-	                        value : argValue
-	                    }
-            		)
-            	)
-            	
 		    	return $http.post("api/key/sync/{entity}/{system}/{key}?values={values}".supplant(
 	                	{
 	                		entity : argEntity,
