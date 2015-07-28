@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-pom</artifactId>
-    <version>0.7.0-SHAPSHOT</version>
+    <version>0.7.0-SNAPSHOT</version>
   </parent>
   <groupId>org.esbtools.message.admin</groupId>
   <artifactId>esb-message-admin-rest-save-cert-auth</artifactId>
-  <version>0.7.0-SHAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <packaging>war</packaging>
   <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
   <properties>
@@ -20,14 +20,14 @@
     <dependency>
       <groupId>org.esbtools.message.admin</groupId>
       <artifactId>esb-message-admin-rest-save</artifactId>
-      <version>0.7.0-SHAPSHOT</version>
+      <version>0.7.0-SNAPSHOT</version>
       <type>war</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.esbtools.message.admin</groupId>
       <artifactId>esb-message-admin-common</artifactId>
-      <version>0.7.0-SHAPSHOT</version>
+      <version>0.7.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
