@@ -1,16 +1,39 @@
 describe("ErrorsSearchCtrl", function() {
   var $controller, $scope, $rootScope, $q, msgSvc;
 
+  var emptySearchResponse = {
+    data: {
+      messages: [],
+      totalResults: 0
+    }
+  };
+
+  var testMessage = {id: "testMessage"};
+
   beforeEach(module("esbMessageAdminApp"));
 
   beforeEach(module(function($provide) {
     $provide.service("EsbMessageService", function() {
+      // Overwrite properties if different behavior is needed per test
+      // Service is recreated before each so overwrites will not affect other
+      // tests.
       return {
         // Never resolves to anything.
-        // Overwrite property if different behavior is needed.
         getSuggestions: function() {
           var deferred = $q.defer();
           return deferred.promise;
+        },
+        // Returns 0 results for any parameters
+        search: function() {
+          return $q.when(emptySearchResponse);
+        },
+        // Always returns the same example message
+        getMessage: function() {
+          return $q.when({
+            data: {
+              messages: [testMessage]
+            }
+          });
         }
       };
     });
@@ -79,5 +102,62 @@ describe("ErrorsSearchCtrl", function() {
     $scope.$apply();
 
     expect(savedColumns).toEqual(["foo", "bar"]);
+  });
+
+  describe("with nested ErrorDetailsCtrl", function() {
+    var $detailsScope;
+
+    beforeEach(function() {
+      $detailsScope = $scope.$new();
+    });
+
+    describe("after selecting a message from search results", function() {
+      beforeEach(function searchAndSelectResult() {
+        // Set required search properties on $scope to perform search();
+        $scope.pagingOptions = {
+          currentPage: 1,
+          pageSize: 1,
+        };
+
+        $scope.sortOptions = {
+          fields: ["foo"],
+          directions: ["asc"]
+        };
+
+        $rootScope.searchField_searchStr = "foo=bar";
+
+        msgSvc.search = function() {
+          // Simulate a result for the first call...
+          return $q.when({
+            data: {
+              messages: [{}],
+              totalresults: 1
+            }
+          });
+        };
+
+        // Run injected controller functions on their scopes
+        $controller("ErrorsSearchCtrl", {$scope: $scope});
+        $controller("ErrorDetailsCtrl", {$scope: $detailsScope});
+
+        $scope.search();
+        $scope.$apply();
+        $scope.messageSelections = [{id: 1}];
+        $scope.$apply();
+      });
+
+      it("resets {{message}} in ErrorDetailsCtrl after a second search " +
+          "which returns no results", function() {
+        // Simulate no results for next search
+        msgSvc.search = function() {
+          return $q.when(emptySearchResponse);
+        };
+
+        $scope.search();
+        $scope.$apply();
+
+        expect($detailsScope.$eval("message")).toBeFalsy();
+      });
+    });
   });
 });
