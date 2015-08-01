@@ -125,7 +125,7 @@
                             <goal>karma</goal>
                         </goals>
                         <configuration>
-                            <karmaConfPath>src/test/resources/karma.conf.headless.js</karmaConfPath>
+                            <karmaConfPath>src/test/resources/karma.conf.headless.coveralls.js</karmaConfPath>
                         </configuration>
                     </execution>
                 </executions>
