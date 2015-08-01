@@ -145,6 +145,10 @@ describe("ErrorsSearchCtrl", function() {
         $scope.messageSelections = [{id: 1}];
         $scope.$apply();
       });
+      
+      it("populates {{message}} in ErrorDetailsCtrl with the selection", function() {
+        expect($detailsScope.$eval("message")).toEqual(testMessage);
+      });
 
       it("resets {{message}} in ErrorDetailsCtrl after a second search " +
           "which returns no results", function() {
