@@ -128,17 +128,6 @@
                             <karmaConfPath>src/test/resources/karma.conf.headless.js</karmaConfPath>
                         </configuration>
                     </execution>
-                    <execution>
-                        <!-- When run explicitly on command line (as in travis builds), runs coveralls upload -->
-                        <!-- This is kind of a hack. -->
-                        <id>default-cli</id>
-                        <goals>
-                            <goal>karma</goal>
-                        </goals>
-                        <configuration>
-                            <karmaConfPath>src/test/resources/karma.conf.headless.coveralls.js</karmaConfPath>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
         </plugins>
