@@ -23,11 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
@@ -44,6 +40,7 @@ import org.esbtools.message.admin.common.dao.MetadataDAOImpl;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.model.EsbMessage;
+import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
@@ -73,7 +70,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
             config = (JSONObject) parser.parse(new InputStreamReader(configFile));
             configFile.close();
             InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
-            encryptionKey = new BufferedReader(new InputStreamReader(encryptionKeyFile)).readLine();
+            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile));
+            encryptionKey = encryptionKeyFileReader.readLine();
+            encryptionKeyFileReader.close();
             encryptionKeyFile.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -100,13 +99,10 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         MetadataResponse searchKeyResponse = getMetadataDAO().getMetadataTree(MetadataType.SearchKeys);
         if (extractor == null || !extractor.getHash().contentEquals(searchKeyResponse.getHash())) {
-            extractor = new KeyExtractorUtil(searchKeyResponse.getTree().getChildren(), searchKeyResponse.getHash());
+            List<MetadataField> searchKeys = (searchKeyResponse.getTree() != null) ? searchKeyResponse.getTree().getChildren() : new ArrayList<MetadataField>();
+            extractor = new KeyExtractorUtil(searchKeys, searchKeyResponse.getHash());
         }
         return extractor;
-    }
-
-    void setKeyExtractor(KeyExtractorUtil keyExtractorUtil) {
-        extractor = keyExtractorUtil;
     }
 
     private EncryptionUtil getEncrypter() {
@@ -114,10 +110,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
             encrypter = new EncryptionUtil(encryptionKey);
         }
         return encrypter;
-    }
-
-    void setEncrypter(EncryptionUtil encryptionUtil) {
-        encrypter = encryptionUtil;
     }
 
     @Override
