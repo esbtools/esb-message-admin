@@ -12,7 +12,7 @@ esbMessageAdminControllers.controller('ErrorsSearchCtrl',
 		'Globals',
 		'ngGridLayoutPlugin',
 		function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log, Globals, layoutPlugin) {
-		
+
 		    // initialize autocomplete data
 		    EsbMessageService.getSuggestions().then(
 		        function(response) {
@@ -22,39 +22,39 @@ esbMessageAdminControllers.controller('ErrorsSearchCtrl',
 		            $log.error(error.status);
 		        }
 		    );
-		    $scope.message = null;	
+		    $scope.message = null;
 		    $scope.messageSelections = [];
-		
+
 		    // ngGrid
 		    $scope.$on(
-		        'ngGridEventColumns', 
+		        'ngGridEventColumns',
 		        function(event, columns) {
 		            errorColumnPrefs.save(columns);
 		        }
 		    );
-		
+
 		    var columnDefs = errorColumnPrefs.load();
-		
+
 		    $scope.sortOptions = {
 		        fields : [ "timestamp" ],
 		        directions : [ "asc" ]
 		    };
-		
+
 		    $scope.totalServerItems = 0;
-		
+
 		    $scope.pagingOptions = {
 		        pageSizes : [ 12, 20, 50, 100 ],
 		        pageSize : 12,
 		        currentPage : 1
 		    };
-		
+
 		    $scope.$on(
-		    	'errorGridResize', 
+		    	'errorGridResize',
 		    	function() {
 		    		layoutPlugin.updateGridLayout();
 		    	}
 		    );
-		
+
 		    $scope.gridOptions = {
 		        plugins: [layoutPlugin],
 		        data : 'messages',
@@ -70,7 +70,7 @@ esbMessageAdminControllers.controller('ErrorsSearchCtrl',
 		        showColumnMenu: true,
 		        enableColumnReordering: true,
 		    };
-		
+
 		    var parseSearchString = function(searchStr) {
 		        var searchParams = searchStr.split(';');
 		        var criteria = {};
@@ -89,62 +89,56 @@ esbMessageAdminControllers.controller('ErrorsSearchCtrl',
 		        );
 		        return criteria;
 		    };
-		
+
 		    var prepareResultsPage = function() {
 		        var first = ($scope.pagingOptions.currentPage - 1) * $scope.pagingOptions.pageSize;
 		        var maxResults = $scope.pagingOptions.pageSize;
 		        var sortField = $scope.sortOptions.fields[0];
 		        var sortAsc = ($scope.sortOptions.directions[0] === "asc");
-		
+
 		        if ($rootScope.searchField_searchStr) {
 		            var criteria = parseSearchString($rootScope.searchField_searchStr);
-		
+
 		            EsbMessageService.search(
-		                criteria, 
+		                criteria,
 		                $scope.fromDate,
-		                $scope.toDate, 
+		                $scope.toDate,
 		                first,
-		                maxResults, 
+		                maxResults,
 		                sortField,
 		                sortAsc
 		            ).then(
 		                function(response) {
 		                	$scope.messages = response.data.messages;
 		                	$scope.totalServerItems = response.data.totalResults;
-		                                
-		                    if ($scope.totalServerItems === 0) {
-		                    	$scope.message = null;
-		                    }
-		                    if (!$scope.$$phase) {
-		                    	$scope.$apply();
-		                    }
+		                  $scope.messageSelections.splice(0, $scope.messageSelections.length);
 		                }
 		            );
 		        }
 		    };
-		
+
 		    $scope.search = function() {
 		        prepareResultsPage();
 		    };
-		
-		    $scope.$watch('pagingOptions', 
+
+		    $scope.$watch('pagingOptions',
 		    	function(newVal, oldVal) {
 		    		if (newVal !== oldVal) {
 		    			prepareResultsPage();
 		    		}
-		    	}, 
+		    	},
 		    	true
 		    );
-		
-		    $scope.$watch('sortOptions', 
+
+		    $scope.$watch('sortOptions',
 		    	function(newVal,oldVal) {
 		        	if (newVal !== oldVal) {
 		        		prepareResultsPage();
 		        	}
-		    	}, 
+		    	},
 		    	true
 		    );
-		
+
 		    $scope.$watch('messageSelections',
 		        function() {
 		            if ($scope.messageSelections.length > 0) {
@@ -152,47 +146,47 @@ esbMessageAdminControllers.controller('ErrorsSearchCtrl',
 		            } else {
 		            	delete $rootScope.selectedMessage;
 		            }
-		        }, 
+		        },
 		        true
 		    );
-		
+
 		    // Begin Date picker stuff
 		    $scope.dateFormat = Globals.dateFormat.datepicker;
 		    $scope.timeFormat = Globals.dateFormat.timepicker;
-		
+
 		    $scope.maxDate = new Date(); // now
-		
+
 		    $scope.toDate = new Date(); // now
-		
+
 		    $scope.fromDate = new Date($scope.toDate.getTime());
 		    $scope.fromDate.setDate($scope.fromDate.getDate() - 1); // yesterday
-		
+
 		    $scope.calendarFromOpen = function($event) {
 		        $event.preventDefault();
 		        $event.stopPropagation();
-		
+
 		        $scope.calendarFromOpened = true;
 		    };
-		
+
 		    $scope.calendarToOpen = function($event) {
 		        $event.preventDefault();
 		        $event.stopPropagation();
-		
+
 		        $scope.calendarToOpened = true;
 		    };
-		    // End Date picker stuff		
-		} 
+		    // End Date picker stuff
+		}
 	]
 );
 
-esbMessageAdminControllers.controller('ErrorDetailsCtrl', 
+esbMessageAdminControllers.controller('ErrorDetailsCtrl',
 	[
         '$scope',
         '$rootScope',
         'EsbMessageService',
         function($scope, $rootScope, EsbMessageService) {
             // on message select, fetch message details
-            $rootScope.$watch('selectedMessage', 
+            $rootScope.$watch('selectedMessage',
             	function() {
                 	if ($scope.selectedMessage) {
                 		EsbMessageService.getMessage($scope.selectedMessage.id).then(
@@ -209,7 +203,7 @@ esbMessageAdminControllers.controller('ErrorDetailsCtrl',
             $scope.resubmitMessage = function() {
                 alert("Not implemented yet");
             };
-        } 
+        }
     ]
 );
 
@@ -218,7 +212,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	    '$scope',
 	    'EsbMessageService',
 	    function($scope, EsbMessageService) {
-	
+
 	        $scope.searchKeys = {
 	            "id" : 0,
 	            "name" : "Search Keys",
@@ -226,7 +220,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	            "value" : "searchKeys",
 	            "children" : []
 	        };
-	
+
 	        $scope.getChildTypes = function(type) {
 	            if (type === "SearchKeys") {
 	                return [ "SearchKey" ];
@@ -234,7 +228,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	                return [ "XPATH", "Suggestion" ];
 	            }
 	        };
-	
+
 	        $scope.getPeerTypes = function(type) {
 	            if (type === "SearchKey") {
 	                return [ "SearchKey" ];
@@ -242,7 +236,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	                return [ "XPATH", "Suggestion" ];
 	            }
 	        };
-	
+
 	        $scope.updateParent = function(parent) {
 	            $scope.keyType = null;
 	            $scope.parent = parent;
@@ -251,13 +245,13 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	            $scope.peerTypes = $scope.getPeerTypes($scope.parent.type);
 	            $scope.peerKeyType = $scope.peerTypes[0];
 	        };
-	
+
 	        $scope.updateParent($scope.searchKeys);
-	
+
 	        $scope.crumbs = [ $scope.searchKeys ];
 	        $scope.addMode = false;
 	        $scope.updateMode = false;
-	
+
 	        EsbMessageService.getSearchKeysTree().then(
                 function(response) {
                     $scope.searchKeys = response.data.tree || $scope.searchKeys;
@@ -265,7 +259,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
                     $scope.crumbs = [ $scope.searchKeys ];
                 }
             );
-	
+
 	        $scope.addChild = function(parent) {
 	            $scope.addMode = true;
 	            $scope.updateParent(parent);
@@ -274,7 +268,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	            };
 	            $scope.crumbs.push(newCrumb);
 	        };
-	
+
 	        $scope.requestAdd = function() {
 	            var name = $scope.parent.type;
 	            EsbMessageService.addKey(
@@ -291,13 +285,13 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	            $scope.addMode = false;
 	            $scope.crumbs.pop();
 	        };
-	
+
 	        $scope.editChild = function(field) {
 	            $scope.updateMode = true;
 	            $scope.updateParent(field);
 	            $scope.crumbs.push(field);
 	        };
-	
+
 	        $scope.requestUpdate = function() {
 	            EsbMessageService.updateKey(
 	            	$scope.parent.id,
@@ -313,7 +307,7 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	            $scope.crumbs.pop();
 	            $scope.updateMode = false;
 	        };
-	
+
 	        $scope.deleteChild = function(field) {
 	            EsbMessageService.deleteKey(field.id).then(
 	            	function(response) {
@@ -322,27 +316,27 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	                }
 	            );
 	        };
-	
+
 	        $scope.manageChildren = function(field) {
 	            $scope.updateParent(field);
 	            $scope.crumbs.push(field);
 	        };
-	
+
 	        $scope.cantHaveChild = function(field) {
-	
-	            if (field == null || 
-	            	field.type == null || 
-	            	field.type === "Suggestion" || 
+
+	            if (field == null ||
+	            	field.type == null ||
+	            	field.type === "Suggestion" ||
 	            	field.type === "XPATH") {
 	            	return true;
 	            }
 	        };
-	
+
 	        $scope.gotoCrumb = function(crumb) {
-	
+
 	            $scope.addMode = false;
 	            $scope.updateMode = false;
-	
+
 	            if (crumb.type === "SearchKeys") {
 	                $scope.updateParent($scope.searchKeys);
 	            } else {
@@ -362,14 +356,14 @@ esbMessageAdminControllers.controller('SearchKeysCtrl',
 	                    }
 	                }
 	            }
-	
+
 	            if (crumb.type === "SearchKeys") {
 	                $scope.crumbs = $scope.crumbs.slice(0, 1);
 	            } else if (crumb.type == "SearchKey") {
 	                $scope.crumbs = $scope.crumbs.slice(0, 2);
 	            }
 	        };
-	    } 
+	    }
 	]
 );
 
@@ -378,7 +372,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	    '$scope',
 	    'EsbMessageService',
 	    function($scope, EsbMessageService) {
-	    	
+
 	        $scope.entities = {
 	            "id" : 0,
 	            "name" : "Entities",
@@ -386,7 +380,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	            "value" : "entities",
 	            "children" : []
 	        };
-	
+
 	        EsbMessageService.getSyncKeysTree().then(
 	        	function(response) {
 	        		$scope.parent = response.data.tree || $scope.parent;
@@ -394,20 +388,20 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	                $scope.crumbs = [ $scope.entities ];
 	            }
 	        );
-	
+
 	        $scope.crumbs = [ $scope.entities ];
-	
+
 	        $scope.parent = $scope.entities;
-	
+
 	        $scope.addMode = false;
 	        $scope.updateMode = false;
-	
+
 	        $scope.cantHaveChild = function(field) {
 	            if (field.type === "SyncKey") {
 	            	return true;
 	            }
 	        };
-	
+
 	        $scope.addChild = function(parent) {
 	            $scope.addMode = true;
 	            $scope.parent = parent;
@@ -416,7 +410,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	            };
 	            $scope.crumbs.push(newCrumb);
 	        };
-	
+
 	        $scope.requestAdd = function() {
 	            var type;
 	            switch ($scope.parent.type) {
@@ -430,7 +424,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	                type = "SyncKey";
 	                break;
 	            }
-	            
+
 	            EsbMessageService.addKey(
                     $scope.parent.id,
                     $scope.addFormName, type,
@@ -446,13 +440,13 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	            $scope.addMode = false;
 	            $scope.crumbs.pop();
 	        };
-	
+
 	        $scope.editChild = function(field) {
 	            $scope.updateMode = true;
 	            $scope.parent = field;
 	            $scope.crumbs.push(field);
 	        };
-	
+
 	        $scope.requestUpdate = function() {
 	            EsbMessageService
 	            	.updateKey(
@@ -470,7 +464,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	            $scope.crumbs.pop();
 	            $scope.updateMode = false;
 	        };
-	
+
 	        $scope.deleteChild = function(field) {
 	            EsbMessageService
 	                    .deleteKey(field.id)
@@ -482,11 +476,11 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	                                        || $scope.parent;
 	                            });
 	        };
-	
+
 	        $scope.gotoCrumb = function(crumb) {
 	            $scope.addMode = false;
 	            $scope.updateMode = false;
-	
+
 	            if (crumb.type === "Entities") {
 	                $scope.parent = $scope.entities;
 	            } else {
@@ -514,12 +508,12 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	                $scope.crumbs = $scope.crumbs.slice(0, 3);
 	            }
 	        };
-	
+
 	        $scope.manageChildren = function(field) {
 	            $scope.parent = field;
 	            $scope.crumbs.push(field);
 	        };
-	
+
 	        $scope.getNextType = function(currType, grandChild) {
 	            if (currType === "Entities") {
 	                if (grandChild) {
@@ -543,7 +537,7 @@ esbMessageAdminControllers.controller('SyncKeysCtrl',
 	]
 );
 
-esbMessageAdminControllers.controller('SyncCtrl', 
+esbMessageAdminControllers.controller('SyncCtrl',
 	[
         '$scope',
         'EsbMessageService',
@@ -571,9 +565,9 @@ esbMessageAdminControllers.controller('SyncCtrl',
             $scope.syncValues = [];
 
             $scope.enableSubmit = function() {
-                if ($scope.syncEntity == "" || 
-                	$scope.syncKey == "" || 
-                	$scope.syncSystem == "" || 
+                if ($scope.syncEntity == "" ||
+                	$scope.syncKey == "" ||
+                	$scope.syncSystem == "" ||
                 	$scope.syncValues.length <= 0) {
                 	return true;
                 }
@@ -581,15 +575,15 @@ esbMessageAdminControllers.controller('SyncCtrl',
 
             $scope.sync = function() {
                 var values = '';
-                
+
                 for ( var value in $scope.syncValues) {
                     values += $scope.syncValues[value] + ",";
                 }
-                
+
                 EsbMessageService.sync(
                 	$scope.syncEntity.value,
-                    $scope.syncSystem.value, 
-                    $scope.syncKey.value, 
+                    $scope.syncSystem.value,
+                    $scope.syncKey.value,
                     values
                 );
             };
@@ -606,7 +600,7 @@ esbMessageAdminControllers.controller('SyncCtrl',
     ]
 );
 
-esbMessageAdminControllers.controller('gridResizeController', 
+esbMessageAdminControllers.controller('gridResizeController',
 	[
 	    '$scope',
 	    '$rootScope',
