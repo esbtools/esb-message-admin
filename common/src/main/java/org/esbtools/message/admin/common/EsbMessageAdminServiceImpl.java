@@ -104,8 +104,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return extractor;
     }
 
-    void setKeyExtractor(KeyExtractorUtil extractor) {
-        this.extractor = extractor;
+    void setKeyExtractor(KeyExtractorUtil keyExtractorUtil) {
+        extractor = keyExtractorUtil;
     }
 
     private EncryptionUtil getEncrypter() {
@@ -115,8 +115,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return encrypter;
     }
 
-    void setEncrypter(EncryptionUtil encrypter) {
-        this.encrypter = encrypter;
+    void setEncrypter(EncryptionUtil encryptionUtil) {
+        encrypter = encryptionUtil;
     }
 
     @Override
