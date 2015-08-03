@@ -306,7 +306,7 @@ public class MetadataDAOImpl implements MetadataDAO {
 
         MetadataField result = null;
         if (tree != null && field != null) {
-            if (tree.getId() == field.getId()) {
+            if (tree.getId().equals(field.getId())) {
                 return tree;
             } else {
                 for (MetadataField child : tree.getChildren()) {
