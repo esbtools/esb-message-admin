@@ -61,7 +61,6 @@ public class SearchErrorResourceBean {
     @Inject
     private Instance<Provider> client;
     private final static String formatString = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static DateFormat df = new SimpleDateFormat(formatString);
     private final static Logger log = Logger.getLogger(SearchErrorResourceBean.class.getName());
 
     /**
@@ -118,7 +117,7 @@ public class SearchErrorResourceBean {
 
     private Date getDate(String stringDate) {
         try {
-            return df.parse(stringDate);
+            return new SimpleDateFormat(formatString).parse(stringDate);
         } catch (ParseException e) {
             throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + formatString);
         }
