@@ -68,12 +68,13 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     {
         try {
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.json");
+            InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(in));
-            in.close();
-            in = this.getClass().getClassLoader().getResourceAsStream("security.txt");
-            encryptionKey = new BufferedReader(new InputStreamReader(in)).readLine();
+            config = (JSONObject) parser.parse(new InputStreamReader(configFile));
+            configFile.close();
+            InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
+            encryptionKey = new BufferedReader(new InputStreamReader(encryptionKeyFile)).readLine();
+            encryptionKeyFile.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -104,8 +105,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return extractor;
     }
 
-    void setKeyExtractor(KeyExtractorUtil extractor) {
-        this.extractor = extractor;
+    void setKeyExtractor(KeyExtractorUtil keyExtractorUtil) {
+        extractor = keyExtractorUtil;
     }
 
     private EncryptionUtil getEncrypter() {
@@ -115,8 +116,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return encrypter;
     }
 
-    void setEncrypter(EncryptionUtil encrypter) {
-        this.encrypter = encrypter;
+    void setEncrypter(EncryptionUtil encryptionUtil) {
+        encrypter = encryptionUtil;
     }
 
     @Override
