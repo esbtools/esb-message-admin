@@ -34,7 +34,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataType;
 import org.w3c.dom.Document;

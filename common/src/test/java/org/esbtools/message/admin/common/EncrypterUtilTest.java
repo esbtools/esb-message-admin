@@ -18,6 +18,7 @@
  */
 package org.esbtools.message.admin.common;
 
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.junit.Assert;
 import org.junit.Test;
 

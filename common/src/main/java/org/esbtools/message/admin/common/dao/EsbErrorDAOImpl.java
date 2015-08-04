@@ -33,9 +33,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.esbtools.message.admin.common.Configuration;
-import org.esbtools.message.admin.common.ConversionUtility;
-import org.esbtools.message.admin.common.EncryptionUtil;
+import org.esbtools.message.admin.common.config.Configuration;
+import org.esbtools.message.admin.common.utility.ConversionUtility;
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.model.Criterion;

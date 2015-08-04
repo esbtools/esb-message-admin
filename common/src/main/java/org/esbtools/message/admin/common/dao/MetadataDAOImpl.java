@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.esbtools.message.admin.common.ConversionUtility;
+import org.esbtools.message.admin.common.utility.ConversionUtility;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
