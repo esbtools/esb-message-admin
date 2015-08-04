@@ -22,11 +22,7 @@ public enum MetadataType {
     Entities, Entity, System, SyncKey, SearchKeys, SearchKey, XPATH, Suggestion;
 
     public boolean isSearchKeyType() {
-        if(this==Entities || this==Entity || this==System || this==SyncKey) {
-            return false;
-        } else {
-            return true;
-        }
+        return (this==SearchKeys || this==SearchKey || this==XPATH || this==Suggestion);
     }
 
     public boolean isSyncKeyType() {

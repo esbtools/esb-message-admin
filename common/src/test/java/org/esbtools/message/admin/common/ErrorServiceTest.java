@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;

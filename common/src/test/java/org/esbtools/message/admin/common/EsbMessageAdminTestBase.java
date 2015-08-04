@@ -56,8 +56,6 @@ public abstract class EsbMessageAdminTestBase {
         }
         service = new EsbMessageAdminServiceImpl();
         service.setErrorEntityManager(entityManager);
-        List<MetadataField> searchKeys = new ArrayList<MetadataField>();
-        service.setKeyExtractor(new KeyExtractorUtil(searchKeys,""));
     }
 
     @After

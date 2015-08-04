@@ -16,7 +16,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.esbtools.message.admin.common;
+package org.esbtools.message.admin.common.utility;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.esbtools.message.admin.common.config.Configuration;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
@@ -41,7 +42,11 @@ import org.json.simple.JSONObject;
  * @author ykoer
  */
 
-public class ConversionUtility {
+public final class ConversionUtility {
+
+    private ConversionUtility() {
+
+    }
 
     /**
      * Convert an EsbMessage to an EsbMessageEntity
@@ -145,8 +150,10 @@ public class ConversionUtility {
             return null;
         }
         ArrayList<EsbMessageEntity> list=new ArrayList<EsbMessageEntity>(esbMessages.length);
-        for(EsbMessage esbMessage:esbMessages)
+        for(EsbMessage esbMessage:esbMessages) {
             list.add(convertFromEsbMessage(esbMessage));
+        }
+
         return list;
     }
 

@@ -18,16 +18,11 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 import javax.inject.Named;
@@ -43,7 +38,9 @@ import org.esbtools.message.admin.common.dao.MetadataDAO;
 import org.esbtools.message.admin.common.dao.MetadataDAOImpl;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.esbtools.message.admin.model.EsbMessage;
+import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
@@ -57,23 +54,26 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @PersistenceContext(unitName = "EsbMessageAdminPU")
     private EntityManager entityMgr;
 
-    private final static Logger log = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
     private JSONObject config;
     private String encryptionKey;
-    transient EsbErrorDAO errorDao;
-    transient MetadataDAO metadataDao;
-    transient AuditEventDAO auditDao;
-    transient static KeyExtractorUtil extractor;
-    transient static EncryptionUtil encrypter;
+    private transient EsbErrorDAO errorDao;
+    private transient MetadataDAO metadataDao;
+    private transient AuditEventDAO auditDao;
+    private static transient KeyExtractorUtil extractor;
+    private static transient EncryptionUtil encrypter;
 
     {
         try {
-            InputStream in = this.getClass().getClassLoader().getResourceAsStream("config.json");
+            InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(in));
-            in.close();
-            in = this.getClass().getClassLoader().getResourceAsStream("security.txt");
-            encryptionKey = new BufferedReader(new InputStreamReader(in)).readLine();
+            config = (JSONObject) parser.parse(new InputStreamReader(configFile, "UTF-8"));
+            configFile.close();
+            InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
+            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, "UTF-8"));
+            encryptionKey = encryptionKeyFileReader.readLine();
+            encryptionKeyFileReader.close();
+            encryptionKeyFile.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -99,13 +99,10 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         MetadataResponse searchKeyResponse = getMetadataDAO().getMetadataTree(MetadataType.SearchKeys);
         if (extractor == null || !extractor.getHash().contentEquals(searchKeyResponse.getHash())) {
-            extractor = new KeyExtractorUtil(searchKeyResponse.getTree().getChildren(), searchKeyResponse.getHash());
+            List<MetadataField> searchKeys = (searchKeyResponse.getTree() != null) ? searchKeyResponse.getTree().getChildren() : new ArrayList<MetadataField>();
+            extractor = new KeyExtractorUtil(searchKeys, searchKeyResponse.getHash());
         }
         return extractor;
-    }
-
-    void setKeyExtractor(KeyExtractorUtil extractor) {
-        this.extractor = extractor;
     }
 
     private EncryptionUtil getEncrypter() {
@@ -113,10 +110,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
             encrypter = new EncryptionUtil(encryptionKey);
         }
         return encrypter;
-    }
-
-    void setEncrypter(EncryptionUtil encrypter) {
-        this.encrypter = encrypter;
     }
 
     @Override
@@ -127,7 +120,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         try {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
         } catch (KeyExtractorException e) {
-            log.warning("Could not extract metadata! " + e);
+            LOG.warning("Could not extract metadata! " + e);
             extractedHeaders = new HashMap<>();
         }
 
@@ -149,7 +142,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
-            c.add(Calendar.DATE, -30); // get this from a property file
+            // TODO get magic number from a property file
+            c.add(Calendar.DATE, -30);
             fromDate = c.getTime();
         }
         if (toDate == null) {

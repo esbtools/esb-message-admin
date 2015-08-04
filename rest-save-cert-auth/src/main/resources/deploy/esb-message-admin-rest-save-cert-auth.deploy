@@ -3,7 +3,7 @@
         {
             "NAME" => "${project.build.finalName}.${project.packaging}",
             "path" => "/var/lib/jbossas/standalone/deployments/${project.build.finalName}.${project.packaging}",
-            "replace-name-regex" => "\\Q${project.artifactId}\\E-${version.major}\\..*",
+            "replace-name-regex" => "\\Q${project.artifactId}\\E\\..*",
         }
    }
 }

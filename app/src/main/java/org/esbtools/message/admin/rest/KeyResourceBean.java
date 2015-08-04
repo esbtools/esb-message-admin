@@ -19,11 +19,8 @@
 package org.esbtools.message.admin.rest;
 
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Instance;
@@ -58,9 +55,6 @@ public class KeyResourceBean {
 
     @Inject
     private Instance<Provider> client;
-    private final static String formatString = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static DateFormat df = new SimpleDateFormat(formatString);
-    private final static Logger log = Logger.getLogger(KeyResourceBean.class.getName());
 
     /**
      * Returns entire metadata keys tree based on the type of the tree requested

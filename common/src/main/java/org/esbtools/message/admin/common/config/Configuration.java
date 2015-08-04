@@ -1,4 +1,4 @@
-package org.esbtools.message.admin.common;
+package org.esbtools.message.admin.common.config;
 
 import java.util.Map;
 

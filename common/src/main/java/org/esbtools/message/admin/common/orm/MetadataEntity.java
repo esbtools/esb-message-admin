@@ -108,14 +108,35 @@ public class MetadataEntity implements Serializable {
      * SearchKeys -> SearchKey -> [ *Path | Suggestion ]
      */
     public boolean canBeChildOf(MetadataType parentType) {
+        return checkEntitiesChildren(parentType) || checkSearchKeysChildren(parentType);
+    }
 
-        if(this.type==MetadataType.Entity && parentType==MetadataType.Entities ||
-            this.type==MetadataType.System && parentType==MetadataType.Entity ||
-            this.type==MetadataType.SyncKey && parentType==MetadataType.System ||
-            this.type==MetadataType.SearchKey && parentType==MetadataType.SearchKeys ||
-            parentType==MetadataType.SearchKey && ( this.type==MetadataType.XPATH || this.type == MetadataType.Suggestion))
-            return true;
-        return false;
+    private boolean checkEntitiesChildren(MetadataType parentType) {
+        return isEntityWithEntitiesParent(parentType) || isSystemWithEntityParent(parentType) || isSyncKeyWithSystemParent(parentType);
+    }
+
+    private boolean checkSearchKeysChildren(MetadataType parentType) {
+        return isSearchKeyWithSearchKeysParent(parentType) || isXpathOrSuggestionWithSearchKeyParent(parentType);
+    }
+
+    private boolean isEntityWithEntitiesParent(MetadataType parentType) {
+        return this.type==MetadataType.Entity && parentType==MetadataType.Entities;
+    }
+
+    private boolean isSystemWithEntityParent(MetadataType parentType) {
+        return this.type==MetadataType.System && parentType==MetadataType.Entity;
+    }
+
+    private boolean isSyncKeyWithSystemParent(MetadataType parentType) {
+        return this.type==MetadataType.SyncKey && parentType==MetadataType.System;
+    }
+
+    private boolean isSearchKeyWithSearchKeysParent(MetadataType parentType) {
+        return this.type==MetadataType.SearchKey && parentType==MetadataType.SearchKeys;
+    }
+
+    private boolean isXpathOrSuggestionWithSearchKeyParent(MetadataType parentType) {
+        return parentType==MetadataType.SearchKey && ( this.type==MetadataType.XPATH || this.type == MetadataType.Suggestion);
     }
 
     @Override

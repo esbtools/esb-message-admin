@@ -19,7 +19,6 @@
 package org.esbtools.message.admin.rest;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,9 +59,8 @@ public class SearchErrorResourceBean {
 
     @Inject
     private Instance<Provider> client;
-    private final static String formatString = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static DateFormat df = new SimpleDateFormat(formatString);
-    private final static Logger log = Logger.getLogger(SearchErrorResourceBean.class.getName());
+    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final Logger LOG = Logger.getLogger(SearchErrorResourceBean.class.getName());
 
     /**
      * Returns error messages from a given queue
@@ -105,7 +103,7 @@ public class SearchErrorResourceBean {
         if(sortAsc==null) {
             sortAsc = true;
         }
-        log.info("search criteria:" + criteria+" sortBy"+sortField+" asc="+sortAsc);
+        LOG.info("search criteria:" + criteria + " sortBy" + sortField + " asc=" + sortAsc);
         return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortField, sortAsc, start, maxResults);
     }
 
@@ -118,16 +116,16 @@ public class SearchErrorResourceBean {
 
     private Date getDate(String stringDate) {
         try {
-            return df.parse(stringDate);
+            return new SimpleDateFormat(DATE_FORMAT).parse(stringDate);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + formatString);
+            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + DATE_FORMAT);
         }
     }
 
-    private SearchCriteria getCriteria(PathSegment search_criteria) {
+    private SearchCriteria getCriteria(PathSegment searchCriteria) {
         SearchCriteria criteria = new SearchCriteria();
         List<Criterion> criteriaList = new ArrayList<Criterion>();
-        MultivaluedMap<String, String> map = search_criteria.getMatrixParameters();
+        MultivaluedMap<String, String> map = searchCriteria.getMatrixParameters();
 
         for (Map.Entry<String, List<String>> entry : map.entrySet()) {
             for (String value : entry.getValue()) {
@@ -148,7 +146,7 @@ public class SearchErrorResourceBean {
             }
         }
         criteria.setCriteria(criteriaList.toArray(new Criterion[0]));
-        log.log(Level.FINE, criteria.toString());
+        LOG.log(Level.FINE, criteria.toString());
         return criteria;
     }
 }

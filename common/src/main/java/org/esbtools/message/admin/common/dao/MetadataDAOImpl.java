@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.esbtools.message.admin.common.ConversionUtility;
+import org.esbtools.message.admin.common.utility.ConversionUtility;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
@@ -50,9 +50,11 @@ public class MetadataDAOImpl implements MetadataDAO {
 
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
-    private final static Logger log = Logger.getLogger(MetadataDAOImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(MetadataDAOImpl.class.getName());
     private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
+    private static final String DEFAULT_USER = "someUser";
+    private static final String METADATA_KEY_TYPE = "metadata";
 
     private Set<String> suggestedFields = new HashSet<>();
     private List<String> resyncRestEndpoints = new ArrayList<>();
@@ -156,10 +158,8 @@ public class MetadataDAOImpl implements MetadataDAO {
      */
     private static MetadataField makeTree(List<MetadataEntity> entities) {
         MetadataField root = null;
-        Map<Long, MetadataField> map = new HashMap<Long, MetadataField>();
-        int i = 0;
+        Map<Long, MetadataField> map = new HashMap<>();
         for (MetadataEntity entity : entities) {
-            i++;
             MetadataField field = ConversionUtility.convertToMetadataField(entity);
             if (entity.getType() == MetadataType.Entities || entity.getType() == MetadataType.SearchKeys) {
                 root = field;
@@ -170,8 +170,11 @@ public class MetadataDAOImpl implements MetadataDAO {
         for (MetadataEntity entity : entities) {
             MetadataField field = map.get(entity.getId());
             MetadataField parent=null;
-            if (entity.getParentId().intValue() != -1 && (parent=map.get(entity.getParentId()))!= null) {
-                parent.addDescendant((field));
+            if (entity.getParentId().intValue() != -1) {
+                parent=map.get(entity.getParentId());
+                if(parent != null) {
+                    parent.addDescendant((field));
+                }
             }
         }
         return root;
@@ -215,7 +218,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 result = createMetadataResult(parent);
             }
         }
-        auditDAO.save("someUser", "ADD", "metadata", type.toString(), value, curr.toString());
+        auditDAO.save(DEFAULT_USER, "ADD", METADATA_KEY_TYPE, type.toString(), value, curr.toString());
         return result;
     }
 
@@ -253,7 +256,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 result = createMetadataResult(parent);
             }
         }
-        auditDAO.save("someUser", "UPDATE", "metadata", type.toString(), value, entity.toString());
+        auditDAO.save(DEFAULT_USER, "UPDATE", METADATA_KEY_TYPE, type.toString(), value, entity.toString());
         return result;
 
     }
@@ -269,7 +272,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             markTreeDirty(parent.getType());
             result = createMetadataResult(parent);
         }
-        auditDAO.save("someUser", "DELETE", "metadata", entity.getType().toString(), entity.getValue(), entity.toString());
+        auditDAO.save(DEFAULT_USER, "DELETE", METADATA_KEY_TYPE, entity.getType().toString(), entity.getValue(), entity.toString());
         return result;
     }
 
@@ -289,14 +292,8 @@ public class MetadataDAOImpl implements MetadataDAO {
     }
 
     private MetadataField getMetadataField(Long id) {
-
-        // if it is a top level field, return null;
-        MetadataEntity current = null;
-        current = mgr.find(MetadataEntity.class, id);
-        if (current != null) {
-            return ConversionUtility.convertToMetadataField(current);
-        }
-        return null;
+        MetadataEntity current = mgr.find(MetadataEntity.class, id);
+        return (current == null) ? null : ConversionUtility.convertToMetadataField(current);
     }
 
     /*
@@ -306,7 +303,7 @@ public class MetadataDAOImpl implements MetadataDAO {
 
         MetadataField result = null;
         if (tree != null && field != null) {
-            if (tree.getId() == field.getId()) {
+            if (tree.getId().equals(field.getId())) {
                 return tree;
             } else {
                 for (MetadataField child : tree.getChildren()) {
@@ -340,13 +337,11 @@ public class MetadataDAOImpl implements MetadataDAO {
             }
         }
         message.append("</SyncRequest>");
-        log.log(Level.INFO, "Initiating sync request:"+message.toString());
+        LOG.log(Level.INFO, "Initiating sync request:" + message.toString());
 
         auditDAO.save("someUser", "SYNC", "metadata", entity, key, message.toString());
 
-        boolean foundActiveHost = false;
         for(String restEndPoint: resyncRestEndpoints) {
-
             try {
                 URL url = new URL(restEndPoint);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -354,21 +349,21 @@ public class MetadataDAOImpl implements MetadataDAO {
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/xml");
                 OutputStream os = conn.getOutputStream();
-                os.write(message.toString().getBytes());
+                os.write(message.toString().getBytes("UTF-8"));
                 os.flush();
                 if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
                     // status is Success by default
                     return new MetadataResponse();
                 } else {
                     // try another host
-                    log.warning("unable to send resync message, recieved Http response code:"+
-                            conn.getResponseCode()+ " response message:"+conn.getResponseMessage()+" from:"+restEndPoint);
+                    LOG.warning("unable to send resync message, received Http response code:" +
+                            conn.getResponseCode() + " response message:" + conn.getResponseMessage() + " from:" + restEndPoint);
                 }
                 conn.disconnect();
             } catch (MalformedURLException e) {
-                log.severe(e.getMessage());
+                LOG.severe(e.getMessage());
             } catch (IOException e) {
-                log.severe(e.getMessage());
+                LOG.severe(e.getMessage());
             }
         }
         MetadataResponse result = new MetadataResponse();
@@ -436,7 +431,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             if(searchKeyId!=null) {
                 addChildMetadataField(searchKeyId, suggestion, MetadataType.Suggestion, suggestion);
             } else {
-                log.severe("unable to add suggestion!");
+                LOG.severe("unable to add suggestion!");
             }
         }
     }

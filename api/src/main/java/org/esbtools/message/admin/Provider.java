@@ -36,7 +36,7 @@ public interface Provider {
      * @param esbMessage an ESB Message
      * @throws IOException
      */
-    public void persist(EsbMessage esbMessage) throws IOException;
+    void persist(EsbMessage esbMessage) throws IOException;
 
     /**
      * Persists multiple ESB MessagesA
@@ -44,7 +44,7 @@ public interface Provider {
      * @param esbMessages array of ESB Messages
      * @throws IOException
      */
-    public void persist(EsbMessage[] esbMessages) throws IOException;
+    void persist(EsbMessage[] esbMessages) throws IOException;
 
     /**
      * @param criteria          search
@@ -54,7 +54,7 @@ public interface Provider {
      * @param maxResults        sets the maximum number of results to retrieve
      * @return SearchResult     results matching the search criteria
      */
-    public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults);
+    SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults);
 
     /**
      * Returns details for a specific message
@@ -62,21 +62,21 @@ public interface Provider {
      * @param id                the id of the message to retrieve
      * @return SearchResult     the resulting message
      */
-    public SearchResult getMessageById(Long id);
+    SearchResult getMessageById(Long id);
 
     /**
      * Suggests search key and value suggestions
      *
      * @return all key and value suggestions
      */
-    public Map<String, List<String>> getSearchKeyValueSuggestions();
+    Map<String, List<String>> getSearchKeyValueSuggestions();
 
     /**
      * @param type       specific tree type to return, possible values:
      *                   [Entities,KeyGroups]
      * @return MetadataResponse the entire keys tree
      */
-    public MetadataResponse getMetadataTree(MetadataType type);
+    MetadataResponse getMetadataTree(MetadataType type);
 
     /**
      * @param parentId          the id of the MetadataField to add a child to
@@ -85,7 +85,7 @@ public interface Provider {
      * @param value             the value of the child
      * @return MetadataResponse the entire MetadataField tree and the parent field
      */
-    public MetadataResponse addChildMetadataField(Long parentId, String name, MetadataType type, String value);
+    MetadataResponse addChildMetadataField(Long parentId, String name, MetadataType type, String value);
 
     /**
      * @param id                the id of the MetadataField to update
@@ -94,13 +94,13 @@ public interface Provider {
      * @param value             the value of the field
      * @return MetadataResponse the entire MetadataField tree and the parent field
      */
-    public MetadataResponse updateMetadataField(Long id, String name, MetadataType type, String value);
+    MetadataResponse updateMetadataField(Long id, String name, MetadataType type, String value);
 
     /**
      * @param id                the id of the MetadataField to delete
      * @return MetadataResponse the entire MetadataField tree and the parent field
      */
-    public MetadataResponse deleteMetadataField(Long id);
+    MetadataResponse deleteMetadataField(Long id);
 
     /**
      * @param entity            the entity to sync
@@ -108,6 +108,6 @@ public interface Provider {
      * @param key               the key name using which to sync
      * @param values            the values of the key
      */
-    public MetadataResponse sync(String entity, String system, String key, String... values);
+    MetadataResponse sync(String entity, String system, String key, String... values);
 
 }

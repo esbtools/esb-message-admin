@@ -52,9 +52,11 @@ public class Criterion implements Serializable {
      * Constructor for Object value
      */
     public Criterion(SearchField field, Object value) {
-        if (field == null)
+        if (field == null) {
             throw new IllegalArgumentException("field is null");
-        this.setField(field);
+        }
+        this.isCustom = false;
+        this.field = field;
         this.value = value;
     }
     
@@ -62,7 +64,8 @@ public class Criterion implements Serializable {
      * Constructor for Object value
      */
     public Criterion(String customKey, Object value) {
-        this.setCustomKey(customKey);
+        this.isCustom = true;
+        this.customKey = customKey;
         this.value = value;
     }
 
@@ -70,8 +73,9 @@ public class Criterion implements Serializable {
      * Constructor for long value
      */
     public Criterion(Long value) {
-        if(value==null)
+        if(value==null) {
             throw new IllegalArgumentException("value is null");
+        }
         this.value=value;
     }
 
@@ -86,14 +90,15 @@ public class Criterion implements Serializable {
      */
     public Long getLongValue()  {
         if(value!=null) {
-            if(value instanceof Long)
+            if(value instanceof Long) {
                 return (Long)value;
-            else if(value instanceof Number)
+            } else if(value instanceof Number) {
                 return Long.valueOf(((Number)value).longValue());
-            else if(value instanceof String)
+            } else if(value instanceof String) {
                 return Long.valueOf((String)value);
-            else
+            } else {
                 throw new NumberFormatException("value");
+            }
         }
         return null;
     }
@@ -200,17 +205,18 @@ public class Criterion implements Serializable {
      * key
      */
     public String getKeyString() {
-        if (isCustom())
+        if (isCustom()) {
             return getCustomKey();
+        }
         return getField().name();
-
     }
 
     @Override
     public String toString() {
         String keyValue = getKeyString() + "=" + value.toString() + ";";
-        if (this.isCustom())
+        if (this.isCustom()) {
             return "Custom Field: " + keyValue;
+        }
         return "PreDefined Field: " + keyValue;
     }
 }

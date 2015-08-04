@@ -33,12 +33,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.esbtools.message.admin.common.Configuration;
-import org.esbtools.message.admin.common.ConversionUtility;
-import org.esbtools.message.admin.common.EncryptionUtil;
+import org.esbtools.message.admin.common.config.Configuration;
+import org.esbtools.message.admin.common.utility.ConversionUtility;
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
-import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.HeaderType;
@@ -53,7 +52,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
     private final EncryptionUtil encrypter;
-    private final static Logger log = Logger.getLogger(EsbErrorDAOImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(EsbErrorDAOImpl.class.getName());
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
@@ -129,7 +128,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults) {
 
         SearchResult result = new SearchResult();
-        long start_time = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
         // allow sorting only by display fields, choose time stamp if proper field is not set.
         if(sortField==null || !sortingFields.contains(sortField)) {
             sortField = "timestamp";
@@ -168,8 +167,8 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setItemsPerPage(0);
             result.setPage(0);
         }
-        long end_time = System.currentTimeMillis();
-        auditDAO.save("someUser", "SEARCH", "error", "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(end_time-start_time));
+        long endTime = System.currentTimeMillis();
+        auditDAO.save("someUser", "SEARCH", "error", "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(endTime-startTime));
 
         return result;
     }
@@ -202,7 +201,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 queryBuilder.append(" desc");
             }
         }
-        log.info(queryBuilder.toString());
+        LOG.info(queryBuilder.toString());
         Query query = mgr.createQuery(queryBuilder.toString());
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);

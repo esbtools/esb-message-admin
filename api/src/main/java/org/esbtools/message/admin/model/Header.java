@@ -18,7 +18,9 @@
  */
 package org.esbtools.message.admin.model;
 
-public class Header {
+import java.io.Serializable;
+
+public class Header implements Serializable {
 
     private HeaderType type;
     private String name;
