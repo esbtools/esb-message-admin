@@ -108,15 +108,19 @@ public class MetadataEntity implements Serializable {
      * SearchKeys -> SearchKey -> [ *Path | Suggestion ]
      */
     public boolean canBeChildOf(MetadataType parentType) {
-        if(isEntityWithEntitiesParent(parentType) ||
-           isSystemWithEntityParent(parentType) ||
-           isSyncKeyWithSystemParent(parentType) ||
-           isSearchKeyWithSearchKeysParent(parentType) ||
-           isXpathOrSuggestionWithSearchKeyParent(parentType)) {
+        if(checkEntitiesChildren(parentType) || checkSearchKeysChildren(parentType)) {
             return true;
         } else {
             return false;
         }
+    }
+
+    private boolean checkEntitiesChildren(MetadataType parentType) {
+        return isEntityWithEntitiesParent(parentType) || isSystemWithEntityParent(parentType) || isSyncKeyWithSystemParent(parentType);
+    }
+
+    private boolean checkSearchKeysChildren(MetadataType parentType) {
+        return isSearchKeyWithSearchKeysParent(parentType) || isXpathOrSuggestionWithSearchKeyParent(parentType);
     }
 
     private boolean isEntityWithEntitiesParent(MetadataType parentType) {

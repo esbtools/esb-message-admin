@@ -1,4 +1,4 @@
-package org.esbtools.message.admin.common;
+package org.esbtools.message.admin.common.utility;
 
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;

@@ -38,6 +38,7 @@ import org.esbtools.message.admin.common.dao.MetadataDAO;
 import org.esbtools.message.admin.common.dao.MetadataDAOImpl;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
+import org.esbtools.message.admin.common.utility.EncryptionUtil;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
@@ -59,8 +60,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private transient EsbErrorDAO errorDao;
     private transient MetadataDAO metadataDao;
     private transient AuditEventDAO auditDao;
-    private transient static KeyExtractorUtil extractor;
-    private transient static EncryptionUtil encrypter;
+    private static transient KeyExtractorUtil extractor;
+    private static transient EncryptionUtil encrypter;
 
     {
         try {
