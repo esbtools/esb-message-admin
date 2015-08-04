@@ -73,7 +73,7 @@ public class SearchCriteria implements Serializable {
      * Constructs a criteria to search for an array of Criterion
      */
     public SearchCriteria(Criterion[] criteria) {
-        this.setCriteria(criteria);
+        this.criteria = criteria;
     }
 
     /**
@@ -92,8 +92,9 @@ public class SearchCriteria implements Serializable {
 
     public String toString() {
         StringBuilder text = new StringBuilder("SearchCriteria:{");
-        for (Criterion criterion : criteria)
+        for (Criterion criterion : criteria) {
             text.append(criterion.toString());
+        }
         return text.append("}").toString();
     }
 

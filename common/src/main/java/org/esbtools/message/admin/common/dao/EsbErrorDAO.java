@@ -33,16 +33,16 @@ public interface EsbErrorDAO {
     /**
      * Creates a new EsbError entity
      */
-    public void create(EsbMessage ee, Map<String, List<String>> extractedHeaders);
+    void create(EsbMessage ee, Map<String, List<String>> extractedHeaders);
 
     /**
      * Returns error message of the given queue
      */
-    public SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults);
+    SearchResult findMessagesBySearchCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, Boolean sortAsc, Integer start, Integer maxResults);
 
     /**
      * Returns the error message given the id
      */
-    public SearchResult getMessageById(Long id);
+    SearchResult getMessageById(Long id);
 
 }

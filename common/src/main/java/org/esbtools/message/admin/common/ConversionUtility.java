@@ -43,6 +43,10 @@ import org.json.simple.JSONObject;
 
 public class ConversionUtility {
 
+    private ConversionUtility() {
+
+    }
+
     /**
      * Convert an EsbMessage to an EsbMessageEntity
      */
@@ -145,8 +149,10 @@ public class ConversionUtility {
             return null;
         }
         ArrayList<EsbMessageEntity> list=new ArrayList<EsbMessageEntity>(esbMessages.length);
-        for(EsbMessage esbMessage:esbMessages)
+        for(EsbMessage esbMessage:esbMessages) {
             list.add(convertFromEsbMessage(esbMessage));
+        }
+
         return list;
     }
 

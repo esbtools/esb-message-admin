@@ -18,9 +18,7 @@
  */
 package org.esbtools.message.admin.model;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -42,10 +40,10 @@ public enum SearchField {
     private Class valueType;
 
     // Reverse-lookup map
-    private static final Set<String> lookup = new HashSet<String>();
+    private static final Set<String> LOOKUP = new HashSet<String>();
     static {
         for (SearchField f : SearchField.values()) {
-            lookup.add(f.name().toUpperCase());
+            LOOKUP.add(f.name().toUpperCase());
         }
     }
 
@@ -58,7 +56,7 @@ public enum SearchField {
     }
 
     public static boolean isPreDefined(String key) {
-        return lookup.contains(key.toUpperCase()) ? true : false;
+        return LOOKUP.contains(key.toUpperCase()) ? true : false;
     }
     
     public static SearchField match(String pattern) {
