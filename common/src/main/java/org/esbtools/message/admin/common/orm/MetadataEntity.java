@@ -108,11 +108,7 @@ public class MetadataEntity implements Serializable {
      * SearchKeys -> SearchKey -> [ *Path | Suggestion ]
      */
     public boolean canBeChildOf(MetadataType parentType) {
-        if(checkEntitiesChildren(parentType) || checkSearchKeysChildren(parentType)) {
-            return true;
-        } else {
-            return false;
-        }
+        return checkEntitiesChildren(parentType) || checkSearchKeysChildren(parentType);
     }
 
     private boolean checkEntitiesChildren(MetadataType parentType) {

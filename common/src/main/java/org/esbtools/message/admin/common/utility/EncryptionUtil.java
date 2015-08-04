@@ -44,7 +44,7 @@ public class EncryptionUtil {
             Cipher cipher = Cipher.getInstance(ALGORITHM, "SunJCE");
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes(FILE_ENCODING), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key);
-            return new String(cipher.doFinal(Base64.decodeBase64(encryptedInfo.getBytes(FILE_ENCODING)))).trim();
+            return new String(cipher.doFinal(Base64.decodeBase64(encryptedInfo.getBytes(FILE_ENCODING))), FILE_ENCODING).trim();
         } catch(NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException
                 | UnsupportedEncodingException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
