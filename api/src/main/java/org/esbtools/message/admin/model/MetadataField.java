@@ -87,17 +87,22 @@ public class MetadataField {
         }
     }
     public void addDescendants(List<MetadataField> descendants) {
-        for (MetadataField descendant : descendants)
+        for (MetadataField descendant : descendants) {
             addDescendant(descendant);
+        }
     }
 
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder(String.format(" MetadataField (%d) %s: %s = %s", id, type.name(), name, value));
-        for (MetadataField child : children)
+        for (MetadataField child : children) {
             result.append(child.toString());
-        for (MetadataField suggestion : suggestions)
+        }
+
+        for (MetadataField suggestion : suggestions) {
             result.append(suggestion.toString());
+        }
+
         return result.toString();
     }
 }

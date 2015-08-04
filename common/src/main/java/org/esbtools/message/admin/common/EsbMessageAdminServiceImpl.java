@@ -18,7 +18,6 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,23 +53,23 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @PersistenceContext(unitName = "EsbMessageAdminPU")
     private EntityManager entityMgr;
 
-    private final static Logger log = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
+    private static final Logger LOG = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
     private JSONObject config;
     private String encryptionKey;
-    transient EsbErrorDAO errorDao;
-    transient MetadataDAO metadataDao;
-    transient AuditEventDAO auditDao;
-    transient static KeyExtractorUtil extractor;
-    transient static EncryptionUtil encrypter;
+    private transient EsbErrorDAO errorDao;
+    private transient MetadataDAO metadataDao;
+    private transient AuditEventDAO auditDao;
+    private transient static KeyExtractorUtil extractor;
+    private transient static EncryptionUtil encrypter;
 
     {
         try {
             InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(configFile));
+            config = (JSONObject) parser.parse(new InputStreamReader(configFile, "UTF-8"));
             configFile.close();
             InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
-            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile));
+            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, "UTF-8"));
             encryptionKey = encryptionKeyFileReader.readLine();
             encryptionKeyFileReader.close();
             encryptionKeyFile.close();
@@ -120,7 +119,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         try {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
         } catch (KeyExtractorException e) {
-            log.warning("Could not extract metadata! " + e);
+            LOG.warning("Could not extract metadata! " + e);
             extractedHeaders = new HashMap<>();
         }
 
@@ -142,7 +141,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
-            c.add(Calendar.DATE, -30); // get this from a property file
+            // TODO get magic number from a property file
+            c.add(Calendar.DATE, -30);
             fromDate = c.getTime();
         }
         if (toDate == null) {

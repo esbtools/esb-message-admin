@@ -58,9 +58,6 @@ public class KeyResourceBean {
 
     @Inject
     private Instance<Provider> client;
-    private final static String formatString = "yyyy-MM-dd'T'HH:mm:ss";
-    private final static DateFormat df = new SimpleDateFormat(formatString);
-    private final static Logger log = Logger.getLogger(KeyResourceBean.class.getName());
 
     /**
      * Returns entire metadata keys tree based on the type of the tree requested

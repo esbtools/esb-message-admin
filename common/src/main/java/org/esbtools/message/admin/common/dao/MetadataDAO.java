@@ -32,36 +32,36 @@ public interface MetadataDAO {
     /**
      * Returns entire tree given the tree type = Entities / SearchKeys
      */
-    public MetadataResponse getMetadataTree(MetadataType type);
+    MetadataResponse getMetadataTree(MetadataType type);
 
     /**
      * Add a child field
      */
-    public MetadataResponse addChildMetadataField(Long parentId, String name, MetadataType type, String value);
+    MetadataResponse addChildMetadataField(Long parentId, String name, MetadataType type, String value);
 
     /**
      * update an existing field
      */
-    public MetadataResponse updateMetadataField(Long id, String name, MetadataType type, String value);
+    MetadataResponse updateMetadataField(Long id, String name, MetadataType type, String value);
 
     /**
      * delete a field
      */
-    public MetadataResponse deleteMetadataField(Long id);
+    MetadataResponse deleteMetadataField(Long id);
 
     /**
      * fetch suggestions for search keys and values ( for some of the keys )
      */
-    public Map<String, List<String>> getSearchKeyValueSuggestions();
+    Map<String, List<String>> getSearchKeyValueSuggestions();
 
     /**
      * sync an entity by enqueuing a JMS request
      */
-    public MetadataResponse sync(String entity, String system, String key, String... values);
+    MetadataResponse sync(String entity, String system, String key, String... values);
 
     /*
      * ensure all new suggestions are set for specific keys
      */
-    public void ensureSuggestionsArePresent(EsbMessage esbMessage, Map<String, List<String>> extractedHeaders);
+    void ensureSuggestionsArePresent(EsbMessage esbMessage, Map<String, List<String>> extractedHeaders);
 
 }

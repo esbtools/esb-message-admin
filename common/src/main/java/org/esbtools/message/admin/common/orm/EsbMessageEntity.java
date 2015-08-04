@@ -98,7 +98,7 @@ public class EsbMessageEntity implements Serializable {
     @Column(columnDefinition="TEXT")
     private String payload;
 
-    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage") //,fetch=FetchType.LAZY
+    @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage")
     private List<EsbMessageHeaderEntity> errorHeaders;
 
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage" , fetch=FetchType.LAZY)

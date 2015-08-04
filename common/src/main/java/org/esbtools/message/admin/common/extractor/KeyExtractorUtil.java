@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataType;
 import org.w3c.dom.Document;
@@ -54,7 +55,7 @@ import org.xml.sax.InputSource;
  */
 public class KeyExtractorUtil {
 
-    private static final Logger log = Logger.getLogger(KeyExtractorUtil.class.getName());
+    private static final Logger LOG = Logger.getLogger(KeyExtractorUtil.class.getName());
     private String hash;
     private Map<String, List<XPathExpression>> expressions;
 
@@ -74,9 +75,9 @@ public class KeyExtractorUtil {
                     try {
                         expr = xpath.compile(path.getValue());
                         expressions.get(searchKey.getValue()).add(expr);
-                        log.info("adding key:" + searchKey.getValue() + " with path:" + path.getValue());
+                        LOG.info("adding key:" + searchKey.getValue() + " with path:" + path.getValue());
                     } catch (XPathExpressionException e) {
-                        log.warning("XPATH: " + path.getValue() + " is invalid. Ignoring it!");
+                        LOG.warning("XPATH: " + path.getValue() + " is invalid. Ignoring it!");
                     }
                 }
             }
@@ -118,7 +119,7 @@ public class KeyExtractorUtil {
                             Node node = result.item(index);
                             String value = node.getFirstChild().getNodeValue();
                             addToMap(keysMap, key, value);
-                            log.info("found key:" + key + "with value:" + value);
+                            LOG.info("found key:" + key + "with value:" + value);
                         }
                     } catch (XPathExpressionException e) {
                         addToMap(keysMap, key, valuePath.evaluate(doc));
