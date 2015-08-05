@@ -50,9 +50,7 @@
                                 <br/>
                                 <form ng-if="message">
                                     <button type="button" class="btn btn-primary" ng-click='resubmitMessage()'>Resubmit message</button><br/><br/>
-                                    <textarea class="payload">
-                                        {{message.payload}}
-                                    </textarea>
+                                    <textarea class="payload" ng-trim="true">{{message.payload}}</textarea>
                                 </form>
                             </tab>
                             <tab heading="Headers">
