@@ -192,34 +192,36 @@ esbMessageAdminControllers.controller('ErrorDetailsCtrl',
                 		EsbMessageService.getMessage($scope.selectedMessage.id).then(
                 			function(result) {
 								$scope.message = result.data.messages[0];
-								var payload = result.data.messages[0].payload.trim();
-								var formatted = '';
-								var reg = /(>)(<)(\/*)/g;
-								payload = payload.replace(reg, '$1\r\n$2$3');
-								var pad = 0;
-								jQuery.each(payload.split('\r\n'), function(index, node) {
-									var indent = 0;
-									if (node.match( /.+<\/\w[^>]*>$/ )) {
-										indent = 0;
-									} else if (node.match( /^<\/\w/ )) {
-										if (pad != 0) {
-											pad -= 1;
+								if(result.data.messages[0].payload) {
+									var payload = result.data.messages[0].payload;
+									var formatted = '';
+									var reg = /(>)(<)(\/*)/g;
+									payload = payload.replace(reg, '$1\r\n$2$3');
+									var pad = 0;
+									jQuery.each(payload.split('\r\n'), function(index, node) {
+										var indent = 0;
+										if (node.match( /.+<\/\w[^>]*>$/ )) {
+											indent = 0;
+										} else if (node.match( /^<\/\w/ )) {
+											if (pad != 0) {
+												pad -= 1;
+											}
+										} else if (node.match( /^<\w[^>]*[^\/]>.*$/ )) {
+											indent = 1;
+										} else {
+											indent = 0;
 										}
-									} else if (node.match( /^<\w[^>]*[^\/]>.*$/ )) {
-										indent = 1;
-									} else {
-										indent = 0;
-									}
 
-									var padding = '';
-									for (var i = 0; i < pad; i++) {
-										padding += '  ';
-									}
+										var padding = '';
+										for (var i = 0; i < pad; i++) {
+											padding += '  ';
+										}
 
-									formatted += padding + node + '\r\n';
-									pad += indent;
-								});
-								$scope.message.payload = formatted;
+										formatted += padding + node + '\r\n';
+										pad += indent;
+									});
+									$scope.message.payload = formatted;
+								}
                             }
                 		);
                 	} else {
