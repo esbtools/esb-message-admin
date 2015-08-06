@@ -117,7 +117,12 @@ public class KeyExtractorUtil {
 
                         for (int index = 0; index < result.getLength(); index++) {
                             Node node = result.item(index);
-                            String value = node.getNodeValue();
+                            String value;
+                            if(node.hasChildNodes()) {
+                                value = node.getFirstChild().getNodeValue();
+                            } else {
+                                value = node.getNodeValue();
+                            }
                             addToMap(keysMap, key, value);
                             LOG.info("found key:" + key + "with value:" + value);
                         }
