@@ -102,6 +102,11 @@ public class KeyExtractorUtilTest {
         searchKey6.addDescendant(field6);
         extractors.add(searchKey6);
 
+        MetadataField searchKey7 = new MetadataField(MetadataType.SearchKey, "Id", "id");
+        MetadataField field7 = new MetadataField(MetadataType.XPATH, "", "/Person/Id/text()");
+        searchKey7.addDescendant(field7);
+        extractors.add(searchKey7);
+
         try {
             KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
             Map<String,List<String>> extractedData = util.getEntriesFromPayload(payload);
@@ -119,6 +124,8 @@ public class KeyExtractorUtilTest {
             assertEquals("2", extractedData.get("addressCount").get(0));
             assertEquals(1, extractedData.get("name").size());
             assertEquals("John Doe", extractedData.get("name").get(0));
+            assertEquals(1, extractedData.get("id").size());
+            assertEquals("12345", extractedData.get("id").get(0));
         } catch (KeyExtractorException e) {
             System.out.println(e);
             fail();
