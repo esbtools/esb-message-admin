@@ -1,0 +1,32 @@
+{
+  "ESBMessageAdminTestData": {
+    "RestSaveMessages": [
+      {
+        "errorQueue": "GITHUB_ORG_ERROR",
+        "messageId": "JMS8675309",
+        "timestamp": "2015-08-06T12:00:00",
+        "messageGuid": "8675309",
+        "messageType": "DATA_ERROR",
+        "sourceQueue": "GITHUB_ORG_CREATE",
+        "sourceLocation": "Internet",
+        "sourceSystem": "GitHub",
+        "originalSystem": "GitHub",
+        "serviceName": "GitHub",
+        "errorComponent": "GitHubOrgCreate",
+        "errorMessage": "That organization already exsits",
+        "errorDetails": "There was a problem syncing your GitHub organization",
+        "errorSystem": "GitHub",
+        "errorType": "DATA_ERROR",
+        "occurrenceCount": "1",
+        "payload": "<GitHubOrganization><OrganizationName>esbtools</OrganizationName><BillingEmail>admin@esbtools.org</BillingEmail><OrganizationsPlan>Open Source</OrganizationsPlan><Visibility>Public</Visibility></GitHubOrganization>",
+        "headers": [
+          {
+            "name": "SERVER_ID",
+            "value": "1"
+          }
+        ]
+      }
+
+    ]
+  }
+}

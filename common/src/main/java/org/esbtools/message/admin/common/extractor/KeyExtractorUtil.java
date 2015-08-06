@@ -18,6 +18,7 @@
  */
 package org.esbtools.message.admin.common.extractor;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -101,7 +102,7 @@ public class KeyExtractorUtil {
         try {
 
             DocumentBuilder builder = domFactory.newDocumentBuilder();
-            Document doc = builder.parse(new InputSource(new StringReader(payload)));
+            Document doc = builder.parse(new ByteArrayInputStream(payload.getBytes("UTF-8")));
 
             Iterator<String> iter = expressions.keySet().iterator();
 
@@ -116,7 +117,7 @@ public class KeyExtractorUtil {
 
                         for (int index = 0; index < result.getLength(); index++) {
                             Node node = result.item(index);
-                            String value = node.getFirstChild().getNodeValue();
+                            String value = node.getNodeValue();
                             addToMap(keysMap, key, value);
                             LOG.info("found key:" + key + "with value:" + value);
                         }
