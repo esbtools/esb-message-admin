@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ESBMessageAdminTestData>
+    <OrganizationMessages>
+        <GitHubOrganization>
+            <OrganizationName>esbtools</OrganizationName>
+            <BillingEmail>admin@esbtools.org</BillingEmail>
+            <OrganizationsPlan>Open Source</OrganizationsPlan>
+            <Visibility>Public</Visibility>
+        </GitHubOrganization>
+        <GitHubOrganization>
+            <OrganizationName>lightblue-platform</OrganizationName>
+            <BillingEmail>admin@lightblue.io</BillingEmail>
+            <OrganizationsPlan>Open Source</OrganizationsPlan>
+            <Visibility>Public</Visibility>
+        </GitHubOrganization>
+        <GitHubOrganization>
+            <OrganizationName>darcy-framework</OrganizationName>
+            <BillingEmail>admin@darcyframework.org</BillingEmail>
+            <OrganizationsPlan>Open Source</OrganizationsPlan>
+            <Visibility>Public</Visibility>
+        </GitHubOrganization>
+    </OrganizationMessages>
+    <RepositoryMessages>
+        <GitHubRespository>
+            <Owner>esbtools</Owner>
+            <RepositoryName>esb-message-admin</RepositoryName>
+            <Description>an Enterprise Service Bus support tool</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+        <GitHubRespository>
+            <Owner>esbtools</Owner>
+            <RepositoryName>esbtools.github.io</RepositoryName>
+            <Description>GitHub Pages project for esbtools</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+        <GitHubRespository>
+            <Owner>lightblue-platform</Owner>
+            <RepositoryName>lightblue</RepositoryName>
+            <Description>Submodules repo that brings together all source for lightblue-platform in one place.</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+        <GitHubRespository>
+            <Owner>lightblue-platform</Owner>
+            <RepositoryName>lightblue-applications</RepositoryName>
+            <Description>Web applications for managing data in lightblue</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+        <GitHubRespository>
+            <Owner>lightblue-platform</Owner>
+            <RepositoryName>lightblue-client</RepositoryName>
+            <Description>Client for interacting with lightblue services</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+        <GitHubRespository>
+            <Owner>darcy-framework</Owner>
+            <RepositoryName>darcy-framework</RepositoryName>
+            <Description>Collection of all darcy projects aggregated as git submodules.</Description>
+            <Visibility>Public</Visibility>
+            <InitializeWithReadMe>true</InitializeWithReadMe>
+            <GitIgnores>
+                <GitIgnore>
+                    /target
+                </GitIgnore>
+            </GitIgnores>
+            <License>GNU General Public License v3.0</License>
+        </GitHubRespository>
+    </RepositoryMessages>
+    <UserMessages>
+        <GitHubUser>
+            <Login>derek63</Login>
+            <Name>Derek Haynes</Name>
+            <Location>Berlin, Germany</Location>
+            <TimeZone>GMT+1</TimeZone>
+        </GitHubUser>
+    </UserMessages>
+</ESBMessageAdminTestData>
