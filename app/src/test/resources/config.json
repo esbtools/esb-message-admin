@@ -1,0 +1,59 @@
+{
+    "suggestedFields":[
+        "SourceSystem",
+        "ErrorSystem",
+        "MessageType",
+        "SourceQueue"
+    ],
+    "sortingFields":[
+        "id",
+        "timestamp",
+        "messageType",
+        "sourceSystem",
+        "errorSystem",
+        "occurrenceCount"
+    ],
+    "nonViewableMessages":[
+        {
+            "matchCriteria":{
+                "messageType":"EntityOne",
+                "sourceSystem":"SourceSystemOne"
+            },
+            "configuration":{
+                "replaceMessage":"EntityOne messages from SourceSystemOne are restricted"
+            }
+        },
+        {
+            "matchCriteria":{
+                "sourceSystem":"SourceSystemTwo"
+            },
+            "configuration":{
+                "replaceMessage":"SourceSystemTwo messages are restricted"
+            }
+        }
+    ],
+    "partiallyViewableMessages":[
+        {
+            "matchCriteria":{
+                "messageType":"PartialEntityOne",
+                "sourceSystem":"PartiaSourceSystemOne"
+            },
+            "configuration":{
+                "sensitiveTag":"Example",
+                "replacementText":"Sensitive Information is not viewable"
+            }
+        },
+        {
+            "matchCriteria":{
+                "messageType":"PartialEntityTwo"
+            },
+            "configuration":{
+                "searchRegex":"\"(Example)\":\\{(?:[^{}]*|(?:\\{[^{}]*\\}))*\\}",
+                "replaceRegex":"\"$1\":\"MASKED\""
+            }
+        }
+    ],
+    "resyncRestEndpoints":[
+        "https://localhost/emagateway/resync",
+    ]
+}
