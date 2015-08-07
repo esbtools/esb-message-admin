@@ -25,9 +25,9 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.common.dao.AuditEventDAO;
@@ -51,9 +51,6 @@ import org.json.simple.parser.JSONParser;
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
 
-    @PersistenceContext(unitName = "EsbMessageAdminPU")
-    private EntityManager entityMgr;
-
     private static final Logger LOG = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
     private JSONObject config;
     private String encryptionKey;
@@ -62,6 +59,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private transient AuditEventDAO auditDao;
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtil encrypter;
+
+    @Inject
+    private EntityManager entityMgr;
 
     {
         try {
