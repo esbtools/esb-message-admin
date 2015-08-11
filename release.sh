@@ -12,7 +12,7 @@ fi
 
 # prepare and verify state
 git fetch --all
-rm -rf ~/.m2/repository/com/redhat/lightblue/
+rm -rf ~/.m2/repository/org/esbtools/message/admin
 
 BRANCH=`git branch | grep ^* | awk '{print $2}'`
 
