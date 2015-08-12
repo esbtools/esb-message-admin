@@ -36,7 +36,7 @@ CREATE TABLE `ESB_MESSAGE_HEADER`
 CREATE TABLE `ESB_MESSAGE_SENSITIVE_INFO`
 (
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
-    `value` varchar(255) DEFAULT NULL,
+    `value` text DEFAULT NULL,
     `message_id` bigint(20) DEFAULT NULL,
     PRIMARY KEY (`id`),
     KEY `FK_8p928yu1xeh4h3qkuao1wgt9h` (`message_id`),
