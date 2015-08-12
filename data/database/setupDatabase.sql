@@ -11,7 +11,7 @@ CREATE TABLE `ESB_MESSAGE`
     `jms_message_id` varchar(255) DEFAULT NULL,
     `message_type` varchar(255) DEFAULT NULL,
     `occurrence_count` int(11) DEFAULT NULL,
-    `payload` text,
+    `payload` mediumtext,
     `service_name` varchar(255) DEFAULT NULL,
     `source_location` varchar(255) DEFAULT NULL,
     `source_queue` varchar(255) DEFAULT NULL,
