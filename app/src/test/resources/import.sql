@@ -1,1 +1,1 @@
-../../../../db/exampleDataLoad.sql
+../../../../data/database/exampleDataLoad.sql
