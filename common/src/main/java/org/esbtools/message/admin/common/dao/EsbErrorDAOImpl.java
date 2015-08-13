@@ -79,32 +79,9 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     public void create(EsbMessage em, Map<String, List<String>> extractedHeaders) {
 
         EsbMessageEntity eme = ConversionUtility.convertFromEsbMessage(em);
+        maskSensitiveInfo(em, eme);
 
-        Map<String,String> matchedConfiguration = matchCriteria(em, partiallyViewableConfiguration);
-        if(matchedConfiguration!=null) {
-            String parentTag = matchedConfiguration.get("sensitiveTag");
-            Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
-            Matcher matcher = pattern.matcher(em.getPayload());
-            ArrayList<String> sensitiveInformation = new ArrayList<>();
-            while(matcher.find()) {
-                sensitiveInformation.add(matcher.group(0));
-            }
-            matcher.reset();
-            String maskedText = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
-            eme.setErrorSensitiveInfo(ConversionUtility.convertToEsbMessageSensitiveInfo(encrypter, eme, sensitiveInformation));
-            eme.setPayload(maskedText);
-        }
-
-        for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
-            for(String value : headerSet.getValue()) {
-                EsbMessageHeaderEntity extractedHeader= new EsbMessageHeaderEntity();
-                extractedHeader.setName(headerSet.getKey());
-                extractedHeader.setType(HeaderType.METADATA);
-                extractedHeader.setValue(value);
-                extractedHeader.setEsbMessage(eme);
-                eme.getErrorHeaders().add(extractedHeader);
-            }
-        }
+        extractHeaders(extractedHeaders, eme);
 
         // check if message(s) with the same payload hash exists already
         EsbMessageHeaderEntity payloadHash = eme.getHeader(MESSAGE_PROPERTY_PAYLOAD_HASH);
@@ -122,6 +99,41 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             eme.setOccurrenceCount(++occurrenceCount);
         }
         mgr.persist(eme);
+    }
+
+    private void maskSensitiveInfo(EsbMessage em, EsbMessageEntity eme) {
+        //TODO Attempt to identify content type, if XML, don't use RegEx and use XML parsing instead
+        em.setPayload(em.getPayload().replaceAll("\n", ""));
+        em.setPayload(em.getPayload().replaceAll("\r", ""));
+        em.setPayload(em.getPayload().replaceAll("\t", ""));
+        em.setPayload(em.getPayload().replaceAll(">\\s*<", "><"));
+        Map<String,String> matchedConfiguration = matchCriteria(em, partiallyViewableConfiguration);
+        if(matchedConfiguration!=null) {
+            String parentTag = matchedConfiguration.get("sensitiveTag");
+            Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
+            Matcher matcher = pattern.matcher(em.getPayload());
+            ArrayList<String> sensitiveInformation = new ArrayList<>();
+            while(matcher.find()) {
+                sensitiveInformation.add(matcher.group(0));
+            }
+            matcher.reset();
+            String maskedText = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
+            eme.setErrorSensitiveInfo(ConversionUtility.convertToEsbMessageSensitiveInfo(encrypter, eme, sensitiveInformation));
+            eme.setPayload(maskedText);
+        }
+    }
+
+    private void extractHeaders(Map<String, List<String>> extractedHeaders, EsbMessageEntity eme) {
+        for (Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
+            for(String value : headerSet.getValue()) {
+                EsbMessageHeaderEntity extractedHeader= new EsbMessageHeaderEntity();
+                extractedHeader.setName(headerSet.getKey());
+                extractedHeader.setType(HeaderType.METADATA);
+                extractedHeader.setValue(value);
+                extractedHeader.setEsbMessage(eme);
+                eme.getErrorHeaders().add(extractedHeader);
+            }
+        }
     }
 
     @Override
