@@ -225,6 +225,37 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals(result.getMessages()[0].getId(),queryResult.get(1).getEsbMessage().getId().longValue());
     }
 
+    @Test
+    public void testSegregateSensitiveInfoFromXMLWithFormatting() {
+        EsbMessage esbMessage = createTestMessage(255, 0);
+        String payload = "<Payload>\n\r\t<Hello> is it me you're looking for ?</Hello>\n\r\t"+
+                "<Example>I can see it in your eyes</Example>\n<Example>I can see it in your soul</Example>\n</Payload>";
+        esbMessage.setPayload(payload);
+        esbMessage.setSourceSystem("PartiaSourceSystemOne");
+        esbMessage.setMessageType("PartialEntityOne");
+        try {
+            service.persist(esbMessage);
+        } catch (IOException e) {
+            Assert.fail();
+        }
+        Criterion[] c1 = {new Criterion(SearchField.sourceSystem, "PartiaSourceSystemOne")};
+        SearchCriteria criteria = new SearchCriteria();
+        criteria.setCriteria(c1);
+        SearchResult result = service.searchMessagesByCriteria(criteria, null, null, "sourceSystem", false, 0, 10);
+        result = service.getMessageById(result.getMessages()[0].getId());
+        Assert.assertEquals("<Payload><Hello> is it me you're looking for ?</Hello>"+
+                "<Example>Sensitive Information is not viewable</Example>"+
+                "<Example>Sensitive Information is not viewable</Example></Payload>", result.getMessages()[0].getPayload());
+        Query query = getEntityManager().createQuery("select f from EsbMessageSensitiveInfoEntity f");
+        List<EsbMessageSensitiveInfoEntity> queryResult = (List<EsbMessageSensitiveInfoEntity>) query.getResultList();
+        Assert.assertEquals("two sensitive bits expected", 2, queryResult.size());
+        EncryptionUtil util = new EncryptionUtil("passwordpassword");
+        Assert.assertEquals("<Example>I can see it in your eyes</Example>",util.decrypt(queryResult.get(0).getValue()));
+        Assert.assertEquals("<Example>I can see it in your soul</Example>",util.decrypt(queryResult.get(1).getValue()));
+        Assert.assertEquals(result.getMessages()[0].getId(),queryResult.get(1).getEsbMessage().getId().longValue());
+    }
+
+
     /*
      * TODO : fix example json regex, Does not work currently.
      */
@@ -272,9 +303,9 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
       matcher.reset();
 
       text = matcher.replaceAll("<$1>"+replaceText+"</$1>");
-      Assert.assertEquals( "<Payload><Hello> is it me you're looking for ?</Hello>"+
-              "<Example>Sensitive Information is not viewable</Example>"+
-            "<Example>Sensitive Information is not viewable</Example></Payload> ", text);
+      Assert.assertEquals("<Payload><Hello> is it me you're looking for ?</Hello>" +
+              "<Example>Sensitive Information is not viewable</Example>" +
+              "<Example>Sensitive Information is not viewable</Example></Payload> ", text);
 
       String patternString2 = "<"+parentTag+">"+replaceText+"</"+parentTag+">";
       Pattern pattern2 = Pattern.compile(patternString2);
