@@ -19,13 +19,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <scm>
-        <connection></connection>
-        <developerConnection></developerConnection>
-        <url></url>
-        <tag></tag>
-    </scm>
-    <distributionManagement></distributionManagement>
     <dependencies>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
@@ -64,6 +57,10 @@
             <groupId>com.googlecode.json-simple</groupId>
             <artifactId>json-simple</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
 
         <!-- Test dependencies -->
         <dependency>
@@ -77,6 +74,11 @@
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

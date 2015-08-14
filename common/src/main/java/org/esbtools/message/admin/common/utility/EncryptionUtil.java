@@ -4,7 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.logging.Logger;
+
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -13,10 +13,12 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class EncryptionUtil {
 
-    private static final Logger LOG = Logger.getLogger(EncryptionUtil.class.getName());
+    private static final Logger LOGGER=LoggerFactory.getLogger(EncryptionUtil.class);
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String FILE_ENCODING = "UTF-8";
     private final String encryptionKey;
@@ -34,7 +36,7 @@ public class EncryptionUtil {
         } catch(NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException
                 | UnsupportedEncodingException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            LOG.severe("EMA Encryption error!" + e);
+            LOGGER.error("EMA Encryption error!" + e, e);
             return null;
         }
     }
@@ -48,7 +50,7 @@ public class EncryptionUtil {
         } catch(NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException
                 | UnsupportedEncodingException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            LOG.severe("EMA Decryption error!" + e);
+            LOGGER.error("EMA Decryption error!" + e, e);
             return null;
         }
     }

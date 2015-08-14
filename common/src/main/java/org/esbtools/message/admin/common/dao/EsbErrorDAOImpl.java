@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Logger;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,14 +45,16 @@ import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class EsbErrorDAOImpl implements EsbErrorDAO {
 
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
     private final EncryptionUtil encrypter;
-    private static final Logger LOG = Logger.getLogger(EsbErrorDAOImpl.class.getName());
+
+    private static final Logger LOGGER=LoggerFactory.getLogger(EsbErrorDAOImpl.class);
 
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
@@ -213,7 +215,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 queryBuilder.append(" desc");
             }
         }
-        LOG.info(queryBuilder.toString());
+        LOGGER.info(queryBuilder.toString());
         Query query = mgr.createQuery(queryBuilder.toString());
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);
