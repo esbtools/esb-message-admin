@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,8 +52,8 @@ public class MetadataDAOImpl implements MetadataDAO {
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
     private static final Logger LOG = Logger.getLogger(MetadataDAOImpl.class.getName());
-    private static transient Map<MetadataType, MetadataResponse> treeCache = new HashMap<>();
-    private static transient Map<String, List<String>> suggestionsCache = new HashMap<>();
+    private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
+    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
     private static final String DEFAULT_USER = "someUser";
     private static final String METADATA_KEY_TYPE = "metadata";
 

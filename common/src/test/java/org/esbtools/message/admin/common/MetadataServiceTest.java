@@ -271,10 +271,13 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         service.addChildMetadataField(-1L, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
         try {
             service.persist(message);
+            //Persist again to make sure suggestions are not saved twice
+            service.persist(message);
         } catch (IOException e) {
             Assert.fail();
         }
         Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
+        Assert.assertEquals("Unexpected number of keys returned",1, suggestions.size());
         Assert.assertTrue("JMS Suggestions are no longer automatically added",suggestions.containsKey("SourceQueue"));
         Assert.assertTrue("JMS Suggestions added with wrong value",suggestions.get("SourceQueue").contains("QueueName"));
         Assert.assertFalse("unecessary JMS Suggestions are automatically added",suggestions.containsKey("Taylor"));
@@ -297,6 +300,8 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
 
     // persist message and check suggestion
     try {
+        service.persist(getTestMessage());
+        //Persist again to make sure suggestions are not saved twice
         service.persist(getTestMessage());
     } catch (IOException e) {
         Assert.fail();
