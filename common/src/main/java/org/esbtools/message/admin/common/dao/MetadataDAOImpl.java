@@ -338,7 +338,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             }
         }
         message.append("</SyncRequest>");
-        LOGGER.info("Initiating sync request:" + message.toString());
+        LOGGER.info("Initiating sync request: {}", message.toString());
 
         auditDAO.save("someUser", "SYNC", "metadata", entity, key, message.toString());
 

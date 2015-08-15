@@ -215,7 +215,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 queryBuilder.append(" desc");
             }
         }
-        LOGGER.info(queryBuilder.toString());
+        LOGGER.info("queryBuilder: {}", queryBuilder.toString());
         Query query = mgr.createQuery(queryBuilder.toString());
         query.setParameter("fromDate", fromDate);
         query.setParameter("toDate", toDate);

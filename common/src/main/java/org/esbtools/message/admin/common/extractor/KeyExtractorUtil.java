@@ -75,9 +75,9 @@ public class KeyExtractorUtil {
                     try {
                         expr = xpath.compile(path.getValue());
                         expressions.get(searchKey.getValue()).add(expr);
-                        LOGGER.info("adding key:" + searchKey.getValue() + " with path:" + path.getValue());
+                        LOGGER.info("adding key: {} with path: {}", searchKey.getValue(), path.getValue());
                     } catch (XPathExpressionException e) {
-                        LOGGER.warn("XPATH: " + path.getValue() + " is invalid. Ignoring it!", e);
+                        LOGGER.warn("XPATH: {} is invalid. Ignoring it!", path.getValue(), e);
                     }
                 }
             }
@@ -124,7 +124,7 @@ public class KeyExtractorUtil {
                                 value = node.getNodeValue();
                             }
                             addToMap(keysMap, key, value);
-                            LOGGER.info("found key:" + key + "with value:" + value);
+                            LOGGER.info("found key: {} with vaule: {}", key, value);
                         }
                     } catch (XPathExpressionException e) {
                         addToMap(keysMap, key, valuePath.evaluate(doc));

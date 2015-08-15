@@ -36,7 +36,7 @@ public class EncryptionUtil {
         } catch(NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException
                 | UnsupportedEncodingException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            LOGGER.error("EMA Encryption error!" + e, e);
+            LOGGER.error("EMA Encryption error!", e);
             return null;
         }
     }
@@ -50,7 +50,7 @@ public class EncryptionUtil {
         } catch(NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException
                 | UnsupportedEncodingException | InvalidKeyException | IllegalBlockSizeException
                 | BadPaddingException e) {
-            LOGGER.error("EMA Decryption error!" + e, e);
+            LOGGER.error("EMA Decryption error!", e);
             return null;
         }
     }

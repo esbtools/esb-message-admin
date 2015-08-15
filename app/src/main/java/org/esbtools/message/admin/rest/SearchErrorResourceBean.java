@@ -102,7 +102,7 @@ public class SearchErrorResourceBean {
         if(sortAsc==null) {
             sortAsc = true;
         }
-        LOGGER.info("search criteria:" + criteria + " sortBy" + sortField + " asc=" + sortAsc);
+        LOGGER.info("search criteria: {}  sortBy: {} asc=: {}", criteria, sortField, sortAsc);
         return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortField, sortAsc, start, maxResults);
     }
 
@@ -145,7 +145,7 @@ public class SearchErrorResourceBean {
             }
         }
         criteria.setCriteria(criteriaList.toArray(new Criterion[0]));
-        LOGGER.debug("criteria: " + criteria.toString());
+        LOGGER.debug("criteria: {}", criteria.toString());
         return criteria;
     }
 }
