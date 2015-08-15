@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Instance;
@@ -46,6 +44,8 @@ import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchField;
 import org.esbtools.message.admin.model.SearchResult;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 
 /**
@@ -60,8 +60,7 @@ public class SearchErrorResourceBean {
     @Inject
     private Instance<Provider> client;
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-    private static final Logger LOG = Logger.getLogger(SearchErrorResourceBean.class.getName());
-
+    private static final Logger LOGGER= LoggerFactory.getLogger(SearchErrorResourceBean.class);
     /**
      * Returns error messages from a given queue
      * To be deleted once the criteria API is ready to be used.
@@ -103,7 +102,7 @@ public class SearchErrorResourceBean {
         if(sortAsc==null) {
             sortAsc = true;
         }
-        LOG.info("search criteria:" + criteria + " sortBy" + sortField + " asc=" + sortAsc);
+        LOGGER.info("search criteria: {}  sortBy: {} asc=: {}", criteria, sortField, sortAsc);
         return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortField, sortAsc, start, maxResults);
     }
 
@@ -146,7 +145,7 @@ public class SearchErrorResourceBean {
             }
         }
         criteria.setCriteria(criteriaList.toArray(new Criterion[0]));
-        LOG.log(Level.FINE, criteria.toString());
+        LOGGER.debug("criteria: {}", criteria.toString());
         return criteria;
     }
 }

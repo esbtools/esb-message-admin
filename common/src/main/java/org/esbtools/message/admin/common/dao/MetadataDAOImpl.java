@@ -31,8 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -46,12 +44,14 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class MetadataDAOImpl implements MetadataDAO {
 
     private final EntityManager mgr;
     private final AuditEventDAO auditDAO;
-    private static final Logger LOG = Logger.getLogger(MetadataDAOImpl.class.getName());
+    private static final Logger LOGGER=LoggerFactory.getLogger(MetadataDAOImpl.class);
     private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
     private static final String DEFAULT_USER = "someUser";
@@ -338,7 +338,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             }
         }
         message.append("</SyncRequest>");
-        LOG.log(Level.INFO, "Initiating sync request:" + message.toString());
+        LOGGER.info("Initiating sync request: {}", message.toString());
 
         auditDAO.save("someUser", "SYNC", "metadata", entity, key, message.toString());
 
@@ -357,14 +357,14 @@ public class MetadataDAOImpl implements MetadataDAO {
                     return new MetadataResponse();
                 } else {
                     // try another host
-                    LOG.warning("unable to send resync message, received Http response code:" +
+                    LOGGER.warn("unable to send resync message, received Http response code:" +
                             conn.getResponseCode() + " response message:" + conn.getResponseMessage() + " from:" + restEndPoint);
                 }
                 conn.disconnect();
             } catch (MalformedURLException e) {
-                LOG.severe(e.getMessage());
+                LOGGER.error(e.getMessage(), e);
             } catch (IOException e) {
-                LOG.severe(e.getMessage());
+                LOGGER.error(e.getMessage(), e);
             }
         }
         MetadataResponse result = new MetadataResponse();
@@ -432,7 +432,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             if(searchKeyId!=null) {
                 addChildMetadataField(searchKeyId, suggestion, MetadataType.Suggestion, suggestion);
             } else {
-                LOG.severe("unable to add suggestion!");
+                LOGGER.error("unable to add suggestion!");
             }
         }
     }
