@@ -158,7 +158,7 @@ public class KeyResourceBean {
         try {
             typeEnumValue = MetadataType.valueOf(name);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Unrecognized Metadata Type:" + name);
+            throw new IllegalArgumentException("Unrecognized Metadata Type: " + name, e);
         }
         return typeEnumValue;
     }

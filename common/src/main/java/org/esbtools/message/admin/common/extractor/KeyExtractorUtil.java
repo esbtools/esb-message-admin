@@ -60,7 +60,7 @@ public class KeyExtractorUtil {
     private Map<String, List<XPathExpression>> expressions;
 
     public KeyExtractorUtil(List<MetadataField> searchKeys, String argHash) {
-        expressions = new HashMap<String, List<XPathExpression>>();
+        expressions = new HashMap<>();
         hash = argHash;
 
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -96,7 +96,7 @@ public class KeyExtractorUtil {
     }
 
     public Map<String, List<String>> getEntriesFromPayload(String payload) throws KeyExtractorException {
-        Map<String, List<String>> keysMap = new HashMap<String, List<String>>();
+        Map<String, List<String>> keysMap = new HashMap<>();
         DocumentBuilderFactory domFactory = DocumentBuilderFactory
                 .newInstance();
         try {
@@ -124,9 +124,10 @@ public class KeyExtractorUtil {
                                 value = node.getNodeValue();
                             }
                             addToMap(keysMap, key, value);
-                            LOGGER.info("found key: {} with vaule: {}", key, value);
+                            LOGGER.info("found key: {} with value: {}", key, value);
                         }
                     } catch (XPathExpressionException e) {
+                        LOGGER.error("Error occurred in Xpath evaluation", e);
                         addToMap(keysMap, key, valuePath.evaluate(doc));
                     }
                 }

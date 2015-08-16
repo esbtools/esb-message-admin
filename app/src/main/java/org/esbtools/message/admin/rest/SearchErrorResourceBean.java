@@ -117,7 +117,7 @@ public class SearchErrorResourceBean {
         try {
             return new SimpleDateFormat(DATE_FORMAT).parse(stringDate);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + DATE_FORMAT);
+            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + DATE_FORMAT, e);
         }
     }
 

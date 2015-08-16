@@ -56,7 +56,7 @@ public class SearchResult {
     }
 
     public void setMessages(EsbMessage[] messages) {
-        this.messages = messages;
+        this.messages = messages.clone();
     }
 
     public static SearchResult empty() {

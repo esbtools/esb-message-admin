@@ -152,6 +152,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             try {
                 result.setTotalResults((Long) countQuery.getSingleResult());
             } catch (NoResultException e) {
+                LOGGER.warn("No result when trying to do count of searchResults", e);
                 return SearchResult.empty();
             }
 

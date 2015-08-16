@@ -22,8 +22,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,11 +51,13 @@ import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
 
-    private static final Logger LOG = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(EsbMessageAdminServiceImpl.class);
     private JSONObject config;
     private String encryptionKey;
     private transient EsbErrorDAO errorDao;
@@ -120,7 +126,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         try {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
         } catch (KeyExtractorException e) {
-            LOG.warning("Could not extract metadata! " + e);
+            LOG.warn("Could not extract metadata for ebMessage {} ", esbMessage, e);
             extractedHeaders = new HashMap<>();
         }
 
@@ -131,7 +137,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Override
     public void persist(EsbMessage[] esbMessages) throws IOException {
-        for (EsbMessage esbMessage:esbMessages) {
+        for (EsbMessage esbMessage : esbMessages) {
             persist(esbMessage);
         }
     }

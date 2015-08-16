@@ -11,30 +11,30 @@ import javax.persistence.PersistenceContext;
 @Named
 class EntityManagerProvider {
     @PersistenceContext(unitName = "EsbMessageAdminPU")
-    private EntityManager entityMgr;
+    private EntityManager entityManager;
 
-    private static EntityManagerFactory EMF;
+    private static EntityManagerFactory entityManagerFactory;
 
     @Produces
     public EntityManager getEntityManager() {
         /* if running in container which doesn't support @PersistenceContext
          * (such as jetty), manually create the EntityManager. */
-        if (entityMgr == null) {
+        if (entityManager == null) {
             synchronized(EntityManagerProvider.class) {
-                if (EMF == null) {
-                    EMF = Persistence.createEntityManagerFactory("EsbMessageAdminPU");
+                if (entityManagerFactory == null) {
+                    entityManagerFactory = Persistence.createEntityManagerFactory("EsbMessageAdminPU");
                 }
             }
-            entityMgr = EMF.createEntityManager();
-            entityMgr.getTransaction().begin();
+            entityManager = entityManagerFactory.createEntityManager();
+            entityManager.getTransaction().begin();
         }
-        return entityMgr;
+        return entityManager;
     }
 
     public void closeEntityManager(@Disposes EntityManager em) {
         /* if running in a lightweight container (such as jetty), commit the
          * transaction and close the EntityManager */
-        if (EMF != null) {
+        if (entityManagerFactory != null) {
             em.getTransaction().commit();
             em.close();
         }
