@@ -7,11 +7,11 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.8.0</version>
+        <version>0.9.0-SNAPSHOT</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-rest-save-client</artifactId>
-    <version>0.8.0</version>
+    <version>0.9.0-SNAPSHOT</version>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <description>ESB Message Admin REST client</description>
     <dependencies>
@@ -19,13 +19,13 @@
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-rest-save</artifactId>
             <type>war</type>
-	    <version>0.8.0</version>
+	    <version>0.9.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.esbtools.message.admin</groupId>
             <artifactId>esb-message-admin-api</artifactId>
             <scope>provided</scope>
-	    <version>0.8.0</version>
+	    <version>0.9.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
