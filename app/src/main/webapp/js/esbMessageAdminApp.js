@@ -96,8 +96,8 @@ esbMessageAdminApp.provider('Globals',
 	}
 );
 
-esbMessageAdminApp.factory('samlResponseInterceptor', ['localStorage', '$window', '$timeout',
-  function(localStorage, $window, $timeout) {
+esbMessageAdminApp.factory('samlResponseInterceptor', ['$window', '$timeout',
+  function($window, $timeout) {
     function jqElementContainsSamlRequest(jqElement) {
       for (var i = 0; i < jqElement.length; i++) {
         var e = jqElement[i];
