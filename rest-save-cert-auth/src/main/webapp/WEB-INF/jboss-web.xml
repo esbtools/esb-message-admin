@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <jboss-web>
     <context-root>esb-message-admin-save</context-root>
-    <scurity-domain>ema-cert</security-domain>
+    <security-domain>esb-message-admin-cert</security-domain>
 </jboss-web>
