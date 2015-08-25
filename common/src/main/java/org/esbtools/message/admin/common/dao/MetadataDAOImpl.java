@@ -75,7 +75,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 resyncRestEndpoints.add(endPoint.toString());
             }
         }
-        if(resyncRestEndpoints.size()<1) {
+        if(resyncRestEndpoints.isEmpty()) {
             throw new IllegalStateException("at least one resync rest end point needs to be configured");
         }
     }
@@ -101,7 +101,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
         Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
         List<MetadataEntity> result = query.getResultList();
-        if(result!=null && result.size()>0) {
+        if(result!=null && !result.isEmpty()) {
             hash = UUID.randomUUID().toString();
             result.get(0).setValue(hash);
         }
@@ -174,7 +174,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             if (entity.getParentId().intValue() != -1) {
                 parent=map.get(entity.getParentId());
                 if(parent != null) {
-                    parent.addDescendant((field));
+                    parent.addDescendant(field);
                 }
             }
         }
@@ -383,7 +383,7 @@ public class MetadataDAOImpl implements MetadataDAO {
     private void updateSuggestions(MetadataField searchKeysTree) {
 
         Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
-        if(searchKeysTree!=null && searchKeysTree.getChildren().size()>0) {
+        if(searchKeysTree!=null && !searchKeysTree.getChildren().isEmpty()) {
             for (MetadataField searchKey : searchKeysTree.getChildren()) {
                 if (suggestedFields.contains(searchKey.getValue())) {
                     List<String> values = new ArrayList<String>();
@@ -411,7 +411,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
         for(String suggestedField: suggestedFields) {
             List<String> extractedValues = extractedHeaders.get(suggestedField);
-            if(extractedValues!=null && extractedValues.size()>0) {
+            if(extractedValues!=null && !extractedValues.isEmpty()) {
                 for(String extractedValue: extractedValues) {
                     ensureSuggestionIsPresent(suggestedField, extractedValue);
                 }
@@ -441,7 +441,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         Query query = mgr.createQuery("select f from MetadataEntity f where f.value = :value");
         query.setParameter("value", suggestedField);
         List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
-        if (queryResult != null && queryResult.size() != 0) {
+        if (queryResult != null && !queryResult.isEmpty()) {
             return queryResult.get(0).getId();
         }
         return null;

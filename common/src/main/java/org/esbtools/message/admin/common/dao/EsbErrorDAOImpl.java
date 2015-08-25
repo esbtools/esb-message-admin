@@ -114,7 +114,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             String parentTag = matchedConfiguration.get("sensitiveTag");
             Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
             Matcher matcher = pattern.matcher(em.getPayload());
-            ArrayList<String> sensitiveInformation = new ArrayList<>();
+            List<String> sensitiveInformation = new ArrayList<>();
             while(matcher.find()) {
                 sensitiveInformation.add(matcher.group(0));
             }
