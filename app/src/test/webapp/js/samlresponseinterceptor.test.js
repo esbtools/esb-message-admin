@@ -5,7 +5,7 @@ describe("samlResponseInterceptor", function() {
 
   beforeEach(module(function($provide) {
     // Stub window to just toggle wasReloaded() instead of actually reloading.
-    $provide.service('$window', function() {
+    $provide.service("$window", function() {
       var wasReloaded = false;
       return {
         location: {
@@ -29,7 +29,7 @@ describe("samlResponseInterceptor", function() {
 
   it("refreshes window in $timeout if response is a SAML HTML redirect page", function() {
     $httpBackend.whenGET('foo').respond(
-      '<HTML><HEAD><TITLE>HTTP Post Binding (Request)</TITLE></HEAD><BODY Onload="document.forms[0].submit()"><FORM METHOD="POST" ACTION="https://saml.redhat.com/idp/"><INPUT TYPE="HIDDEN" NAME="SAMLRequest" VALUE="foobar"/></FORM></BODY></HTML>',
+      '<HTML><HEAD><TITLE>HTTP Post Binding (Request)</TITLE></HEAD><BODY Onload="document.forms[0].submit()"><FORM METHOD="POST" ACTION="https://saml.esbtools.org/"><INPUT TYPE="HIDDEN" NAME="SAMLRequest" VALUE="foobar"/></FORM></BODY></HTML>',
       {
         "Content-Type": "text/html"
       }
@@ -53,7 +53,7 @@ describe("samlResponseInterceptor", function() {
       }
     );
 
-    $http.get('foo').then(function() {});
+    $http.get("foo").then(function() {});
     $httpBackend.flush();
     $timeout.flush();
 
