@@ -18,13 +18,6 @@
  */
 package org.esbtools.message.admin.common.utility;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.esbtools.message.admin.common.config.Configuration;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
@@ -35,6 +28,14 @@ import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.MetadataField;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 
 /**
@@ -147,9 +148,9 @@ public final class ConversionUtility {
     public static List<EsbMessageEntity> convertFromEsbMessageArray(EsbMessage[] esbMessages) {
 
         if (esbMessages==null) {
-            return null;
+            return Collections.emptyList();
         }
-        ArrayList<EsbMessageEntity> list=new ArrayList<EsbMessageEntity>(esbMessages.length);
+        List<EsbMessageEntity> list=new ArrayList<EsbMessageEntity>(esbMessages.length);
         for(EsbMessage esbMessage:esbMessages) {
             list.add(convertFromEsbMessage(esbMessage));
         }
@@ -160,7 +161,7 @@ public final class ConversionUtility {
     public static EsbMessage[] convertToEsbMessageArray(List<EsbMessageEntity> l) {
 
         if (l==null) {
-            return null;
+            return new EsbMessage[0];
         }
 
         EsbMessage[] esbMessages = new EsbMessage[l.size()];

@@ -47,7 +47,7 @@ public enum SearchField {
         }
     }
 
-    private SearchField(Class type) {
+    SearchField(Class type) {
         this.valueType = type;
     }
 

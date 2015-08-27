@@ -26,7 +26,9 @@ public class EsbMessage implements Serializable {
 
     private static final long serialVersionUID = -6112339731962679492L;
 
-    public enum ErrorType { DATA_ERROR, SYSTEM_ERROR };
+    public enum ErrorType {
+        DATA_ERROR, SYSTEM_ERROR
+    }
 
     private long id;
     private String errorQueue;

@@ -52,7 +52,9 @@ public class EsbMessageSensitiveInfoEntity implements Serializable {
         this.value = value;
     }
 
-    public EsbMessageSensitiveInfoEntity() {}
+    public EsbMessageSensitiveInfoEntity() {
+
+    }
 
     public Long getId() {
         return id;

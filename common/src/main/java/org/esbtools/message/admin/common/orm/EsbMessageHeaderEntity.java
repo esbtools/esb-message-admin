@@ -65,7 +65,9 @@ public class EsbMessageHeaderEntity implements Serializable {
         this.value = value;
     }
 
-    public EsbMessageHeaderEntity() {}
+    public EsbMessageHeaderEntity() {
+
+    }
 
     public Long getId() {
         return id;

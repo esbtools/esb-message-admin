@@ -143,12 +143,12 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
         SearchResult result = new SearchResult();
         long startTime = System.currentTimeMillis();
+
         // allow sorting only by display fields, choose time stamp if proper field is not set.
-        if(sortField==null || !sortingFields.contains(sortField)) {
-            sortField = "timestamp";
-        }
+        String sortBy = (sortField==null || !sortingFields.contains(sortField)) ? "timestamp" : sortField;
+
         if (maxResults > 0) {
-            Query countQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, true);
+            Query countQuery = getQueryFromCriteria(criteria, sortBy, sortAsc, fromDate, toDate, true);
             try {
                 result.setTotalResults((Long) countQuery.getSingleResult());
             } catch (NoResultException e) {
@@ -156,7 +156,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
                 return SearchResult.empty();
             }
 
-            Query resultQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, false);
+            Query resultQuery = getQueryFromCriteria(criteria, sortBy, sortAsc, fromDate, toDate, false);
 
             resultQuery.setFirstResult(start);
             resultQuery.setMaxResults(maxResults);
@@ -240,7 +240,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         Query query = mgr.createQuery("select e from EsbMessageEntity e where e.id = :id");
         query.setParameter("id", id);
         List<EsbMessageEntity> messages = (List<EsbMessageEntity>) query.getResultList();
-        if (messages.size() == 0) {
+        if (messages.isEmpty()) {
             result.setTotalResults(0);
         } else {
             result.setTotalResults(1);

@@ -19,6 +19,7 @@
 package org.esbtools.message.admin.common.extractor;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -40,6 +42,7 @@ import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -55,7 +58,7 @@ import org.w3c.dom.NodeList;
  */
 public class KeyExtractorUtil {
 
-    public static final Logger LOGGER=LoggerFactory.getLogger(KeyExtractorUtil.class);
+    private static final Logger LOGGER=LoggerFactory.getLogger(KeyExtractorUtil.class);
     private String hash;
     private Map<String, List<XPathExpression>> expressions;
 
@@ -96,47 +99,55 @@ public class KeyExtractorUtil {
     }
 
     public Map<String, List<String>> getEntriesFromPayload(String payload) throws KeyExtractorException {
-        Map<String, List<String>> keysMap = new HashMap<>();
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory
-                .newInstance();
+
         try {
-
-            DocumentBuilder builder = domFactory.newDocumentBuilder();
-            Document doc = builder.parse(new ByteArrayInputStream(payload.getBytes("UTF-8")));
-
-            Iterator<String> iter = expressions.keySet().iterator();
-
-            while (iter.hasNext()) {
-
-                String key = iter.next();
-                for (XPathExpression valuePath : expressions.get(key)) {
-                    valuePath.evaluate(doc);
-                    NodeList result;
-                    try {
-                        result = (NodeList) valuePath.evaluate(doc, XPathConstants.NODESET);
-
-                        for (int index = 0; index < result.getLength(); index++) {
-                            Node node = result.item(index);
-                            String value;
-                            if(node.hasChildNodes()) {
-                                value = node.getFirstChild().getNodeValue();
-                            } else {
-                                value = node.getNodeValue();
-                            }
-                            addToMap(keysMap, key, value);
-                            LOGGER.info("found key: {} with value: {}", key, value);
-                        }
-                    } catch (XPathExpressionException e) {
-                        LOGGER.error("Error occurred in Xpath evaluation", e);
-                        addToMap(keysMap, key, valuePath.evaluate(doc));
-                    }
-                }
-            }
-
+            //TODO determine content type of payload, only parse for XPath matches if the content is XML
+            return getEntriesFromXPaths(payload);
         } catch (Exception e) {
             throw new KeyExtractorException(e);
         }
 
+    }
+
+    private Map<String, List<String>> getEntriesFromXPaths(String payload) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        Map<String, List<String>> keysMap = new HashMap<>();
+
+        DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = domFactory.newDocumentBuilder();
+        Document doc = builder.parse(new ByteArrayInputStream(payload.getBytes("UTF-8")));
+
+        Iterator<String> iter = expressions.keySet().iterator();
+
+        while (iter.hasNext()) {
+
+            String key = iter.next();
+            for (XPathExpression valuePath : expressions.get(key)) {
+                getXPathMatches(keysMap, doc, key, valuePath);
+            }
+        }
         return keysMap;
+    }
+
+    private void getXPathMatches(Map<String, List<String>> keysMap, Document doc, String key, XPathExpression valuePath) throws XPathExpressionException {
+        valuePath.evaluate(doc);
+        NodeList result;
+        try {
+            result = (NodeList) valuePath.evaluate(doc, XPathConstants.NODESET);
+
+            for (int index = 0; index < result.getLength(); index++) {
+                Node node = result.item(index);
+                String value;
+                if(node.hasChildNodes()) {
+                    value = node.getFirstChild().getNodeValue();
+                } else {
+                    value = node.getNodeValue();
+                }
+                addToMap(keysMap, key, value);
+                LOGGER.info("found key: {} with value: {}", key, value);
+            }
+        } catch (XPathExpressionException e) {
+            LOGGER.error("Error occurred in Xpath evaluation", e);
+            addToMap(keysMap, key, valuePath.evaluate(doc));
+        }
     }
 }

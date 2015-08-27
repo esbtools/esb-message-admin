@@ -69,7 +69,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Inject
     private EntityManager entityMgr;
 
-    {
+    public EsbMessageAdminServiceImpl() {
         try {
             InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
@@ -81,7 +81,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             encryptionKeyFileReader.close();
             encryptionKeyFile.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Unable to load configuration files", e);
         }
     }
 
@@ -145,17 +145,20 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Override
     public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults) {
 
+        Date from;
+
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
             // TODO get magic number from a property file
             c.add(Calendar.DATE, -30);
-            fromDate = c.getTime();
+            from = c.getTime();
+        } else {
+            from = fromDate;
         }
-        if (toDate == null) {
-            toDate = new Date();
-        }
-        return getErrorDAO().findMessagesBySearchCriteria(criteria, fromDate, toDate, sortField, sortAsc, start, maxResults);
+        Date to = toDate == null ? new Date() : toDate;
+
+        return getErrorDAO().findMessagesBySearchCriteria(criteria, from, to, sortField, sortAsc, start, maxResults);
     }
 
     @Override

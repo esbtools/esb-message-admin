@@ -85,21 +85,19 @@ public class MetadataDAOImpl implements MetadataDAO {
         if(type==MetadataType.SearchKeys || type==MetadataType.Entities) {
             Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
             List<MetadataEntity> result = query.getResultList();
-            if(result!=null && result.size()>0) {
+            if(result!=null && !result.isEmpty()) {
                 hash = (String) result.get(0).getValue();
             }
         }
         return hash;
     }
 
-    private String markTreeDirty(MetadataType type) {
+    private String markTreeDirty(MetadataType metadataType) {
         String hash = null;
-        if(type.isSearchKeyType()) {
-            type = MetadataType.SearchKeys;
-        } else {
-            type = MetadataType.Entities;
-        }
-        Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
+
+        MetadataType type = metadataType.isSearchKeyType() ? MetadataType.SearchKeys : MetadataType.Entities;
+
+        Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" + type +"'");
         List<MetadataEntity> result = query.getResultList();
         if(result!=null && !result.isEmpty()) {
             hash = UUID.randomUUID().toString();

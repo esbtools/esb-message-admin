@@ -61,7 +61,9 @@ public class MetadataEntity implements Serializable {
         this.parentId = parentId;
     }
 
-    public MetadataEntity() {}
+    public MetadataEntity() {
+
+    }
 
     public Long getId() {
         return id;
