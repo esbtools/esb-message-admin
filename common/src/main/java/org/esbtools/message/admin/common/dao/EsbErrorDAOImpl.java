@@ -105,7 +105,6 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     }
 
     private void maskSensitiveInfo(EsbMessage em, EsbMessageEntity eme) {
-        //TODO Attempt to identify content type, if XML, don't use RegEx and use XML parsing instead
         em.setPayload(em.getPayload().replaceAll("\n", ""));
         em.setPayload(em.getPayload().replaceAll("\r", ""));
         em.setPayload(em.getPayload().replaceAll("\t", ""));

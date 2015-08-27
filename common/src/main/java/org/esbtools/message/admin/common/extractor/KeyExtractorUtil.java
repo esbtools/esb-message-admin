@@ -105,7 +105,6 @@ public class KeyExtractorUtil {
     public Map<String, List<String>> getEntriesFromPayload(String payload) throws KeyExtractorException {
 
         try {
-            //TODO determine content type of payload, only parse for XPath matches if the content is XML
             return getEntriesFromXPaths(payload);
         } catch (Exception e) {
             throw new KeyExtractorException(e);

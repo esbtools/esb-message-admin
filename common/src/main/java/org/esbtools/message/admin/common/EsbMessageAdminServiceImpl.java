@@ -152,7 +152,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
-            // TODO get magic number from a property file
             c.add(Calendar.DATE, -30);
             from = c.getTime();
         } else {
