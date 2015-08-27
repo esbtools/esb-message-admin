@@ -315,15 +315,21 @@ public class MetadataDAOImpl implements MetadataDAO {
             if (tree.getId().equals(field.getId())) {
                 return tree;
             } else {
-                for (MetadataField child : tree.getChildren()) {
-                    MetadataField dfsResult = searchField(child, field);
-                    if (dfsResult != null) {
-                        return dfsResult;
-                    }
-                }
+                result = getMetadataField(tree, field);
             }
         }
         return result;
+    }
+
+    private MetadataField getMetadataField(MetadataField tree, MetadataField field) {
+
+        for (MetadataField child : tree.getChildren()) {
+            MetadataField dfsResult = searchField(child, field);
+            if (dfsResult != null) {
+                return dfsResult;
+            }
+        }
+        return null;
     }
 
     @Override
