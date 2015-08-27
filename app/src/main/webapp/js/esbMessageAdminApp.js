@@ -1,43 +1,43 @@
-var esbMessageAdminApp = angular.module('esbMessageAdminApp', 
-	[ 
+var esbMessageAdminApp = angular.module('esbMessageAdminApp',
+	[
 	 	'ui.bootstrap',
-	 	'ngRoute', 
-	 	'ngGrid', 
+	 	'ngRoute',
+	 	'ngGrid',
 	 	'esbMessageAdminControllers',
-	 	'esbMessageAdminServices', 
-	 	'angucomplete', 
+	 	'esbMessageAdminServices',
+	 	'angucomplete',
 	 	'angular-loading-bar',
-	 	'ngQuickDate', 
-	 	'MessageCenterModule', 
-	 	'ui.layout' 
+	 	'ngQuickDate',
+	 	'MessageCenterModule',
+	 	'ui.layout'
 	]
 );
 
 esbMessageAdminApp.config(
 	[
-		'$routeProvider', 
+		'$routeProvider',
 		function($routeProvider) {
-			$routeProvider.when('/errors', 
+			$routeProvider.when('/errors',
 		    	{
 		    		title : "Errors and Messages",
 		    		templateUrl : 'partials/errors.html',
 		    	}
-			).when('/sync', 
+			).when('/sync',
 				{
 					title : "Sync",
 					templateUrl : 'partials/sync.html',
 				}
-			).when('/synckeys', 
+			).when('/synckeys',
 				{
 					title : "Sync Keys",
 					templateUrl : 'partials/synckeys.html',
 				}
-			).when('/searchkeys', 
+			).when('/searchkeys',
 				{
 					title : "Search Keys",
 					templateUrl : 'partials/searchkeys.html',
 				}
-			).when('/users', 
+			).when('/users',
 				{
 					title : "Users",
 					templateUrl : 'partials/users.html',
@@ -47,7 +47,7 @@ esbMessageAdminApp.config(
 					redirectTo : '/errors'
 				}
 			);
-		} 
+		}
 	]
 );
 
@@ -56,33 +56,33 @@ esbMessageAdminApp.run(
 		'$location',
 		'$rootScope',
 		function($location, $rootScope) {
-		    $rootScope.$on('$routeChangeSuccess', 
+		    $rootScope.$on('$routeChangeSuccess',
 		    	function(event, current, previous) {
 		        	if (current.$$route) {
 		        		$rootScope.title = current.$$route.title;
 		        	}
 		    	}
 		    );
-	    } 
+	    }
 	]
 );
 
-esbMessageAdminApp.provider('Globals', 
+esbMessageAdminApp.provider('Globals',
 	function() {
 	    var self = this;
-	
+
 	    // providers are initialized before services
 	    // this guarantees that Globals is setup first
-	    self.$get = [ '$window', 
+	    self.$get = [ '$window',
 	        function($window) {
 		        var globals = {
-		            'dateFormat' : 
+		            'dateFormat' :
 		            {
 		                'service' : 'yyyy-MM-ddTHH:mm:ss',
 		                'datepicker' : 'yyyy/MM/dd',
 		                'timepicker' : 'HH:mm:ss'
 		            },
-		            'serverSideLogging' : 
+		            'serverSideLogging' :
 		            {
 		                'info' : false,
 		                'debug' : false,
@@ -91,13 +91,51 @@ esbMessageAdminApp.provider('Globals',
 		            }
 		        };
 		        return globals;
-	    	} 
+	    	}
 	    ];
 	}
 );
 
+esbMessageAdminApp.factory('samlResponseInterceptor', ['$window', '$timeout',
+  function($window, $timeout) {
+    function jqElementContainsSamlRequest(jqElement) {
+      for (var i = 0; i < jqElement.length; i++) {
+        var e = jqElement[i];
+        if (e.tagName === 'FORM' &&
+          e.querySelector('input[name="SAMLRequest"]') !== null) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    return {
+      response: function(response) {
+        var contentType = response.headers('Content-Type');
+
+        if (contentType !== null && contentType.indexOf("text/html") !== -1) {
+          var responseAsJqElement = angular.element(response.data);
+
+          if (jqElementContainsSamlRequest(responseAsJqElement)) {
+            // Schedule reload on next tick to let xhr request finish normally.
+            $timeout(function() {
+              $window.location.reload();
+            });
+          }
+        }
+
+        return response;
+      }
+    };
+  }
+]);
+
+esbMessageAdminApp.config(['$httpProvider', function($httpProvider) {
+  $httpProvider.interceptors.push('samlResponseInterceptor');
+}]);
+
 String.prototype.supplant = function(o) {
-    return this.replace(/{([^{}]*)}/g, 
+    return this.replace(/{([^{}]*)}/g,
     	function(a, b) {
         	var r = o[b];
         	return typeof r === 'string' || typeof r === 'number' ? r : a;
