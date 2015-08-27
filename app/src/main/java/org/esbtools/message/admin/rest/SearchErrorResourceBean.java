@@ -61,29 +61,7 @@ public class SearchErrorResourceBean {
     private Instance<Provider> client;
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final Logger LOGGER= LoggerFactory.getLogger(SearchErrorResourceBean.class);
-    /**
-     * Returns error messages from a given queue
-     * To be deleted once the criteria API is ready to be used.
-     *
-     * @param queue    the error queue
-     * @param fromDate the start timestamp of the range
-     * @param toDate   the end timestamp of the range
-     * @param start    sets the position of the first result to retrieve
-     * @param results  sets the maximum number of results to retrieve
-     * @return ESB Error info
-     */
-    @GET
-    @Path("/queue/{queue}")
-    @Deprecated
-    @Produces({MediaType.APPLICATION_JSON})
-    public SearchResult getErrorsByQueueName(@PathParam("queue") String queue,
-                                             @QueryParam("fromDate") String fromDate,
-                                             @QueryParam("toDate") String toDate,
-                                             @QueryParam("start") Integer start,
-                                             @QueryParam("results") Integer maxResults) throws IOException {
-        SearchCriteria criteria = new SearchCriteria(SearchField.errorQueue, queue);
-        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), null, true, start, maxResults);
-    }
+
 
     @GET
     @Path("/criteria/{search_criteria}")
@@ -96,14 +74,12 @@ public class SearchErrorResourceBean {
                                             @QueryParam("start") Integer start,
                                             @QueryParam("results") Integer maxResults) {
         SearchCriteria criteria = getCriteria(argCriteria);
-        if(StringUtils.isBlank(sortField)) {
-            sortField = "timestamp";
-        }
-        if(sortAsc==null) {
-            sortAsc = true;
-        }
-        LOGGER.info("search criteria: {}  sortBy: {} asc=: {}", criteria, sortField, sortAsc);
-        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortField, sortAsc, start, maxResults);
+
+        String sortBy = StringUtils.isBlank(sortField) ? "timestamp" : sortField;
+        Boolean sortAscending = sortAsc==null ? true : sortAsc;
+
+        LOGGER.info("search criteria: {}  sortBy: {} asc=: {}", criteria, sortBy, sortAscending);
+        return client.get().searchMessagesByCriteria(criteria, getDate(fromDate), getDate(toDate), sortBy, sortAscending, start, maxResults);
     }
 
     @GET
@@ -117,7 +93,7 @@ public class SearchErrorResourceBean {
         try {
             return new SimpleDateFormat(DATE_FORMAT).parse(stringDate);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + DATE_FORMAT);
+            throw new IllegalArgumentException("Invalid date format:" + stringDate + " expected format:" + DATE_FORMAT, e);
         }
     }
 
@@ -133,13 +109,7 @@ public class SearchErrorResourceBean {
                     criterion.setCustomKey(entry.getKey());
                     criterion.setValue(value);
                 } else {
-                    criterion.setField(SearchField.match(entry.getKey()));
-                    if (criterion.getField().getValueType() == String.class) {
-                        criterion.setValue(value);
-                    } else {
-                        // only other value is long
-                        criterion.setValue(Long.parseLong(value));
-                    }
+                    getPredefinedCriteria(entry, value, criterion);
                 }
                 criteriaList.add(criterion);
             }
@@ -147,5 +117,15 @@ public class SearchErrorResourceBean {
         criteria.setCriteria(criteriaList.toArray(new Criterion[0]));
         LOGGER.debug("criteria: {}", criteria.toString());
         return criteria;
+    }
+
+    private void getPredefinedCriteria(Map.Entry<String, List<String>> entry, String value, Criterion criterion) {
+        criterion.setField(SearchField.match(entry.getKey()));
+        if (criterion.getField().getValueType() == String.class) {
+            criterion.setValue(value);
+        } else {
+            // only other value is long
+            criterion.setValue(Long.parseLong(value));
+        }
     }
 }

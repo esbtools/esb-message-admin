@@ -55,7 +55,8 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final EncryptionUtil encrypter;
 
     private static final Logger LOGGER=LoggerFactory.getLogger(EsbErrorDAOImpl.class);
-
+    private static final String DEFAULT_USER = "someUser";
+    private static final String ERROR_KEY_TYPE = "error";
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
     private Set<String> sortingFields = new HashSet<>();
@@ -114,7 +115,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             String parentTag = matchedConfiguration.get("sensitiveTag");
             Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
             Matcher matcher = pattern.matcher(em.getPayload());
-            ArrayList<String> sensitiveInformation = new ArrayList<>();
+            List<String> sensitiveInformation = new ArrayList<>();
             while(matcher.find()) {
                 sensitiveInformation.add(matcher.group(0));
             }
@@ -143,19 +144,20 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
         SearchResult result = new SearchResult();
         long startTime = System.currentTimeMillis();
+
         // allow sorting only by display fields, choose time stamp if proper field is not set.
-        if(sortField==null || !sortingFields.contains(sortField)) {
-            sortField = "timestamp";
-        }
+        String sortBy = (sortField==null || !sortingFields.contains(sortField)) ? "timestamp" : sortField;
+
         if (maxResults > 0) {
-            Query countQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, true);
+            Query countQuery = getQueryFromCriteria(criteria, sortBy, sortAsc, fromDate, toDate, true);
             try {
                 result.setTotalResults((Long) countQuery.getSingleResult());
             } catch (NoResultException e) {
+                LOGGER.warn("No result when trying to do count of searchResults", e);
                 return SearchResult.empty();
             }
 
-            Query resultQuery = getQueryFromCriteria(criteria, sortField, sortAsc, fromDate, toDate, false);
+            Query resultQuery = getQueryFromCriteria(criteria, sortBy, sortAsc, fromDate, toDate, false);
 
             resultQuery.setFirstResult(start);
             resultQuery.setMaxResults(maxResults);
@@ -164,7 +166,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
             EsbMessage[] resultMessages = new EsbMessage[searchResult.size()];
             for (int i = 0; i < resultMessages.length; i++) {
-                Object cols[] = (Object[]) searchResult.get(i);
+                Object[] cols = (Object[]) searchResult.get(i);
                 EsbMessage msg = new EsbMessage();
                 msg.setId((Long) cols[0]);
                 msg.setTimestamp((Date) cols[1]);
@@ -182,7 +184,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setPage(0);
         }
         long endTime = System.currentTimeMillis();
-        auditDAO.save("someUser", "SEARCH", "error", "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(endTime-startTime));
+        auditDAO.save(DEFAULT_USER, "SEARCH", ERROR_KEY_TYPE, "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(endTime-startTime));
 
         return result;
     }
@@ -239,7 +241,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
         Query query = mgr.createQuery("select e from EsbMessageEntity e where e.id = :id");
         query.setParameter("id", id);
         List<EsbMessageEntity> messages = (List<EsbMessageEntity>) query.getResultList();
-        if (messages.size() == 0) {
+        if (messages.isEmpty()) {
             result.setTotalResults(0);
         } else {
             result.setTotalResults(1);
@@ -251,7 +253,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             }
             result.setMessages(messageArray);
         }
-        auditDAO.save("someUser", "FETCH", "error", "", "", id.toString());
+        auditDAO.save(DEFAULT_USER, "FETCH", ERROR_KEY_TYPE, "", "", id.toString());
         return result;
     }
 

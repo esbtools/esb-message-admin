@@ -72,7 +72,7 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         assertSuccess(result);
         MetadataField field = fetchMetadataField("Entities", "Entities", MetadataType.Entities);
         result = service.addChildMetadataField(field.getId().longValue(), "System", MetadataType.System, "system");
-        assertError(result, "Illegal Argument: System can not be a child of Entities");
+        assertError(result, "Illegal Argument:System can not be a child of Entities");
     }
 
     @Test

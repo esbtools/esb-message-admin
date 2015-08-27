@@ -21,6 +21,7 @@ public class EncryptionUtil {
     private static final Logger LOGGER=LoggerFactory.getLogger(EncryptionUtil.class);
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String FILE_ENCODING = "UTF-8";
+    public static final String SECURITY_PROVIDER = "SunJCE";
     private final String encryptionKey;
 
     public EncryptionUtil(String key) {
@@ -29,7 +30,7 @@ public class EncryptionUtil {
 
     public String encrypt(String sensitiveInfo) {
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM, "SunJCE");
+            Cipher cipher = Cipher.getInstance(ALGORITHM, SECURITY_PROVIDER);
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes(FILE_ENCODING), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return Base64.encodeBase64String(cipher.doFinal(sensitiveInfo.getBytes(FILE_ENCODING)));
@@ -43,7 +44,7 @@ public class EncryptionUtil {
 
     public String decrypt(String encryptedInfo) {
         try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM, "SunJCE");
+            Cipher cipher = Cipher.getInstance(ALGORITHM, SECURITY_PROVIDER);
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes(FILE_ENCODING), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key);
             return new String(cipher.doFinal(Base64.decodeBase64(encryptedInfo.getBytes(FILE_ENCODING))), FILE_ENCODING).trim();

@@ -22,7 +22,8 @@ public class MetadataResponse {
 
     public static enum Status {
         Success, Error
-    };
+    }
+
     private MetadataField tree;
     private MetadataField resultField;
     private String hash;

@@ -54,8 +54,11 @@ public class MetadataDAOImpl implements MetadataDAO {
     private static final Logger LOGGER=LoggerFactory.getLogger(MetadataDAOImpl.class);
     private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
+    private static final String ILLEGAL_ARGUMENT = "Illegal Argument:";
     private static final String DEFAULT_USER = "someUser";
     private static final String METADATA_KEY_TYPE = "metadata";
+    private static final String TYPE_PLACEHOLDER = "$TYPE";
+    private static final String METADATA_QUERY = "select f from MetadataEntity f where f.type = '" + TYPE_PLACEHOLDER + "'";
 
     private Set<String> suggestedFields = new HashSet<>();
     private List<String> resyncRestEndpoints = new ArrayList<>();
@@ -75,7 +78,7 @@ public class MetadataDAOImpl implements MetadataDAO {
                 resyncRestEndpoints.add(endPoint.toString());
             }
         }
-        if(resyncRestEndpoints.size()<1) {
+        if(resyncRestEndpoints.isEmpty()) {
             throw new IllegalStateException("at least one resync rest end point needs to be configured");
         }
     }
@@ -83,25 +86,24 @@ public class MetadataDAOImpl implements MetadataDAO {
     private String getMetadataHash(MetadataType type) {
         String hash = "";
         if(type==MetadataType.SearchKeys || type==MetadataType.Entities) {
-            Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
+            Query query = mgr.createQuery(METADATA_QUERY.replace(TYPE_PLACEHOLDER, type.toString()));
+
             List<MetadataEntity> result = query.getResultList();
-            if(result!=null && result.size()>0) {
+            if(result!=null && !result.isEmpty()) {
                 hash = (String) result.get(0).getValue();
             }
         }
         return hash;
     }
 
-    private String markTreeDirty(MetadataType type) {
+    private String markTreeDirty(MetadataType metadataType) {
         String hash = null;
-        if(type.isSearchKeyType()) {
-            type = MetadataType.SearchKeys;
-        } else {
-            type = MetadataType.Entities;
-        }
-        Query query = mgr.createQuery("select f from MetadataEntity f where f.type = '" +type+"'");
+
+        MetadataType type = metadataType.isSearchKeyType() ? MetadataType.SearchKeys : MetadataType.Entities;
+
+        Query query = mgr.createQuery(METADATA_QUERY.replace(TYPE_PLACEHOLDER, type.toString()));
         List<MetadataEntity> result = query.getResultList();
-        if(result!=null && result.size()>0) {
+        if(result!=null && !result.isEmpty()) {
             hash = UUID.randomUUID().toString();
             result.get(0).setValue(hash);
         }
@@ -128,27 +130,33 @@ public class MetadataDAOImpl implements MetadataDAO {
             if(treeCache.containsKey(type) && hash.contentEquals(treeCache.get(type).getHash())) {
                 return treeCache.get(type);
             } else {
-                result = new MetadataResponse();
-                String inClause = null;
-                if (type == MetadataType.Entities) {
-                    inClause = "('Entities', 'Entity', 'System', 'SyncKey')";
-                } else {
-                    inClause = "('SearchKeys', 'SearchKey', 'XPATH', 'Suggestion')";
-                }
-                if (inClause != null) {
-                    Query query = mgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
-                    List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
-                    result.setTree(makeTree(queryResult));
-                    result.setHash(hash);
-                    treeCache.put(type, result);
-                    if(type == MetadataType.SearchKeys) {
-                        updateSuggestions(result.getTree());
-                    }
-                }
+                result = refreshCache(type, hash);
             }
         } else {
             result = new MetadataResponse();
-            result.setErrorMessage("Illegal Argument:" + type + ", Expected: Entities or SearchKeys");
+            result.setErrorMessage(ILLEGAL_ARGUMENT + type + ", Expected: Entities or SearchKeys");
+        }
+        return result;
+    }
+
+    private MetadataResponse refreshCache(MetadataType type, String hash) {
+        MetadataResponse result;
+        result = new MetadataResponse();
+        String inClause = null;
+        if (type == MetadataType.Entities) {
+            inClause = "('Entities', 'Entity', 'System', 'SyncKey')";
+        } else {
+            inClause = "('SearchKeys', 'SearchKey', 'XPATH', 'Suggestion')";
+        }
+        if (inClause != null) {
+            Query query = mgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
+            List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
+            result.setTree(makeTree(queryResult));
+            result.setHash(hash);
+            treeCache.put(type, result);
+            if(type == MetadataType.SearchKeys) {
+                updateSuggestions(result.getTree());
+            }
         }
         return result;
     }
@@ -174,7 +182,7 @@ public class MetadataDAOImpl implements MetadataDAO {
             if (entity.getParentId().intValue() != -1) {
                 parent=map.get(entity.getParentId());
                 if(parent != null) {
-                    parent.addDescendant((field));
+                    parent.addDescendant(field);
                 }
             }
         }
@@ -201,7 +209,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         MetadataEntity curr = new MetadataEntity(type, name, value, parentId);
         if (parentId == -1L) {
             if (type != MetadataType.Entities && type != MetadataType.SearchKeys) {
-                result.setErrorMessage("Illegal Argument:" + type + ", If parent = -1, Expected: Entities or SearchKeys");
+                result.setErrorMessage(ILLEGAL_ARGUMENT + type + ", If parent = -1, Expected: Entities or SearchKeys");
             } else {
                 markTreeDirty(type);
                 mgr.persist(curr);
@@ -210,9 +218,9 @@ public class MetadataDAOImpl implements MetadataDAO {
         } else {
             MetadataField parent = getMetadataField(parentId);
             if(parent==null) {
-                result.setErrorMessage("Illegal Argument:parent "+parentId+ " not found!");
+                result.setErrorMessage(ILLEGAL_ARGUMENT + "parent "+parentId+ " not found!");
             } else if (!curr.canBeChildOf(parent.getType())) {
-                result.setErrorMessage("Illegal Argument: " + type + " can not be a child of " + parent.getType());
+                result.setErrorMessage(ILLEGAL_ARGUMENT + type + " can not be a child of " + parent.getType());
             } else {
                 markTreeDirty(type);
                 mgr.persist(curr);
@@ -340,7 +348,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         message.append("</SyncRequest>");
         LOGGER.info("Initiating sync request: {}", message.toString());
 
-        auditDAO.save("someUser", "SYNC", "metadata", entity, key, message.toString());
+        auditDAO.save(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString());
 
         for(String restEndPoint: resyncRestEndpoints) {
             try {
@@ -382,21 +390,25 @@ public class MetadataDAOImpl implements MetadataDAO {
 
     private void updateSuggestions(MetadataField searchKeysTree) {
 
-        Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
-        if(searchKeysTree!=null && searchKeysTree.getChildren().size()>0) {
+        Map<String, List<String>> newSuggestions = new HashMap<>();
+        if(searchKeysTree!=null && !searchKeysTree.getChildren().isEmpty()) {
             for (MetadataField searchKey : searchKeysTree.getChildren()) {
-                if (suggestedFields.contains(searchKey.getValue())) {
-                    List<String> values = new ArrayList<String>();
-                    for (MetadataField suggestion : searchKey.getSuggestions()) {
-                        values.add(suggestion.getValue());
-                    }
-                    newSuggestions.put(searchKey.getValue(), values);
-                } else {
-                    newSuggestions.put(searchKey.getValue(), null);
-                }
+                addSuggestion(newSuggestions, searchKey);
             }
         }
         suggestionsCache = newSuggestions;
+    }
+
+    private void addSuggestion(Map<String, List<String>> newSuggestions, MetadataField searchKey) {
+        if (suggestedFields.contains(searchKey.getValue())) {
+            List<String> values = new ArrayList<>();
+            for (MetadataField suggestion : searchKey.getSuggestions()) {
+                values.add(suggestion.getValue());
+            }
+            newSuggestions.put(searchKey.getValue(), values);
+        } else {
+            newSuggestions.put(searchKey.getValue(), null);
+        }
     }
 
     @Override
@@ -411,7 +423,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         }
         for(String suggestedField: suggestedFields) {
             List<String> extractedValues = extractedHeaders.get(suggestedField);
-            if(extractedValues!=null && extractedValues.size()>0) {
+            if(extractedValues!=null && !extractedValues.isEmpty()) {
                 for(String extractedValue: extractedValues) {
                     ensureSuggestionIsPresent(suggestedField, extractedValue);
                 }
@@ -441,7 +453,7 @@ public class MetadataDAOImpl implements MetadataDAO {
         Query query = mgr.createQuery("select f from MetadataEntity f where f.value = :value");
         query.setParameter("value", suggestedField);
         List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
-        if (queryResult != null && queryResult.size() != 0) {
+        if (queryResult != null && !queryResult.isEmpty()) {
             return queryResult.get(0).getId();
         }
         return null;

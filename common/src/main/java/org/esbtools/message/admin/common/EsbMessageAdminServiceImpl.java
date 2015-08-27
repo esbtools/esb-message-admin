@@ -22,8 +22,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -47,11 +51,13 @@ import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
 
-    private static final Logger LOG = Logger.getLogger(EsbMessageAdminServiceImpl.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(EsbMessageAdminServiceImpl.class);
     private JSONObject config;
     private String encryptionKey;
     private transient EsbErrorDAO errorDao;
@@ -60,22 +66,24 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtil encrypter;
 
+    private static final String DEFAULT_ENCODING = "UTF-8";
+
     @Inject
     private EntityManager entityMgr;
 
-    {
+    public EsbMessageAdminServiceImpl() {
         try {
             InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(configFile, "UTF-8"));
+            config = (JSONObject) parser.parse(new InputStreamReader(configFile, DEFAULT_ENCODING));
             configFile.close();
             InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
-            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, "UTF-8"));
+            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, DEFAULT_ENCODING));
             encryptionKey = encryptionKeyFileReader.readLine();
             encryptionKeyFileReader.close();
             encryptionKeyFile.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Unable to load configuration files", e);
         }
     }
 
@@ -120,7 +128,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         try {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
         } catch (KeyExtractorException e) {
-            LOG.warning("Could not extract metadata! " + e);
+            LOG.warn("Could not extract metadata for ebMessage {} ", esbMessage, e);
             extractedHeaders = new HashMap<>();
         }
 
@@ -131,7 +139,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Override
     public void persist(EsbMessage[] esbMessages) throws IOException {
-        for (EsbMessage esbMessage:esbMessages) {
+        for (EsbMessage esbMessage : esbMessages) {
             persist(esbMessage);
         }
     }
@@ -139,17 +147,20 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Override
     public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults) {
 
+        Date from;
+
         if (fromDate == null) {
             Calendar c = Calendar.getInstance();
             c.setTime(new Date());
             // TODO get magic number from a property file
             c.add(Calendar.DATE, -30);
-            fromDate = c.getTime();
+            from = c.getTime();
+        } else {
+            from = fromDate;
         }
-        if (toDate == null) {
-            toDate = new Date();
-        }
-        return getErrorDAO().findMessagesBySearchCriteria(criteria, fromDate, toDate, sortField, sortAsc, start, maxResults);
+        Date to = toDate == null ? new Date() : toDate;
+
+        return getErrorDAO().findMessagesBySearchCriteria(criteria, from, to, sortField, sortAsc, start, maxResults);
     }
 
     @Override
