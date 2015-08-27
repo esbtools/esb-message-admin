@@ -55,7 +55,8 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
     private final EncryptionUtil encrypter;
 
     private static final Logger LOGGER=LoggerFactory.getLogger(EsbErrorDAOImpl.class);
-
+    private static final String DEFAULT_USER = "someUser";
+    private static final String ERROR_KEY_TYPE = "error";
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
 
     private Set<String> sortingFields = new HashSet<>();
@@ -165,7 +166,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
 
             EsbMessage[] resultMessages = new EsbMessage[searchResult.size()];
             for (int i = 0; i < resultMessages.length; i++) {
-                Object cols[] = (Object[]) searchResult.get(i);
+                Object[] cols = (Object[]) searchResult.get(i);
                 EsbMessage msg = new EsbMessage();
                 msg.setId((Long) cols[0]);
                 msg.setTimestamp((Date) cols[1]);
@@ -183,7 +184,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             result.setPage(0);
         }
         long endTime = System.currentTimeMillis();
-        auditDAO.save("someUser", "SEARCH", "error", "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(endTime-startTime));
+        auditDAO.save(DEFAULT_USER, "SEARCH", ERROR_KEY_TYPE, "", "", criteria.toString()+", From:"+fromDate+", To:"+toDate+", Sort:"+sortField+", Asc:"+sortAsc+", start:"+start+", maxResults:"+maxResults +" time:"+(endTime-startTime));
 
         return result;
     }
@@ -252,7 +253,7 @@ public class EsbErrorDAOImpl implements EsbErrorDAO {
             }
             result.setMessages(messageArray);
         }
-        auditDAO.save("someUser", "FETCH", "error", "", "", id.toString());
+        auditDAO.save(DEFAULT_USER, "FETCH", ERROR_KEY_TYPE, "", "", id.toString());
         return result;
     }
 

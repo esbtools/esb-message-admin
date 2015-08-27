@@ -109,13 +109,7 @@ public class SearchErrorResourceBean {
                     criterion.setCustomKey(entry.getKey());
                     criterion.setValue(value);
                 } else {
-                    criterion.setField(SearchField.match(entry.getKey()));
-                    if (criterion.getField().getValueType() == String.class) {
-                        criterion.setValue(value);
-                    } else {
-                        // only other value is long
-                        criterion.setValue(Long.parseLong(value));
-                    }
+                    getPredefinedCriteria(entry, value, criterion);
                 }
                 criteriaList.add(criterion);
             }
@@ -123,5 +117,15 @@ public class SearchErrorResourceBean {
         criteria.setCriteria(criteriaList.toArray(new Criterion[0]));
         LOGGER.debug("criteria: {}", criteria.toString());
         return criteria;
+    }
+
+    private void getPredefinedCriteria(Map.Entry<String, List<String>> entry, String value, Criterion criterion) {
+        criterion.setField(SearchField.match(entry.getKey()));
+        if (criterion.getField().getValueType() == String.class) {
+            criterion.setValue(value);
+        } else {
+            // only other value is long
+            criterion.setValue(Long.parseLong(value));
+        }
     }
 }

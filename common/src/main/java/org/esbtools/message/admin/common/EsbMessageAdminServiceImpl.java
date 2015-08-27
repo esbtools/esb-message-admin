@@ -66,6 +66,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtil encrypter;
 
+    private static final String DEFAULT_ENCODING = "UTF-8";
+
     @Inject
     private EntityManager entityMgr;
 
@@ -73,10 +75,10 @@ public class EsbMessageAdminServiceImpl implements Provider {
         try {
             InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
             JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(configFile, "UTF-8"));
+            config = (JSONObject) parser.parse(new InputStreamReader(configFile, DEFAULT_ENCODING));
             configFile.close();
             InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
-            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, "UTF-8"));
+            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, DEFAULT_ENCODING));
             encryptionKey = encryptionKeyFileReader.readLine();
             encryptionKeyFileReader.close();
             encryptionKeyFile.close();

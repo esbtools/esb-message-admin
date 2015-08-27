@@ -71,19 +71,23 @@ public class KeyExtractorUtil {
 
             for (MetadataField path : searchKey.getChildren()) {
                 if (path.getType() == MetadataType.XPATH) {
-                    if (!expressions.containsKey(searchKey.getValue())) {
-                        expressions.put(searchKey.getValue(), new LinkedList<XPathExpression>());
-                    }
-                    XPathExpression expr;
-                    try {
-                        expr = xpath.compile(path.getValue());
-                        expressions.get(searchKey.getValue()).add(expr);
-                        LOGGER.info("adding key: {} with path: {}", searchKey.getValue(), path.getValue());
-                    } catch (XPathExpressionException e) {
-                        LOGGER.warn("XPATH: {} is invalid. Ignoring it!", path.getValue(), e);
-                    }
+                    loadXPathExpressions(xpath, searchKey, path);
                 }
             }
+        }
+    }
+
+    private final void loadXPathExpressions(XPath xpath, MetadataField searchKey, MetadataField path) {
+        if (!expressions.containsKey(searchKey.getValue())) {
+            expressions.put(searchKey.getValue(), new LinkedList<XPathExpression>());
+        }
+        XPathExpression expr;
+        try {
+            expr = xpath.compile(path.getValue());
+            expressions.get(searchKey.getValue()).add(expr);
+            LOGGER.info("adding key: {} with path: {}", searchKey.getValue(), path.getValue());
+        } catch (XPathExpressionException e) {
+            LOGGER.warn("XPATH: {} is invalid. Ignoring it!", path.getValue(), e);
         }
     }
 

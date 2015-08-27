@@ -139,7 +139,7 @@ public class KeyResourceBean {
            StringUtils.isNotBlank(system) &&
            StringUtils.isNotBlank(key) &&
            StringUtils.isNotBlank(values)) {
-           String valueArray[] = values.split(",");
+           String[] valueArray = values.split(",");
            return client.get().sync(entity, system, key, valueArray);
         }
         return null;
