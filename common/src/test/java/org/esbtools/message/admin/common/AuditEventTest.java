@@ -18,24 +18,21 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.util.List;
-
-import javax.persistence.Query;
-
-import org.esbtools.message.admin.common.dao.AuditEventDAO;
-import org.esbtools.message.admin.common.dao.AuditEventDAOImpl;
 import org.esbtools.message.admin.common.orm.AuditEventEntity;
+import org.esbtools.message.admin.model.AuditEvent;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AuditEventDAOTest extends EsbMessageAdminTestBase {
+import javax.persistence.Query;
+import java.util.List;
+
+public class AuditEventTest extends EsbMessageAdminTestBase {
 
     @Test
     public void testAuditEventCreation() {
-        AuditEventDAO dao = new AuditEventDAOImpl(getEntityManager());
 
-        AuditEventEntity expected = new AuditEventEntity(null,"testuser","ACTION1","ORDER","ORDER_NUMBER","12345","A message");
-        dao.save(expected.getPrincipal(),expected.getAction(),expected.getMessageType(),expected.getKeyType(),expected.getMessageKey(),expected.getMessage());
+        AuditEvent expected = new AuditEvent("testuser","ACTION1","ORDER","ORDER_NUMBER","12345","A message");
+        service.saveAuditEvent(expected);
 
         AuditEventEntity got = new AuditEventEntity();
         Query query = getEntityManager().createQuery("select f from AuditEventEntity f where f.messageKey = 12345");
