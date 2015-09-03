@@ -18,7 +18,7 @@
  */
 package org.esbtools.message.admin.common;
 
-import org.esbtools.message.admin.common.utility.EncryptionUtil;
+import org.esbtools.message.admin.common.utility.EncryptionUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,19 +28,19 @@ import org.junit.Test;
  * @author ykoer
  */
 
-public class EncrypterUtilTest {
+public class EncryptionUtilityTest {
 
     @Test
     public void testEncrypter() {
-        EncryptionUtil util = new EncryptionUtil("myPassisBIG12345");
+        EncryptionUtility util = new EncryptionUtility("myPassisBIG12345");
         Assert.assertNotEquals("text", util.encrypt("text"));
         Assert.assertEquals("text", util.decrypt(util.encrypt("text")));
     }
 
     @Test
     public void testEncrypterDoesntWorkWithDifferentPassword() {
-        EncryptionUtil util = new EncryptionUtil("myPassisBIG12345");
-        EncryptionUtil util2 = new EncryptionUtil("myPassisBIG12346");
+        EncryptionUtility util = new EncryptionUtility("myPassisBIG12345");
+        EncryptionUtility util2 = new EncryptionUtility("myPassisBIG12346");
         Assert.assertNull((util2.decrypt(util.encrypt("text"))));
     }
 }

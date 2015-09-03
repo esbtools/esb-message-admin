@@ -157,7 +157,7 @@ public final class ConversionUtility {
         return result;
     }
 
-    public static List<EsbMessageSensitiveInfoEntity> convertToEsbMessageSensitiveInfo(EncryptionUtil encrypter, EsbMessageEntity eme, List<String> sensitiveInfo) {
+    public static List<EsbMessageSensitiveInfoEntity> convertToEsbMessageSensitiveInfo(EncryptionUtility encrypter, EsbMessageEntity eme, List<String> sensitiveInfo) {
         List<EsbMessageSensitiveInfoEntity> result = new ArrayList<EsbMessageSensitiveInfoEntity>();
         if(sensitiveInfo!=null) {
             for(String text: sensitiveInfo) {

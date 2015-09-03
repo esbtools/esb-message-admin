@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import javax.persistence.Query;
 
 import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
-import org.esbtools.message.admin.common.utility.EncryptionUtil;
+import org.esbtools.message.admin.common.utility.EncryptionUtility;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
@@ -219,7 +219,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Query query = getEntityManager().createQuery("select f from EsbMessageSensitiveInfoEntity f");
         List<EsbMessageSensitiveInfoEntity> queryResult = (List<EsbMessageSensitiveInfoEntity>) query.getResultList();
         Assert.assertEquals("two sensitive bits expected", 2, queryResult.size());
-        EncryptionUtil util = new EncryptionUtil("passwordpassword");
+        EncryptionUtility util = new EncryptionUtility("passwordpassword");
         Assert.assertEquals("<Example>I can see it in your eyes</Example>",util.decrypt(queryResult.get(0).getValue()));
         Assert.assertEquals("<Example>I can see it in your soul</Example>",util.decrypt(queryResult.get(1).getValue()));
         Assert.assertEquals(result.getMessages()[0].getId(),queryResult.get(1).getEsbMessage().getId().longValue());
@@ -249,7 +249,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Query query = getEntityManager().createQuery("select f from EsbMessageSensitiveInfoEntity f");
         List<EsbMessageSensitiveInfoEntity> queryResult = (List<EsbMessageSensitiveInfoEntity>) query.getResultList();
         Assert.assertEquals("two sensitive bits expected", 2, queryResult.size());
-        EncryptionUtil util = new EncryptionUtil("passwordpassword");
+        EncryptionUtility util = new EncryptionUtility("passwordpassword");
         Assert.assertEquals("<Example>I can see it in your eyes</Example>",util.decrypt(queryResult.get(0).getValue()));
         Assert.assertEquals("<Example>I can see it in your soul</Example>",util.decrypt(queryResult.get(1).getValue()));
         Assert.assertEquals(result.getMessages()[0].getId(),queryResult.get(1).getEsbMessage().getId().longValue());

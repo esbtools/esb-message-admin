@@ -36,19 +36,11 @@ public final class EMAConfiguration {
         return jsonConfig;
     }
 
-    public static void setJsonConfig(JSONObject jsonObject) {
-        jsonConfig = jsonObject;
-    }
-
     public static String getEncryptionKey() {
         if (null == encryptionKey) {
             encryptionKey = loadEncryptionKey();
         }
         return encryptionKey;
-    }
-
-    public static void setEncryptionKey(String key) {
-        encryptionKey = key;
     }
 
     public static synchronized Set<String> getSortingFields() {
@@ -58,19 +50,11 @@ public final class EMAConfiguration {
         return sortingFields;
     }
 
-    public static void setSortingFields(Set<String> sortFields) {
-        sortingFields = sortFields;
-    }
-
     public static synchronized Set<String> getSuggestedFields() {
         if (null == suggestedFields) {
             suggestedFields = loadSuggestedFields();
         }
         return suggestedFields;
-    }
-
-    public static void setSuggestedFields(Set<String> fields) {
-        suggestedFields = fields;
     }
 
     public static synchronized List<String> getResyncRestEndpoints() {
@@ -80,10 +64,6 @@ public final class EMAConfiguration {
         return resyncRestEndpoints;
     }
 
-    public static void setResyncRestEndpoints(List<String> endpoints) {
-        resyncRestEndpoints = endpoints;
-    }
-
     public static List<VisibilityConfiguration> getNonViewableMessages() {
         if (null == nonViewableMessages) {
             nonViewableMessages = loadNonViewableConfiguration();
@@ -91,19 +71,11 @@ public final class EMAConfiguration {
         return nonViewableMessages;
     }
 
-    public static void setNonViewableMessages(List<VisibilityConfiguration> messages) {
-        nonViewableMessages = messages;
-    }
-
     public static List<VisibilityConfiguration> getPartiallyViewableMessages() {
         if (null == partiallyViewableMessages) {
             partiallyViewableMessages = loadPartiallyViewableConfiguration();
         }
         return partiallyViewableMessages;
-    }
-
-    public static void setPartiallyViewableMessages(List<VisibilityConfiguration> messages) {
-        partiallyViewableMessages = messages;
     }
 
     private static JSONObject loadJsonConfiguration() {

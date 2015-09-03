@@ -18,30 +18,6 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
@@ -51,7 +27,7 @@ import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.common.utility.ConversionUtility;
-import org.esbtools.message.admin.common.utility.EncryptionUtil;
+import org.esbtools.message.admin.common.utility.EncryptionUtility;
 import org.esbtools.message.admin.model.AuditEvent;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
@@ -65,8 +41,33 @@ import org.esbtools.message.admin.model.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.esbtools.message.admin.common.config.EMAConfiguration.*;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getEncryptionKey;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -74,17 +75,16 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static final Logger LOG = LoggerFactory.getLogger(EsbMessageAdminServiceImpl.class);
     private static final String ERROR_KEY_TYPE = "error";
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
-    private static transient KeyExtractorUtil extractor;
-    private static transient EncryptionUtil encrypter;
-    private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
-    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
     private static final String ILLEGAL_ARGUMENT = "Illegal Argument:";
     private static final String DEFAULT_USER = "someUser";
     private static final String METADATA_KEY_TYPE = "metadata";
     private static final String TYPE_PLACEHOLDER = "$TYPE";
-
     private static final String METADATA_QUERY = "select f from MetadataEntity f where f.type = '" + TYPE_PLACEHOLDER + "'";
-    
+    private static transient KeyExtractorUtil extractor;
+    private static transient EncryptionUtility encryptor;
+    private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
+    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
+
     @Inject
     private EntityManager entityMgr;
 
@@ -102,11 +102,11 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return extractor;
     }
 
-    private EncryptionUtil getEncrypter() {
-        if (encrypter == null) {
-            encrypter = new EncryptionUtil(getEncryptionKey());
+    private EncryptionUtility getEncryptor() {
+        if (encryptor == null) {
+            encryptor = new EncryptionUtility(getEncryptionKey());
         }
-        return encrypter;
+        return encryptor;
     }
 
     @Override
@@ -206,7 +206,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             }
             matcher.reset();
             String maskedText = matcher.replaceAll("<$1>"+matchedConfiguration.get("replacementText")+"</$1>");
-            eme.setErrorSensitiveInfo(ConversionUtility.convertToEsbMessageSensitiveInfo(getEncrypter(), eme, sensitiveInformation));
+            eme.setErrorSensitiveInfo(ConversionUtility.convertToEsbMessageSensitiveInfo(getEncryptor(), eme, sensitiveInformation));
             eme.setPayload(maskedText);
         }
     }
