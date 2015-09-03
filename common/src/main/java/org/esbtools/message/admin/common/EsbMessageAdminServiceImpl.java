@@ -18,10 +18,7 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -46,7 +43,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.esbtools.message.admin.Provider;
-import org.esbtools.message.admin.common.config.Configuration;
+import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.common.orm.AuditEventEntity;
@@ -65,11 +62,11 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.esbtools.message.admin.common.config.EMAConfiguration.*;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -77,67 +74,19 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static final Logger LOG = LoggerFactory.getLogger(EsbMessageAdminServiceImpl.class);
     private static final String ERROR_KEY_TYPE = "error";
     private static final String MESSAGE_PROPERTY_PAYLOAD_HASH = "esbPayloadHash";
-    private JSONObject config;
-    private String encryptionKey;
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtil encrypter;
-    private Set<String> sortingFields = new HashSet<>();
-    private List<Configuration> nonViewableConfiguration = null;
-    private List<Configuration> partiallyViewableConfiguration = null;
     private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
     private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
     private static final String ILLEGAL_ARGUMENT = "Illegal Argument:";
     private static final String DEFAULT_USER = "someUser";
     private static final String METADATA_KEY_TYPE = "metadata";
     private static final String TYPE_PLACEHOLDER = "$TYPE";
+
     private static final String METADATA_QUERY = "select f from MetadataEntity f where f.type = '" + TYPE_PLACEHOLDER + "'";
-
-    private Set<String> suggestedFields = new HashSet<>();
-    private List<String> resyncRestEndpoints = new ArrayList<>();
-
-    private static final String DEFAULT_ENCODING = "UTF-8";
-
+    
     @Inject
     private EntityManager entityMgr;
-
-    public EsbMessageAdminServiceImpl() {
-        try {
-            InputStream configFile = this.getClass().getClassLoader().getResourceAsStream("config.json");
-            JSONParser parser = new JSONParser();
-            config = (JSONObject) parser.parse(new InputStreamReader(configFile, DEFAULT_ENCODING));
-            configFile.close();
-            InputStream encryptionKeyFile = this.getClass().getClassLoader().getResourceAsStream("encryption.key");
-            BufferedReader encryptionKeyFileReader = new BufferedReader(new InputStreamReader(encryptionKeyFile, DEFAULT_ENCODING));
-            encryptionKey = encryptionKeyFileReader.readLine();
-            encryptionKeyFileReader.close();
-            encryptionKeyFile.close();
-            JSONArray sortFields = (JSONArray) config.get("sortingFields");
-            if(sortFields!=null) {
-                for(int i=0;i<sortFields.size();i++) {
-                    sortingFields.add(sortFields.get(i).toString());
-                }
-            }
-            nonViewableConfiguration = ConversionUtility.getConfigurations((JSONArray) config.get("nonViewableMessages"));
-            partiallyViewableConfiguration = ConversionUtility.getConfigurations((JSONArray) config.get("partiallyViewableMessages"));
-            JSONArray suggestConfigs = (JSONArray) config.get("suggestedFields");
-            if(suggestConfigs!=null) {
-                for(int i=0;i<suggestConfigs.size();i++) {
-                    suggestedFields.add(suggestConfigs.get(i).toString());
-                }
-            }
-            JSONArray resyncEndPoints = (JSONArray) config.get("resyncRestEndpoints");
-            if(resyncEndPoints!=null) {
-                for(Object endPoint: resyncEndPoints) {
-                    resyncRestEndpoints.add(endPoint.toString());
-                }
-            }
-            if(resyncRestEndpoints.isEmpty()) {
-                throw new IllegalStateException("at least one resync rest end point needs to be configured");
-            }
-        } catch (Exception e) {
-            throw new IllegalStateException("Unable to load configuration files", e);
-        }
-    }
 
     void setErrorEntityManager(EntityManager entityMgr) {
         this.entityMgr = entityMgr;
@@ -155,7 +104,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private EncryptionUtil getEncrypter() {
         if (encrypter == null) {
-            encrypter = new EncryptionUtil(encryptionKey);
+            encrypter = new EncryptionUtil(getEncryptionKey());
         }
         return encrypter;
     }
@@ -246,7 +195,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         em.setPayload(em.getPayload().replaceAll("\r", ""));
         em.setPayload(em.getPayload().replaceAll("\t", ""));
         em.setPayload(em.getPayload().replaceAll(">\\s*<", "><"));
-        Map<String,String> matchedConfiguration = matchCriteria(em, partiallyViewableConfiguration);
+        Map<String,String> matchedConfiguration = matchCriteria(em, getPartiallyViewableMessages());
         if(matchedConfiguration!=null) {
             String parentTag = matchedConfiguration.get("sensitiveTag");
             Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
@@ -300,7 +249,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         long startTime = System.currentTimeMillis();
 
         // allow sorting only by display fields, choose time stamp if proper field is not set.
-        String sortBy = (sortField==null || !sortingFields.contains(sortField)) ? "timestamp" : sortField;
+        String sortBy = (sortField==null || !getSortingFields().contains(sortField)) ? "timestamp" : sortField;
 
         if (maxResults > 0) {
             Query countQuery = getQueryFromCriteria(criteria, sortBy, sortAsc, fromDate, toDate, true);
@@ -406,7 +355,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
-            Map<String,String> matchedConfiguration = matchCriteria(messageArray[0], nonViewableConfiguration);
+            Map<String,String> matchedConfiguration = matchCriteria(messageArray[0], getNonViewableMessages());
             if(matchedConfiguration!=null) {
                 messageArray[0].setPayload(matchedConfiguration.get("replaceMessage"));
             }
@@ -416,9 +365,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return result;
     }
 
-    private Map<String,String> matchCriteria(EsbMessage message, List<Configuration> configurations) {
+    private Map<String,String> matchCriteria(EsbMessage message, List<VisibilityConfiguration> configurations) {
         String messageString = message.toString().toLowerCase();
-        for(Configuration conf: configurations) {
+        for(VisibilityConfiguration conf: configurations) {
             boolean matched = true;
             for(Map.Entry<String,String> matchCondition: conf.getMatchCriteriaMap().entrySet()) {
                 if(!messageString.contains(matchCondition.toString().toLowerCase())) {
@@ -707,7 +656,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
 
-        for(String restEndPoint: resyncRestEndpoints) {
+        for(String restEndPoint: getResyncRestEndpoints()) {
             try {
                 URL url = new URL(restEndPoint);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -757,7 +706,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private void addSuggestion(Map<String, List<String>> newSuggestions, MetadataField searchKey) {
-        if (suggestedFields.contains(searchKey.getValue())) {
+        if (getSuggestedFields().contains(searchKey.getValue())) {
             List<String> values = new ArrayList<>();
             for (MetadataField suggestion : searchKey.getSuggestions()) {
                 values.add(suggestion.getValue());
@@ -772,12 +721,12 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         if(message.getHeaders()!=null) {
             for(Header header:message.getHeaders()) {
-                if(suggestedFields.contains(header.getName())) {
+                if(getSuggestedFields().contains(header.getName())) {
                     ensureSuggestionIsPresent(header.getName(), header.getValue());
                 }
             }
         }
-        for(String suggestedField: suggestedFields) {
+        for(String suggestedField: getSuggestedFields()) {
             List<String> extractedValues = extractedHeaders.get(suggestedField);
             if(extractedValues!=null && !extractedValues.isEmpty()) {
                 for(String extractedValue: extractedValues) {
