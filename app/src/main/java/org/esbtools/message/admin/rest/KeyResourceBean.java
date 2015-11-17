@@ -125,7 +125,7 @@ public class KeyResourceBean {
      * @param entity           the entity to sync
      * @param system           the system to sync from
      * @param key              the key using which to sync the entity
-     * @param value            the values to sync
+     * @param values            the values to sync
      */
     @POST
     @Path("/sync/{entity}/{system}/{key}")

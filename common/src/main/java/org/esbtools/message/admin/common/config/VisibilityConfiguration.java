@@ -2,7 +2,11 @@ package org.esbtools.message.admin.common.config;
 
 import java.util.Map;
 
-public class Configuration {
+/**
+ * Created by dhaynes on 9/3/15.
+ */
+public class VisibilityConfiguration {
+
     private Map<String,String> matchCriteriaMap = null;
     private Map<String,String> configurationMap = null;
 

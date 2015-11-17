@@ -18,7 +18,6 @@
  */
 package org.esbtools.message.admin.common.utility;
 
-import org.esbtools.message.admin.common.config.Configuration;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageSensitiveInfoEntity;
@@ -26,16 +25,10 @@ import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.MetadataField;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 
 /**
@@ -124,27 +117,6 @@ public final class ConversionUtility {
         return esbMessage;
     }
 
-    public static Map<String, String> getMap(JSONObject jsonMap) {
-        Map<String,String> map = new HashMap<>();
-        for(Entry<String,String> entry : (Set<Entry<String,String>>)jsonMap.entrySet()) {
-            map.put(entry.getKey(),entry.getValue());
-        }
-        return map;
-    }
-
-    public static List<Configuration> getConfigurations(JSONArray jsonConfigurations) {
-
-        List<Configuration> result = new ArrayList<>();
-        for(int i=0; i<jsonConfigurations.size(); i++) {
-            Configuration conf = new Configuration();
-            JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
-            conf.setMatchCriteriaMap(getMap((JSONObject) jsonConfiguration.get("matchCriteria")));
-            conf.setConfigurationMap(getMap((JSONObject) jsonConfiguration.get("configuration")));
-            result.add(conf);
-        }
-        return result;
-    }
-
     public static List<EsbMessageEntity> convertFromEsbMessageArray(EsbMessage[] esbMessages) {
 
         if (esbMessages==null) {
@@ -185,7 +157,7 @@ public final class ConversionUtility {
         return result;
     }
 
-    public static List<EsbMessageSensitiveInfoEntity> convertToEsbMessageSensitiveInfo(EncryptionUtil encrypter, EsbMessageEntity eme, List<String> sensitiveInfo) {
+    public static List<EsbMessageSensitiveInfoEntity> convertToEsbMessageSensitiveInfo(EncryptionUtility encrypter, EsbMessageEntity eme, List<String> sensitiveInfo) {
         List<EsbMessageSensitiveInfoEntity> result = new ArrayList<EsbMessageSensitiveInfoEntity>();
         if(sensitiveInfo!=null) {
             for(String text: sensitiveInfo) {

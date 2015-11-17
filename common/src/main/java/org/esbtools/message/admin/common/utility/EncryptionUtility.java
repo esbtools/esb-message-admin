@@ -16,15 +16,15 @@ import org.apache.commons.codec.binary.Base64;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-public class EncryptionUtil {
+public class EncryptionUtility {
 
-    private static final Logger LOGGER=LoggerFactory.getLogger(EncryptionUtil.class);
+    private static final Logger LOGGER=LoggerFactory.getLogger(EncryptionUtility.class);
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
     private static final String FILE_ENCODING = "UTF-8";
     public static final String SECURITY_PROVIDER = "SunJCE";
     private final String encryptionKey;
 
-    public EncryptionUtil(String key) {
+    public EncryptionUtility(String key) {
         this.encryptionKey = key;
     }
 

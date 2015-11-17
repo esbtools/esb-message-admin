@@ -16,72 +16,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.esbtools.message.admin.common.orm;
-
-import org.esbtools.message.admin.model.AuditEvent;
+package org.esbtools.message.admin.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+public class AuditEvent {
 
-@Entity
-@Table(name="AUDIT_EVENT")
-public class AuditEventEntity {
-
-    // ~ Instance fields
-    // --------------------------------------------------------
-
-    @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
-    @Column(name="event_id")
     private Long eventId;
-
-    @Column(name = "timestamp", nullable = false)
     private Date loggedTime;
-
-    @Column(name = "principal", nullable = false)
     private String principal;
-
-    @Column(name = "action", nullable = false)
     private String action;
-
-    @Column(name = "message_type", nullable = false)
     private String messageType;
-
-    @Column(name = "key_type")
     private String keyType;
-
-    @Column(name = "message_key", nullable = false)
     private String messageKey;
-
-    @Column(name = "message")
     private String message;
 
-    // ~ Constructors
-    // -----------------------------------------------------------
-
-    public AuditEventEntity() {
+    public AuditEvent() {
+        this.loggedTime = new Date();
     }
 
-    public AuditEventEntity(AuditEvent auditEvent) {
-        this.loggedTime = auditEvent.getLoggedTime();
-        this.principal = auditEvent.getPrincipal();
-        this.action = auditEvent.getAction();
-        this.messageType = auditEvent.getMessageType();
-        this.keyType = auditEvent.getKeyType();
-        this.messageKey = auditEvent.getMessageKey();
-        this.message = auditEvent.getMessage();
-    }
-
-    public AuditEventEntity(Date loggedTime, String principal, String action, String messageType,
-            String keyType, String messageKey, String message) {
-        super();
-        this.loggedTime = loggedTime;
+    public AuditEvent(String principal, String action, String messageType,
+                      String keyType, String messageKey, String message) {
+        this.loggedTime = new Date();
         this.principal = principal;
         this.action = action;
         this.messageType = messageType;
@@ -89,9 +45,6 @@ public class AuditEventEntity {
         this.messageKey = messageKey;
         this.message = message;
     }
-
-    // ~ Setters and Getters
-    // -----------------------------------------------------------
 
     public Long getEventId() {
         return eventId;
