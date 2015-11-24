@@ -18,6 +18,15 @@
  */
 package org.esbtools.message.admin.common;
 
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
@@ -47,10 +56,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -656,31 +662,37 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
 
-        for(String restEndPoint: getResyncRestEndpoints()) {
-            try {
-                URL url = new URL(restEndPoint);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setDoOutput(true);
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/xml");
-                OutputStream os = conn.getOutputStream();
-                os.write(message.toString().getBytes("UTF-8"));
-                os.flush();
-                if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                    // status is Success by default
-                    return new MetadataResponse();
-                } else {
-                    // try another host
-                    LOG.warn("unable to send resync message, received Http response code:" +
-                            conn.getResponseCode() + " response message:" + conn.getResponseMessage() + " from:" + restEndPoint);
+        CloseableHttpClient httpClient;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
+            httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+            for(String restEndPoint: getResyncRestEndpoints()) {
+                try {
+                    HttpPost httpPost = new HttpPost(restEndPoint);
+                    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+                    httpPost.setEntity(new StringEntity(message.toString()));
+
+                    CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
+
+                    if (httpResponse.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK) {
+                        // status is Success by default
+                        return new MetadataResponse();
+                    } else {
+                        // try another host
+                        LOG.warn("unable to send resync message, received Http response code:" +
+                                httpResponse.getStatusLine().getStatusCode() + " response message:" + httpResponse.getEntity().toString() + " from:" + restEndPoint);
+                    }
+                } catch (IOException e) {
+                    LOG.error(e.getMessage(), e);
                 }
-                conn.disconnect();
-            } catch (MalformedURLException e) {
-                LOG.error(e.getMessage(), e);
-            } catch (IOException e) {
-                LOG.error(e.getMessage(), e);
             }
+            httpClient.close();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
         }
+
         MetadataResponse result = new MetadataResponse();
         result.setErrorMessage("Unable to resync message");
         return result;
