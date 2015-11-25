@@ -641,23 +641,33 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Override
     public MetadataResponse sync(String entity, String system, String key, String... values) {
 
-        // create JMS Payload
-        StringBuilder message = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        message.append("<SyncRequest><EntityName>");
+        StringBuilder message = new StringBuilder("{");
+        message.append("\"entity\" : \"");
         message.append(entity);
-        message.append("</EntityName><System>");
+        message.append("\",");
+        message.append("\"system\" : \"");
         message.append(system);
-        message.append("</System><KeyName>");
+        message.append("\",");
+        message.append("\"key\": \"");
         message.append(key);
-        message.append("</KeyName>");
+        message.append("\",");
+        message.append("\"values\" : [");
+
+        int i = 0;
         for(String value: values) {
             if(value!=null && value.length()>0) {
-                message.append("<KeyValue>");
+                if(i>0) {
+                    message.append(",");
+                }
+                message.append("\"");
                 message.append(value);
-                message.append("</KeyValue>");
+                message.append("\"");
             }
+            i++;
         }
-        message.append("</SyncRequest>");
+        message.append("]");
+        message.append("}");
+        
         LOG.info("Initiating sync request: {}", message.toString());
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
