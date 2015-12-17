@@ -4,11 +4,11 @@
     <parent>
         <groupId>org.esbtools.message.admin</groupId>
         <artifactId>esb-message-admin-pom</artifactId>
-        <version>0.9.0-SNAPSHOT</version>
+        <version>0.9.0</version>
     </parent>
     <groupId>org.esbtools.message.admin</groupId>
     <artifactId>esb-message-admin-api</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.9.0</version>
     <packaging>jar</packaging>
     <name>esb-message-admin: ${project.groupId}|${project.artifactId}</name>
     <description>ESB Message Admin core API and model</description>
@@ -20,12 +20,12 @@
         </license>
     </licenses>
     <scm>
-        <connection></connection>
-        <developerConnection></developerConnection>
-        <url></url>
-        <tag></tag>
+        <connection />
+        <developerConnection />
+        <url />
+        <tag>V0.9.0</tag>
     </scm>
-    <distributionManagement></distributionManagement>
+    <distributionManagement />
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
