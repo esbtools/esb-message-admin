@@ -1,5 +1,5 @@
 esbMessageAdminApp.service('localStorage',
-	function() {
-    	return window.localStorage;
-	}
+    function() {
+        return window.localStorage;
+    }
 );

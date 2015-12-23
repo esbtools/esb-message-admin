@@ -18,37 +18,42 @@
                         <thead>
                             <tr>
                                 <th style="width:80px;"> </th>
-                                <th style="min-width: 40px;"><span tooltip="Text to be displayed in the dropdown">Name</span></th>
-                                <th style="min-width: 40px;"><span tooltip="Text to be used in the message">Value</span></th>
+                                <th style="min-width: 40px;">
+                                    <span tooltip="Text to be displayed in the dropdown">Name</span>
+                                </th>
+                                <th style="min-width: 40px;">
+                                    <span tooltip="Text to be used in the message">Value</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr ng-repeat="child in parent.children">
                                 <td>
                                     <div class="btn-group" dropdown is-open="status.isopen">
-                                      <button type="button" class="btn btn-primary  btn-xs dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-                                        Manage <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li ng-hide="cantHaveChild(child)">
-                                            <a ng-click="manageChildren(child)">
-                                                <span class="glyphicon glyphicon-envelope"></span>
-                                                Edit Children
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a ng-click="editChild(child)">
-                                                <span class="glyphicon glyphicon-pencil"></span>
-                                                Update
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a ng-click="deleteChild(child)">
-                                                <span class="glyphicon glyphicon-minus"></span>
-                                                Delete
-                                            </a>
-                                        </li>
-                                      </ul>
+                                        <button type="button" class="btn btn-primary  btn-xs dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+                                            Manage
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li ng-hide="cantHaveChild(child)">
+                                                <a ng-click="manageChildren(child)">
+                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                    Edit Children
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="editChild(child)">
+                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                    Update
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="deleteChild(child)">
+                                                    <span class="glyphicon glyphicon-minus"></span>
+                                                    Delete
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </td>
                                 <td>{{ child.name }}</td>
