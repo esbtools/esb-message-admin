@@ -18,22 +18,22 @@ esbMessageAdminApp.config(
 			$routeProvider.when('/errors',
 		    	{
 		    		title : "Errors and Messages",
-		    		templateUrl : 'app/error/errors.html',
+		    		templateUrl : 'app/error/errors.tpl.html',
 		    	}
 			).when('/sync',
 				{
 					title : "Sync",
-					templateUrl : 'app/sync/sync.html',
+					templateUrl : 'app/sync/sync.tpl.html',
 				}
 			).when('/synckeys',
 				{
 					title : "Sync Keys",
-					templateUrl : 'app/sync/synckeys.html',
+					templateUrl : 'app/sync/synckeys.tpl.html',
 				}
 			).when('/searchkeys',
 				{
 					title : "Search Keys",
-					templateUrl : 'app/search/searchkeys.html',
+					templateUrl : 'app/search/searchkeys.tpl.html',
 				}
 			).when('/users',
 				{
