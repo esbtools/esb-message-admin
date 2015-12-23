@@ -1,0 +1,1 @@
+esbMessageAdminApp.service('ngGridLayoutPlugin', ngGridLayoutPlugin);
