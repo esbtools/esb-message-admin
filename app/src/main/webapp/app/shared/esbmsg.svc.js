@@ -1,6 +1,4 @@
-var esbMessageAdminServices = angular.module('esbMessageAdminServices', []);
-
-esbMessageAdminServices.service('EsbMessageService',
+esbMessageAdminApp.service('EsbMessageService',
 	[
 	    '$http',
 	    '$q',
@@ -109,7 +107,7 @@ esbMessageAdminServices.service('EsbMessageService',
             		function() {
             			self.respondError();
                     }
-            	);    
+            	);
             };
 
             self.addKey = function(argParentId, argName, argType, argValue) {
@@ -165,7 +163,7 @@ esbMessageAdminServices.service('EsbMessageService',
             };
 
             self.sync = function(argEntity, argSystem, argKey, argValues) {
-            	
+
 		    	return $http.post("api/key/sync/{entity}/{system}/{key}?values={values}".supplant(
 	                	{
 	                		entity : argEntity,
@@ -181,25 +179,25 @@ esbMessageAdminServices.service('EsbMessageService',
 		                } else {
 		                	messageCenterService.add('danger', response.data.errorMessage, {status : messageCenterService.status.permanent});
 		                }
-		            }, 
+		            },
 		            function(err) {
 		                self.respondError();
 		            }
 		        );
             };
-        } 
+        }
     ]
 );
 
-esbMessageAdminServices.service('localStorage', 
+esbMessageAdminApp.service('localStorage',
 	function() {
     	return window.localStorage;
 	}
 );
 
-esbMessageAdminServices.service('errorColumnPrefs', 
+esbMessageAdminApp.service('errorColumnPrefs',
 	[
-	 	'localStorage', 
+	 	'localStorage',
 	 	function(localStorage) {
 	 		var self = this;
 	 		var error_column_storage_key = 'esb_message_admin.error_columns';
@@ -252,7 +250,7 @@ esbMessageAdminServices.service('errorColumnPrefs',
 		        var column = self.defaults[i];
 		        self.default_map[column.field] = column;
 		    };
-		
+
 		    self.save = function(columns) {
 		        var sanitized_columns = [];
 		        for (var i in columns) {
@@ -266,7 +264,7 @@ esbMessageAdminServices.service('errorColumnPrefs',
 		        }
 		        localStorage.setItem(error_column_storage_key, JSON.stringify(sanitized_columns));
 		    };
-		
+
 		    function add_missing_fields(columns, loaded) {
 		        for (var field_name in self.default_map) {
 		            if (!(field_name in loaded)) {
@@ -274,7 +272,7 @@ esbMessageAdminServices.service('errorColumnPrefs',
 		            }
 		        }
 		    }
-		
+
 		    function get_defaults(name) {
 		        var column = {};
 		        var default_setting = self.default_map[name];
@@ -283,14 +281,14 @@ esbMessageAdminServices.service('errorColumnPrefs',
 		        }
 		        return column;
 		    }
-		
+
 		    function merge_persistent_settings(destination, source) {
 		        for (var i in persistent) {
 		            var property = persistent[i];
 		            destination[property] = source[property];
 		        }
 		    }
-		
+
 		    function sanitize(columns) {
 		        var sanitized_columns = [];
 		        var loaded = {};
@@ -302,10 +300,10 @@ esbMessageAdminServices.service('errorColumnPrefs',
 		            loaded[column.field] = true;
 		        }
 		        add_missing_fields(sanitized_columns, loaded);
-		
+
 		        return sanitized_columns;
 		    }
-		
+
 		    this.load = function() {
 		        var saved = localStorage.getItem(error_column_storage_key);
 		        if (saved) {
@@ -317,4 +315,4 @@ esbMessageAdminServices.service('errorColumnPrefs',
 	]
 );
 
-esbMessageAdminServices.service('ngGridLayoutPlugin', ngGridLayoutPlugin);
+esbMessageAdminApp.service('ngGridLayoutPlugin', ngGridLayoutPlugin);
