@@ -8,7 +8,9 @@ describe("ErrorsSearchCtrl", function() {
     }
   };
 
-  var testMessage = {id: "testMessage"};
+  var testMessage = {
+    id: "testMessage"
+  };
 
   beforeEach(module("esbMessageAdminApp"));
 
@@ -45,7 +47,9 @@ describe("ErrorsSearchCtrl", function() {
         save: function(columns) {
           _columns = columns;
         },
-        load: function() { return _columns; }
+        load: function() {
+          return _columns;
+        }
       };
     });
   }));
@@ -67,7 +71,9 @@ describe("ErrorsSearchCtrl", function() {
 
     spyOn(ngGridLayoutPlugin, 'updateGridLayout');
 
-    $controller("ErrorsSearchCtrl", {$scope: $scope});
+    $controller("ErrorsSearchCtrl", {
+      $scope: $scope
+    });
 
     $scope.$emit("errorGridResize");
     $scope.$apply();
@@ -82,7 +88,9 @@ describe("ErrorsSearchCtrl", function() {
       };
     });
 
-    $controller("ErrorsSearchCtrl", {$scope: $scope});
+    $controller("ErrorsSearchCtrl", {
+      $scope: $scope
+    });
 
     expect($scope.gridOptions.columnDefs).toEqual(["foo", "bar"]);
   });
@@ -96,7 +104,9 @@ describe("ErrorsSearchCtrl", function() {
       };
     });
 
-    $controller("ErrorsSearchCtrl", {$scope: $scope});
+    $controller("ErrorsSearchCtrl", {
+      $scope: $scope
+    });
 
     $scope.$emit("ngGridEventColumns", ["foo", "bar"]);
     $scope.$apply();
@@ -137,31 +147,38 @@ describe("ErrorsSearchCtrl", function() {
         };
 
         // Run injected controller functions on their scopes
-        $controller("ErrorsSearchCtrl", {$scope: $scope});
-        $controller("ErrorDetailsCtrl", {$scope: $detailsScope});
+        $controller("ErrorsSearchCtrl", {
+          $scope: $scope
+        });
+        $controller("ErrorDetailsCtrl", {
+          $scope: $detailsScope
+        });
 
         $scope.search();
         $scope.$apply();
-        $scope.messageSelections = [{id: 1}];
+        $scope.messageSelections = [{
+          id: 1
+        }];
         $scope.$apply();
       });
-      
+
       it("populates {{message}} in ErrorDetailsCtrl with the selection", function() {
         expect($detailsScope.$eval("message")).toEqual(testMessage);
       });
 
       it("resets {{message}} in ErrorDetailsCtrl after a second search " +
-          "which returns no results", function() {
-        // Simulate no results for next search
-        msgSvc.search = function() {
-          return $q.when(emptySearchResponse);
-        };
+        "which returns no results",
+        function() {
+          // Simulate no results for next search
+          msgSvc.search = function() {
+            return $q.when(emptySearchResponse);
+          };
 
-        $scope.search();
-        $scope.$apply();
+          $scope.search();
+          $scope.$apply();
 
-        expect($detailsScope.$eval("message")).toBeFalsy();
-      });
+          expect($detailsScope.$eval("message")).toBeFalsy();
+        });
     });
   });
 });
