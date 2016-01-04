@@ -21,7 +21,7 @@ esbMessageAdminApp.config(
         templateUrl: 'app/sync/sync.tpl.html',
       }).when('/synckeys', {
         title: "Sync Keys",
-        templateUrl: 'app/sync/synckeys.tpl.html',
+        templateUrl: 'app/synckeys/synckeys.tpl.html',
       }).when('/searchkeys', {
         title: "Search Keys",
         templateUrl: 'app/search/searchkeys.tpl.html',
