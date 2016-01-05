@@ -1,4 +1,4 @@
-describe("gridResizeController", function() {
+describe("GridResizeBroadcastController", function() {
   var $controller, $scope, $rootScope, $element = {};
 
   beforeEach(module("esbMessageAdminApp"));
@@ -27,7 +27,7 @@ describe("gridResizeController", function() {
   it("broadcasts errorGridSize event to child scopes when $element.width() changes", function(done) {
     $element.setWidth(5);
 
-    $controller("gridResizeController", {
+    $controller("GridResizeBroadcastController", {
       $scope: $rootScope
     });
 

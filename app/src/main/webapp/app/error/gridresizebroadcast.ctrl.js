@@ -1,4 +1,4 @@
-esbMessageAdminApp.controller('gridResizeController', [
+esbMessageAdminApp.controller('GridResizeBroadcastController', [
   '$scope',
   '$rootScope',
   '$element',
