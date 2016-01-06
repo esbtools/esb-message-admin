@@ -27,7 +27,7 @@ esbMessageAdminApp.config(
         templateUrl: 'app/search/searchkeys.tpl.html',
       }).when('/users', {
         title: "Users",
-        templateUrl: 'app/users/users.html',
+        templateUrl: 'app/users/users.tpl.html',
       }).otherwise({
         redirectTo: '/errors'
       });
