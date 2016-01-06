@@ -57,5 +57,10 @@
         "https://localhost/emagateway/resync",
         "https://anotherhost/blah",
         "https://anotherhost2/resynch"
+    ],
+    "editableMessageTypes":[
+        "PERSON",
+        "PLACE",
+        "THING"
     ]
 }

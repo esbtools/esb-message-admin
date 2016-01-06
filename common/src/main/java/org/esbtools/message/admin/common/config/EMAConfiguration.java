@@ -24,6 +24,7 @@ public final class EMAConfiguration {
     private static List<String> resyncRestEndpoints;
     private static List<VisibilityConfiguration> nonViewableMessages;
     private static List<VisibilityConfiguration> partiallyViewableMessages;
+    private static List<String> editableMessageTypes;
 
     private EMAConfiguration() {
 
@@ -62,6 +63,13 @@ public final class EMAConfiguration {
             resyncRestEndpoints = loadResyncRestEndpoints();
         }
         return resyncRestEndpoints;
+    }
+
+    public static synchronized List<String> getEditableMessageTypes() {
+        if (null == editableMessageTypes) {
+            editableMessageTypes = loadEditableMessageTypes();
+        }
+        return editableMessageTypes;
     }
 
     public static List<VisibilityConfiguration> getNonViewableMessages() {
@@ -149,6 +157,17 @@ public final class EMAConfiguration {
 
     private static List<VisibilityConfiguration> loadPartiallyViewableConfiguration() {
         return getVisibilityConfigurations((JSONArray) getJsonConfig().get("partiallyViewableMessages"));
+    }
+
+    private static List<String> loadEditableMessageTypes() {
+        List<String> editableMessageTypes = new ArrayList<>();
+        JSONArray entities = (JSONArray) getJsonConfig().get("editableMessageTypes");
+        if(entities!=null) {
+            for(Object entity: entities) {
+                editableMessageTypes.add( entity.toString().toUpperCase() ); // this will make comparison more sane
+            }
+        }
+        return editableMessageTypes;
     }
 
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {

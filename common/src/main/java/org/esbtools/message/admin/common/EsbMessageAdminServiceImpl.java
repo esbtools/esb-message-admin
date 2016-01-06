@@ -74,6 +74,7 @@ import static org.esbtools.message.admin.common.config.EMAConfiguration.getParti
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -210,18 +211,20 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     public void updateMessage(EsbMessage esbMessage) {
 
-        EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
-
-        // scold the user for trying to update instead of insert
-        if( persistedMessage == null ){
-            throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
+        // explicitly check if the loaded message is in our list of allowed message types
+        if( isEditableMessage(esbMessage) ){
+            EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
+            // scold the user for trying to update instead of insert
+            if( persistedMessage == null ){
+                throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
+            }
+            // Update the payload. we're going to resend the payload to the gateway anyway, so no sense in messing with headers
+            persistedMessage.setPayload(esbMessage.getPayload());
+            entityMgr.flush();
+        }else{
+            LOG.warn( "User was attempting to edit a message of type " + esbMessage.getMessageType() + "." );
+            throw new IllegalArgumentException("Message is not eligible for editation."); // generic exception
         }
-
-        // Update the payload. we're going to resend the payload to the gateway anyway, so no sense in messing with headers
-        persistedMessage.setPayload(esbMessage.getPayload());
-
-        entityMgr.flush();
-
     }
 
     private void maskSensitiveInfo(EsbMessage em, EsbMessageEntity eme) {
@@ -812,6 +815,10 @@ public class EsbMessageAdminServiceImpl implements Provider {
             return queryResult.get(0).getId();
         }
         return null;
+    }
+
+    private Boolean isEditableMessage( EsbMessage message ){
+        return getEditableMessageTypes().contains( message.getMessageType() );
     }
 
 }
