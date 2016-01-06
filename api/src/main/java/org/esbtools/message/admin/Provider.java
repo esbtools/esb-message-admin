@@ -47,6 +47,22 @@ public interface Provider {
     void persist(EsbMessage[] esbMessages) throws IOException;
 
     /**
+     * Updates a given ESB Message ( Payload only )
+     *
+     * @param esbMessage - a single ESB Message
+     * @throws IOException
+     */
+    void update(EsbMessage esbMessage);
+
+    /**
+     * Updates a given ESB Message ( Payload only )
+     *
+     * @param esbMessages - an array of ESB Messages
+     * @throws IOException
+     */
+    void update(EsbMessage[] esbMessages);
+
+    /**
      * @param criteria          search
      * @param fromDate          the start timestamp of the range
      * @param toDate            the end timestamp of the range

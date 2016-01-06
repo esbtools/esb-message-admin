@@ -140,6 +140,18 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     @Override
+    public void update(EsbMessage esbMessage) {
+        updateMessage(esbMessage);
+    }
+
+    @Override
+    public void update(EsbMessage[] esbMessages) {
+        for (EsbMessage esbMessage : esbMessages) {
+            update(esbMessage);
+        }
+    }
+
+    @Override
     public SearchResult searchMessagesByCriteria(SearchCriteria criteria, Date fromDate, Date toDate, String sortField, boolean sortAsc, int start, int maxResults) {
 
         Date from;
@@ -194,6 +206,22 @@ public class EsbMessageAdminServiceImpl implements Provider {
             eme.setOccurrenceCount(++occurrenceCount);
         }
         entityMgr.persist(eme);
+    }
+
+    public void updateMessage(EsbMessage esbMessage) {
+
+        EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
+
+        // scold the user for trying to update instead of insert
+        if( persistedMessage == null ){
+            throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
+        }
+
+        // Update the payload. we're going to resend the payload to the gateway anyway, so no sense in messing with headers
+        persistedMessage.setPayload(esbMessage.getPayload());
+
+        entityMgr.flush();
+
     }
 
     private void maskSensitiveInfo(EsbMessage em, EsbMessageEntity eme) {
@@ -667,7 +695,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         }
         message.append("]");
         message.append("}");
-        
+
         LOG.info("Initiating sync request: {}", message.toString());
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
