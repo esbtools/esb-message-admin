@@ -1,4 +1,4 @@
-describe("gridResizeController", function() {
+describe("GridResizeBroadcastController", function() {
   var $controller, $scope, $rootScope, $element = {};
 
   beforeEach(module("esbMessageAdminApp"));
@@ -10,8 +10,12 @@ describe("gridResizeController", function() {
 
     var _width;
 
-    $element.width = function() { return _width; };
-    $element.setWidth = function(width) { _width = width; };
+    $element.width = function() {
+      return _width;
+    };
+    $element.setWidth = function(width) {
+      _width = width;
+    };
   }));
 
   beforeEach(inject(function(_$controller_, _$rootScope_, _$q_, _EsbMessageService_) {
@@ -23,7 +27,9 @@ describe("gridResizeController", function() {
   it("broadcasts errorGridSize event to child scopes when $element.width() changes", function(done) {
     $element.setWidth(5);
 
-    $controller("gridResizeController", {$scope: $rootScope});
+    $controller("GridResizeBroadcastController", {
+      $scope: $rootScope
+    });
 
     // Watch expressions are evaluated on first digest cycle no matter what,
     // so digest first...

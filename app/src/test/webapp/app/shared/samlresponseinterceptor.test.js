@@ -29,8 +29,7 @@ describe("samlResponseInterceptor", function() {
 
   it("refreshes window in $timeout if response is a SAML HTML redirect page", function() {
     $httpBackend.whenGET('foo').respond(
-      '<HTML><HEAD><TITLE>HTTP Post Binding (Request)</TITLE></HEAD><BODY Onload="document.forms[0].submit()"><FORM METHOD="POST" ACTION="https://saml.esbtools.org/"><INPUT TYPE="HIDDEN" NAME="SAMLRequest" VALUE="foobar"/></FORM></BODY></HTML>',
-      {
+      '<HTML><HEAD><TITLE>HTTP Post Binding (Request)</TITLE></HEAD><BODY Onload="document.forms[0].submit()"><FORM METHOD="POST" ACTION="https://saml.esbtools.org/"><INPUT TYPE="HIDDEN" NAME="SAMLRequest" VALUE="foobar"/></FORM></BODY></HTML>', {
         "Content-Type": "text/html"
       }
     );
@@ -47,8 +46,7 @@ describe("samlResponseInterceptor", function() {
 
   it("does not refresh window if not a SAML HTML redirect response", function() {
     $httpBackend.whenGET('foo').respond(
-      '<html><body>hey look at me being a template and not a saml response</body></html>',
-      {
+      '<html><body>hey look at me being a template and not a saml response</body></html>', {
         "Content-Type": "text/html"
       }
     );

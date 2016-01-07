@@ -28,7 +28,7 @@ module.exports = function(config) {
         "src/main/webapp/bower_components/angular-loading-bar/build/loading-bar.js",
         "src/main/webapp/bower_components/message-center/message-center.js",
         "src/main/webapp/bower_components/angular-ui-layout/ui-layout.js",
-        "src/main/webapp/js/**/*.js",
+        "src/main/webapp/app/**/*.js",
         "src/test/webapp/**/*.js"
       ],
 

@@ -1,55 +1,62 @@
-<div id="syncpane">
+<div id="syncKeyPane">
     <div mc-messages id="messageCenter"></div>
-    <div ng-controller="SearchKeysCtrl">
+    <div ng-controller="SyncKeysCtrl">
         <div class="panel panel-default">
             <div class="panel-body">
-                <h4>Manage Search Keys</h4>
+                <h4>Manage Sync Form Keys</h4>
                 <ol class="ab-nav breadcrumb">
                     <li ng-repeat="crumb in crumbs" ng-class="{ active: $last }">
-                      <a ng-if="!$last" ng-click="gotoCrumb(crumb)" ng-bind="crumb.value" class="margin-right-xs"></a>
-                      <span ng-if="$last" ng-bind="crumb.value"></span>
+                        <a ng-if="!$last" ng-click="gotoCrumb(crumb)" ng-bind="crumb.name" class="margin-right-xs"></a>
+                        <span ng-if="$last" ng-bind="crumb.name"></span>
                     </li>
                 </ol>
                 <div ng-hide="addMode || updateMode" class="panel-body">
                     <button ng-hide="cantHaveChild(parent)" type="button" class="btn btn-success btn-xs" ng-click="addChild(parent)">
-                        <span class="glyphicon glyphicon-plus"> Add</span>
+                        <span class="glyphicon glyphicon-plus"></span> Add
                     </button>
-                    <table ng-hide="cantHaveChild(parent)" class="table table-striped table-condensed" ng-table="metadataTable">
+                    <table ng-hide="cantHaveChild(parent)" class="table table-striped table-condensed" ng-table="fieldTable">
                         <thead>
                             <tr>
                                 <th style="width:80px;"> </th>
-                                <th style="min-width: 40px;">{{ parent.children.concat(parent.suggestions)[0].type || "Children" }}</th>
+                                <th style="min-width: 40px;">
+                                    <span tooltip="Text to be displayed in the dropdown">Name</span>
+                                </th>
+                                <th style="min-width: 40px;">
+                                    <span tooltip="Text to be used in the message">Value</span>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="child in parent.children.concat(parent.suggestions)">
+                            <tr ng-repeat="child in parent.children">
                                 <td>
                                     <div class="btn-group" dropdown is-open="status.isopen">
-                                      <button type="button" class="btn btn-primary  btn-xs dropdown-toggle" dropdown-toggle ng-disabled="disabled">
-                                        Manage <span class="caret"></span>
-                                      </button>
-                                      <ul class="dropdown-menu" role="menu">
-                                        <li ng-hide="cantHaveChild(child)">
-                                            <a ng-click="manageChildren(child)">
-                                                <span class="glyphicon glyphicon-envelope"></span>
-                                                Edit Children
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a ng-click="editChild(child)">
-                                                <span class="glyphicon glyphicon-pencil"></span>
-                                                Update
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a ng-click="deleteChild(child)">
-                                                <span class="glyphicon glyphicon-minus"></span>
-                                                Delete
-                                            </a>
-                                        </li>
-                                      </ul>
+                                        <button type="button" class="btn btn-primary  btn-xs dropdown-toggle" dropdown-toggle ng-disabled="disabled">
+                                            Manage
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li ng-hide="cantHaveChild(child)">
+                                                <a ng-click="manageChildren(child)">
+                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                    Edit Children
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="editChild(child)">
+                                                    <span class="glyphicon glyphicon-pencil"></span>
+                                                    Update
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="deleteChild(child)">
+                                                    <span class="glyphicon glyphicon-minus"></span>
+                                                    Delete
+                                                </a>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </td>
+                                <td>{{ child.name }}</td>
                                 <td>{{ child.value }}</td>
                             </tr>
                         </tbody>
@@ -57,11 +64,11 @@
                 </div>
                 <div ng-hide="!addMode" class="panel-body">
                     <form class="form-inline" role="form" name='addForm'>
+
                         <div class="form-group">
                             <div class="input-group">
-                                <div class="input-group-addon">Type</div>
-                                <select class="form-control" required="required" id="childKeyType" ng-model="childKeyType" ng-options="key for key in childTypes">
-                                </select>
+                                <div class="input-group-addon">Name</div>
+                                <input class="form-control" id="addFormName" type="text" ng-model="addFormName" />
                             </div>
                         </div>
 
@@ -84,9 +91,8 @@
 
                         <div class="form-group">
                             <div class="input-group">
-                                <div class="input-group-addon">Type</div>
-                                <select class="form-control" required="required" id="peerKeyType" ng-model="peerKeyType" ng-options="key for key in peerTypes">
-                                </select>
+                                <div class="input-group-addon">Name</div>
+                                <input class="form-control" id="updateFormName" type="text" ng-model="parent.name" />
                             </div>
                         </div>
 
@@ -106,5 +112,6 @@
                 </div>
             </div>
         </div>
+
     </div>
 </div>
