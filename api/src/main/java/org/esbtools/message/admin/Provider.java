@@ -49,18 +49,11 @@ public interface Provider {
     /**
      * Updates a given ESB Message ( Payload only )
      *
-     * @param esbMessage - a single ESB Message
+     * @param messageId - a message Id
+     * @param messageBody - the message body
      * @throws IOException
      */
-    void resubmit(EsbMessage esbMessage);
-
-    /**
-     * Updates a given ESB Message ( Payload only )
-     *
-     * @param esbMessages - an array of ESB Messages
-     * @throws IOException
-     */
-    void resubmit(EsbMessage[] esbMessages);
+    MetadataResponse resubmit(Long messageId, String messageBody);
 
     /**
      * @param criteria          search

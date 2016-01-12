@@ -145,6 +145,22 @@ public class KeyResourceBean {
         return null;
     }
 
+    /**
+     * resubmit an entity to the bus
+     *
+     * @param id        the id of the message ( from the esbmessage )
+     * @param message   the body of the message you'd like to resubmit in place of the extant body
+     */
+    @POST
+    @Path("/resubmit/{id}/")
+    @Produces( {MediaType.APPLICATION_JSON})
+    public MetadataResponse resubmit( @PathParam("id") Long messageId, @QueryParam("message") String message ) {
+        if( messageId != null && StringUtils.isNotBlank(message) ){
+            return client.get().resubmit( messageId, message );
+        }
+        return null;
+    }
+
     @GET
     @Path("/suggest/")
     @Produces({MediaType.APPLICATION_JSON})

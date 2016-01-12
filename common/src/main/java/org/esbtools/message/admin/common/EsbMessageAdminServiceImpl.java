@@ -144,15 +144,11 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     @Override
-    public void resubmit(EsbMessage esbMessage) {
-        resubmitMessage(esbMessage);
-    }
-
-    @Override
-    public void resubmit(EsbMessage[] esbMessages) {
-        for (EsbMessage esbMessage : esbMessages) {
-            resubmit(esbMessage);
-        }
+    public MetadataResponse resubmit(Long messageId, String messageBody ){
+        EsbMessage esbMessage = new EsbMessage();
+        esbMessage.setId( messageId );
+        esbMessage.setPayload( messageBody );
+        return resubmitMessage(esbMessage);
     }
 
     @Override
