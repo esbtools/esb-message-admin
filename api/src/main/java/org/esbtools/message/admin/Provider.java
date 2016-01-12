@@ -52,7 +52,7 @@ public interface Provider {
      * @param esbMessage - a single ESB Message
      * @throws IOException
      */
-    void update(EsbMessage esbMessage);
+    void resubmit(EsbMessage esbMessage);
 
     /**
      * Updates a given ESB Message ( Payload only )
@@ -60,7 +60,7 @@ public interface Provider {
      * @param esbMessages - an array of ESB Messages
      * @throws IOException
      */
-    void update(EsbMessage[] esbMessages);
+    void resubmit(EsbMessage[] esbMessages);
 
     /**
      * @param criteria          search

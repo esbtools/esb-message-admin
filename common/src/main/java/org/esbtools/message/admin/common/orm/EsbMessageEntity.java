@@ -104,6 +104,9 @@ public class EsbMessageEntity implements Serializable {
     @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE }, mappedBy = "esbMessage" , fetch=FetchType.LAZY)
     private List<EsbMessageSensitiveInfoEntity> errorSensitiveInfo;
 
+    @Column(name="resubmitted_on")
+    private Date resubmittedOn;
+
     public Long getId() {
         return id;
     }
@@ -254,6 +257,14 @@ public class EsbMessageEntity implements Serializable {
 
     public void setErrorSensitiveInfo(List<EsbMessageSensitiveInfoEntity> errorSensitiveInfo) {
         this.errorSensitiveInfo = errorSensitiveInfo;
+    }
+
+    public Date getResubmittedOn() {
+        return this.resubmittedOn;
+    }
+
+    public void setResubmittedOn( Date resubmittedOn ) {
+        this.resubmittedOn = resubmittedOn;
     }
 
     public EsbMessageHeaderEntity getHeader(String headerName) {

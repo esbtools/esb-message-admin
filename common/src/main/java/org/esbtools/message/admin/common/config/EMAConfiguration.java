@@ -25,6 +25,8 @@ public final class EMAConfiguration {
     private static List<VisibilityConfiguration> nonViewableMessages;
     private static List<VisibilityConfiguration> partiallyViewableMessages;
     private static List<String> editableMessageTypes;
+    private static List<String> resubmitBlackList;
+    private static List<String> resubmitRestEndpoints;
 
     private EMAConfiguration() {
 
@@ -70,6 +72,20 @@ public final class EMAConfiguration {
             editableMessageTypes = loadEditableMessageTypes();
         }
         return editableMessageTypes;
+    }
+
+    public static synchronized List<String> getResubmitBlackList() {
+        if (null == resubmitBlackList) {
+            resubmitBlackList = loadResubmitBlackList();
+        }
+        return resubmitBlackList;
+    }
+
+    public static synchronized List<String> getResubmitRestEndpoints() {
+        if ( null == resubmitRestEndpoints ) {
+            resubmitRestEndpoints = loadResubmitRestEndpoints();
+        }
+        return resubmitRestEndpoints;
     }
 
     public static List<VisibilityConfiguration> getNonViewableMessages() {
@@ -170,6 +186,27 @@ public final class EMAConfiguration {
         return editableMessageTypes;
     }
 
+    private static List<String> loadResubmitBlackList() {
+        List<String> resubmitBlackList = new ArrayList<>();
+        JSONArray entities = (JSONArray) getJsonConfig().get("resubmitBlackList");
+        if(entities!=null) {
+            for(Object entity: entities) {
+                resubmitBlackList.add( entity.toString().toUpperCase() ); // this will make comparison more sane
+            }
+        }
+        return resubmitBlackList;
+    }
+
+    private static List<String> loadResubmitRestEndpoints() {
+        List<String> resubmitRestEndpoints = new ArrayList<>();
+        JSONArray endpoints = (JSONArray) getJsonConfig().get("resubmitRestEndpoints");
+        if(endpoints!=null) {
+            for(Object endpoint: endpoints) {
+                resubmitRestEndpoints.add( endpoint.toString() ); // this will make comparison more sane
+            }
+        }
+        return resubmitRestEndpoints;
+    }
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
 
         List<VisibilityConfiguration> result = new ArrayList<>();
