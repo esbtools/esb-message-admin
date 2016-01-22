@@ -63,7 +63,7 @@ public class KeyExtractorUtil {
     private Map<String, List<XPathExpression>> expressions;
 
     public KeyExtractorUtil(List<MetadataField> searchKeys, String argHash) {
-        expressions = new HashMap<>();
+        expressions = new HashMap<String, List<XPathExpression>>();
         hash = argHash;
 
         XPath xpath = XPathFactory.newInstance().newXPath();
@@ -113,7 +113,7 @@ public class KeyExtractorUtil {
     }
 
     private Map<String, List<String>> getEntriesFromXPaths(String payload) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-        Map<String, List<String>> keysMap = new HashMap<>();
+        Map<String, List<String>> keysMap = new HashMap<String, List<String>>();
 
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = domFactory.newDocumentBuilder();

@@ -108,7 +108,7 @@ public final class EMAConfiguration {
     }
 
     private static Set<String> loadSortingFields() {
-        Set<String> sortingFields = new HashSet<>();
+        Set<String> sortingFields = new HashSet<String>();
         JSONArray sortFields = (JSONArray) getJsonConfig().get("sortingFields");
         if(sortFields!=null) {
             for(int i=0;i<sortFields.size();i++) {
@@ -119,7 +119,7 @@ public final class EMAConfiguration {
     }
 
     private static Set<String> loadSuggestedFields() {
-        Set<String> suggestedFields = new HashSet<>();
+        Set<String> suggestedFields = new HashSet<String>();
         JSONArray suggestConfigs = (JSONArray) getJsonConfig().get("suggestedFields");
         if(suggestConfigs!=null) {
             for(int i=0;i<suggestConfigs.size();i++) {
@@ -130,7 +130,7 @@ public final class EMAConfiguration {
     }
 
     private static List<String> loadResyncRestEndpoints() {
-        List<String> resyncRestEndpoints = new ArrayList<>();
+        List<String> resyncRestEndpoints = new ArrayList<String>();
         JSONArray resyncEndPoints = (JSONArray) getJsonConfig().get("resyncRestEndpoints");
         if(resyncEndPoints!=null) {
             for(Object endPoint: resyncEndPoints) {
@@ -153,7 +153,7 @@ public final class EMAConfiguration {
 
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
 
-        List<VisibilityConfiguration> result = new ArrayList<>();
+        List<VisibilityConfiguration> result = new ArrayList<VisibilityConfiguration>();
         for(int i=0; i<jsonConfigurations.size(); i++) {
             VisibilityConfiguration conf = new VisibilityConfiguration();
             JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
@@ -165,7 +165,7 @@ public final class EMAConfiguration {
     }
 
     private static Map<String, String> getMap(JSONObject jsonMap) {
-        Map<String,String> map = new HashMap<>();
+        Map<String,String> map = new HashMap<String, String>();
         for(Map.Entry<String,String> entry : (Set<Map.Entry<String,String>>)jsonMap.entrySet()) {
             map.put(entry.getKey(),entry.getValue());
         }

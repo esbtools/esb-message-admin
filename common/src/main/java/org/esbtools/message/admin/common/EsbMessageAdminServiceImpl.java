@@ -88,8 +88,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static final String METADATA_QUERY = "select f from MetadataEntity f where f.type = '" + TYPE_PLACEHOLDER + "'";
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtility encryptor;
-    private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
-    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
+    private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<MetadataType, MetadataResponse>();
+    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<String, List<String>>();
 
     @Inject
     private EntityManager entityMgr;
@@ -124,7 +124,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
         } catch (KeyExtractorException e) {
             LOG.warn("Could not extract metadata for ebMessage {} ", esbMessage, e);
-            extractedHeaders = new HashMap<>();
+            extractedHeaders = new HashMap<String, List<String>>();
         }
 
         create(esbMessage, extractedHeaders);
@@ -206,7 +206,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             String parentTag = matchedConfiguration.get("sensitiveTag");
             Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
             Matcher matcher = pattern.matcher(em.getPayload());
-            List<String> sensitiveInformation = new ArrayList<>();
+            List<String> sensitiveInformation = new ArrayList<String>();
             while(matcher.find()) {
                 sensitiveInformation.add(matcher.group(0));
             }
@@ -473,7 +473,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
      */
     private static MetadataField makeTree(List<MetadataEntity> entities) {
         MetadataField root = null;
-        Map<Long, MetadataField> map = new HashMap<>();
+        Map<Long, MetadataField> map = new HashMap<Long, MetadataField>();
         for (MetadataEntity entity : entities) {
             MetadataField field = ConversionUtility.convertToMetadataField(entity);
             if (entity.getType() == MetadataType.Entities || entity.getType() == MetadataType.SearchKeys) {
@@ -718,7 +718,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private void updateSuggestions(MetadataField searchKeysTree) {
 
-        Map<String, List<String>> newSuggestions = new HashMap<>();
+        Map<String, List<String>> newSuggestions = new HashMap<String, List<String>>();
         if(searchKeysTree!=null && !searchKeysTree.getChildren().isEmpty()) {
             for (MetadataField searchKey : searchKeysTree.getChildren()) {
                 addSuggestion(newSuggestions, searchKey);
@@ -729,7 +729,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private void addSuggestion(Map<String, List<String>> newSuggestions, MetadataField searchKey) {
         if (getSuggestedFields().contains(searchKey.getValue())) {
-            List<String> values = new ArrayList<>();
+            List<String> values = new ArrayList<String>();
             for (MetadataField suggestion : searchKey.getSuggestions()) {
                 values.add(suggestion.getValue());
             }

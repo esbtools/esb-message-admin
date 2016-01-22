@@ -293,7 +293,7 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
       Pattern pattern = Pattern.compile("<("+parentTag+")>((?!<("+parentTag+")>).)*</("+parentTag+")>");
       Matcher matcher = pattern.matcher(text);
 
-      ArrayList<String> sensitiveInformation = new ArrayList<>();
+      ArrayList<String> sensitiveInformation = new ArrayList<String>();
       while(matcher.find()) {
           sensitiveInformation.add(matcher.group(0));
       }
