@@ -94,7 +94,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Inject
     private EntityManager entityMgr;
 
-    void setErrorEntityManager(EntityManager entityMgr) {
+    public void setErrorEntityManager(EntityManager entityMgr) {
         this.entityMgr = entityMgr;
     }
 
