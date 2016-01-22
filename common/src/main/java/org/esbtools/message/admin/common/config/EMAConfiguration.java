@@ -27,7 +27,9 @@ public final class EMAConfiguration {
     private static List<String> editableMessageTypes;
     private static List<String> resubmitBlackList;
     private static List<String> resubmitRestEndpoints;
-
+    private static String resubmitControlHeader;
+    private static String resubmitHeaderNamespace;
+    
     private EMAConfiguration() {
 
     }
@@ -100,6 +102,20 @@ public final class EMAConfiguration {
             partiallyViewableMessages = loadPartiallyViewableConfiguration();
         }
         return partiallyViewableMessages;
+    }
+
+    public static String getResubmitControlHeader() {
+        if (null == resubmitControlHeader) {
+            resubmitControlHeader = loadResubmitControlHeader();
+        }
+        return resubmitControlHeader;
+    }
+
+    public static String getResubmitHeaderNamespace() {
+        if (null == resubmitHeaderNamespace) {
+            resubmitHeaderNamespace = loadResubmitHeaderNamespace();
+        }
+        return resubmitHeaderNamespace;
     }
 
     private static JSONObject loadJsonConfiguration() {
@@ -207,6 +223,15 @@ public final class EMAConfiguration {
         }
         return resubmitRestEndpoints;
     }
+
+    private static String loadResubmitControlHeader() {
+        return (String) getJsonConfig().get("resubmitControlHeader");
+    }
+
+    private static String loadResubmitHeaderNamespace() {
+        return (String) getJsonConfig().get("resubmitHeaderNamespace");
+    }
+
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
 
         List<VisibilityConfiguration> result = new ArrayList<>();

@@ -48,7 +48,6 @@ import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
 import org.esbtools.gateway.resubmit.ResubmitRequest;
-import org.esbtools.gateway.resubmit.ResubmitResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +78,8 @@ import static org.esbtools.message.admin.common.config.EMAConfiguration.getSugge
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitRestEndpoints;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitControlHeader;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitHeaderNamespace;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -217,7 +218,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
 
         request.setHeaders( reduceToEsbHeaders(persistedMessage) );
-        request.setDestination( persistedMessage.getHeader("esbResubmitDestination").getValue() );
+        request.setDestination( persistedMessage.getHeader( getResubmitControlHeader() ).getValue() );
         request.setSystem( persistedMessage.getSourceSystem() );
 
         // scold the user for trying to update instead of insert
@@ -231,6 +232,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         } else {
             request .setPayload( persistedMessage.getPayload() );
         }
+
         saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", request.getPayload().toString() ) );
         MetadataResponse result = sendMessageToResubmitGateway( request.toString() );
         persistedMessage.setResubmittedOn(new Date());
@@ -240,7 +242,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     private MetadataResponse sendMessageToResubmitGateway( String message ) {
 
-        if( sendMessageToRESTEndPoint( message, getResubmitRestEndpoints() ) ){
+        if( sendMessageToRestEndPoint( message, getResubmitRestEndpoints() ) ){
             return new MetadataResponse();
         } else{
             MetadataResponse result = new MetadataResponse();
@@ -250,7 +252,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     }
 
-    private Boolean sendMessageToRESTEndPoint( String message, List<String> endpoints ) {
+    private Boolean sendMessageToRestEndPoint( String message, List<String> endpoints ) {
         CloseableHttpClient httpClient;
         try {
             SSLContextBuilder builder = new SSLContextBuilder();
@@ -765,7 +767,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
 
-        if( sendMessageToRESTEndPoint( message.toString(), getResyncRestEndpoints() ) ){
+        if( sendMessageToRestEndPoint( message.toString(), getResyncRestEndpoints() ) ){
             return new MetadataResponse();
         }else{
             MetadataResponse result = new MetadataResponse();
@@ -865,7 +867,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         Map<String,String> headers = new HashMap<String,String>();
 
         for( EsbMessageHeaderEntity header : message.getErrorHeaders() ){
-            if( header.getName().contains( "esb" ) ){
+            if( header.getName().contains( getResubmitHeaderNamespace() ) ){
                 headers.put( header.getName(), header.getValue() );
             }
         }

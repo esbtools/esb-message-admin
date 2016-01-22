@@ -68,5 +68,7 @@
     ],
     "resubmitBlackList":[
         "STUFF"
-    ]
+    ],
+    "resubmitControlHeader":"someRandomHeader",
+    "resubmitHeaderNamespace":"blar"
 }
