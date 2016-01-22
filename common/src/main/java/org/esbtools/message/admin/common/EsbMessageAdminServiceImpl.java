@@ -47,6 +47,8 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
+import org.esbtools.gateway.resubmit.ResubmitRequest;
+import org.esbtools.gateway.resubmit.ResubmitResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -210,9 +212,14 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     public MetadataResponse resubmitMessage(EsbMessage esbMessage) {
 
-        String messageBody;
+        ResubmitRequest request = new ResubmitRequest();
 
         EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
+
+        request.setHeaders( reduceToEsbHeaders(persistedMessage) );
+        request.setDestination( persistedMessage.getHeader("esbResubmitDestination").getValue() );
+        request.setSystem( persistedMessage.getSourceSystem() );
+
         // scold the user for trying to update instead of insert
         if( persistedMessage == null ){
             throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
@@ -220,23 +227,20 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         // explicitly check if the loaded message is in our list of allowed message types
         if( isEditableMessage(esbMessage) ){
-            messageBody = esbMessage.getPayload();
+            request.setPayload( esbMessage.getPayload() );
         } else {
-            messageBody = persistedMessage.getPayload();
+            request .setPayload( persistedMessage.getPayload() );
         }
-        String sourceSystem = persistedMessage.getSourceSystem();
-        saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", messageBody) );
-        MetadataResponse result = sendMessageToResubmitGateway( messageBody, sourceSystem );
+        saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", request.getPayload().toString() ) );
+        MetadataResponse result = sendMessageToResubmitGateway( request.toString() );
         persistedMessage.setResubmittedOn(new Date());
         entityMgr.flush();
         return result;
     }
 
-    private MetadataResponse sendMessageToResubmitGateway( String message, String sourceSystem ) {
+    private MetadataResponse sendMessageToResubmitGateway( String message ) {
 
-        String restMessage = "";
-
-        if( sendMessageToRESTEndPoint( restMessage, getResubmitRestEndpoints() ) ){
+        if( sendMessageToRESTEndPoint( message, getResubmitRestEndpoints() ) ){
             return new MetadataResponse();
         } else{
             MetadataResponse result = new MetadataResponse();
@@ -857,4 +861,15 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return !getResubmitBlackList().contains( message.getMessageType().toUpperCase() ) && message.getResubmittedOn() == null;
     }
 
+    private Map<String,String> reduceToEsbHeaders( EsbMessageEntity message ){
+        Map<String,String> headers = new HashMap<String,String>();
+
+        for( EsbMessageHeaderEntity header : message.getErrorHeaders() ){
+            if( header.getName().contains( "esb" ) ){
+                headers.put( header.getName(), header.getValue() );
+            }
+        }
+
+        return headers;
+    }
 }
