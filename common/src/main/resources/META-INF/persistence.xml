@@ -17,6 +17,7 @@
             <property name="hibernate.cache.use_query_cache" value="false" />
             <property name="hibernate.cache.use_minimal_puts" value="false"/>
             <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.JBossTransactionManagerLookup"/>
       </properties>
    </persistence-unit>
 </persistence>
