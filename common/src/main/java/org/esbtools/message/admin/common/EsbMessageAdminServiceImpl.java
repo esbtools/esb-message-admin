@@ -216,21 +216,32 @@ public class EsbMessageAdminServiceImpl implements Provider {
         ResubmitRequest request = new ResubmitRequest();
 
         EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
-
-        request.setHeaders( reduceToEsbHeaders(persistedMessage) );
-        request.setDestination( persistedMessage.getHeader( getResubmitControlHeader() ).getValue() );
-        request.setSystem( persistedMessage.getSourceSystem() );
-
         // scold the user for trying to update instead of insert
         if( persistedMessage == null ){
             throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
         }
 
+
+        // It may be the case that the header we're configured to use isn't
+        // present on the message So we should indicate this with an appropriate
+        // return object so the front end can act.
+        try{
+            request.setDestination( persistedMessage.getHeader( getResubmitControlHeader() ).getValue() );
+        }catch(Exception e){
+            LOG.warn("Warning: Message that was resubmitted lacked configured control header! Message ID: " + new Long(esbMessage.getId()).toString() );
+            MetadataResponse result = new MetadataResponse();
+            result.setErrorMessage("Unable to resubmit message due to configured resubmit control header not being present on message.");
+            return result;
+        }
+        request.setHeaders( reduceToEsbHeaders(persistedMessage) );
+        request.setSystem( persistedMessage.getSourceSystem() );
+
         // explicitly check if the loaded message is in our list of allowed message types
-        if( isEditableMessage(esbMessage) ){
+        LOG.warn(esbMessage.toString());
+        if( isEditableMessage(persistedMessage) ){
             request.setPayload( esbMessage.getPayload() );
         } else {
-            request .setPayload( persistedMessage.getPayload() );
+            request.setPayload( persistedMessage.getPayload() );
         }
 
         saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", request.getPayload().toString() ) );
@@ -855,6 +866,10 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private Boolean isEditableMessage( EsbMessage message ){
+        return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
+    }
+
+    private Boolean isEditableMessage( EsbMessageEntity message ){
         return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
     }
 
