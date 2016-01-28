@@ -1,4 +1,4 @@
-describe("ErrorsSearchCtrl", function() {
+describe("ErrorCtrl", function() {
   var $controller, $scope, $rootScope, $q, msgSvc;
 
   var emptySearchResponse = {
@@ -71,7 +71,7 @@ describe("ErrorsSearchCtrl", function() {
 
     spyOn(ngGridLayoutPlugin, 'updateGridLayout');
 
-    $controller("ErrorsSearchCtrl", {
+    $controller("ErrorCtrl", {
       $scope: $scope
     });
 
@@ -88,7 +88,7 @@ describe("ErrorsSearchCtrl", function() {
       };
     });
 
-    $controller("ErrorsSearchCtrl", {
+    $controller("ErrorCtrl", {
       $scope: $scope
     });
 
@@ -104,7 +104,7 @@ describe("ErrorsSearchCtrl", function() {
       };
     });
 
-    $controller("ErrorsSearchCtrl", {
+    $controller("ErrorCtrl", {
       $scope: $scope
     });
 
@@ -114,7 +114,7 @@ describe("ErrorsSearchCtrl", function() {
     expect(savedColumns).toEqual(["foo", "bar"]);
   });
 
-  describe("with nested ErrorDetailsCtrl", function() {
+  describe("with nested ErrorCtrl", function() {
     var $detailsScope;
 
     beforeEach(function() {
@@ -147,10 +147,10 @@ describe("ErrorsSearchCtrl", function() {
         };
 
         // Run injected controller functions on their scopes
-        $controller("ErrorsSearchCtrl", {
+        $controller("ErrorCtrl", {
           $scope: $scope
         });
-        $controller("ErrorDetailsCtrl", {
+        $controller("ErrorCtrl", {
           $scope: $detailsScope
         });
 
@@ -162,11 +162,11 @@ describe("ErrorsSearchCtrl", function() {
         $scope.$apply();
       });
 
-      it("populates {{message}} in ErrorDetailsCtrl with the selection", function() {
+      it("populates {{message}} in ErrorCtrl with the selection", function() {
         expect($detailsScope.$eval("message")).toEqual(testMessage);
       });
 
-      it("resets {{message}} in ErrorDetailsCtrl after a second search " +
+      it("resets {{message}} in ErrorCtrl after a second search " +
         "which returns no results",
         function() {
           // Simulate no results for next search
