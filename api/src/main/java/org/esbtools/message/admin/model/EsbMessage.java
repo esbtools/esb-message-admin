@@ -34,6 +34,7 @@ public class EsbMessage implements Serializable {
     private String errorQueue;
     private String messageId;
     private Date timestamp;
+    private Date resubmittedOn;
     private String messageGuid;
     private String messageType;
     private String sourceQueue;
@@ -49,6 +50,8 @@ public class EsbMessage implements Serializable {
     private int occurrenceCount;
     private String payload;
     private List<Header> headers;
+    private Boolean editableMessage;
+    private Boolean allowsResubmit;
 
     public long getId() {
         return id;
@@ -80,6 +83,14 @@ public class EsbMessage implements Serializable {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public Date getResubmittedOn() {
+        return this.resubmittedOn;
+    }
+
+    public void setResubmittedOn(Date resubmittedOn) {
+        this.resubmittedOn = resubmittedOn;
     }
 
     public String getMessageGuid() {
@@ -220,6 +231,22 @@ public class EsbMessage implements Serializable {
         this.headers = headers;
     }
 
+    public Boolean isEditableMessage() {
+        return this.editableMessage;
+    }
+
+    public void setEditableMessage(Boolean isEditableMessage) {
+        this.editableMessage = isEditableMessage;
+    }
+
+    public Boolean isAllowsResubmit() {
+        return this.allowsResubmit;
+    }
+
+    public void setAllowsResubmit(Boolean allowsResubmit) {
+        this.allowsResubmit = allowsResubmit;
+    }
+
     @Override
     public String toString() {
         return "EsbMessage [id=" + id
@@ -239,6 +266,9 @@ public class EsbMessage implements Serializable {
                 + ", errorSystem=" + errorSystem
                 + ", errorType=" + errorType
                 + ", occurrenceCount=" + occurrenceCount
+                + ", editableMessage=" + editableMessage
+                + ", allowsResubmit=" + allowsResubmit
+                + ", resubmittedOn=" + resubmittedOn
                 + ", payload=" + payload
                 + ", headers=" + headers + "]";
     }

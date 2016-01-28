@@ -55,5 +55,18 @@
     ],
     "resyncRestEndpoints":[
         "https://localhost/emagateway/resync",
-    ]
+    ],
+    "resubmitRestEndpoints":[
+        "https://sandwich/pasta/resubmit"
+    ],
+    "editableMessageTypes":[
+        "PERSON",
+        "PLACE",
+        "XML"
+    ],
+    "resubmitBlackList":[
+        "STUFF"
+    ],
+    "resubmitControlHeader":"resubmitControlHeaderTest",
+    "resubmitHeaderNamespace":"namespace"
 }

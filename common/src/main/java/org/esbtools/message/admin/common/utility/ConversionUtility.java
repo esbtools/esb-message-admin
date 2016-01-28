@@ -104,6 +104,7 @@ public final class ConversionUtility {
             esbMessage.setErrorType(ee.getErrorType());
             esbMessage.setOccurrenceCount(ee.getOccurrenceCount());
             esbMessage.setPayload(ee.getPayload());
+            esbMessage.setResubmittedOn( ee.getResubmittedOn() );
 
             List<EsbMessageHeaderEntity> headers = ee.getErrorHeaders();
             if (headers != null) {

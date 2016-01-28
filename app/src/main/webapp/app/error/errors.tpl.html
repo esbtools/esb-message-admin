@@ -1,27 +1,24 @@
 <div id="errorpane" ng-controller="ErrorsSearchCtrl">
-<div mc-messages id="messageCenter"></div>
+    <div mc-messages id="messageCenter"></div>
     <div class="row">
         <div class="col-xs-12 panel panel-default">
             <div class="panel-body">
                 <form class="form-inline" role="form" name='searchForm' style="vertical-align: middle;">
 
                     <div class="form-group">
-                        <angucomplete id="searchField"
-                            placeholder='Search by key="value" pairs. All keys are autocompleted. Some keys have autocompleted values.'
-                            pause="400"
-                            selectedObject="selected"
-                            localdata="autocompleteData"
-                            titlefield="key"
-                            searchfields="key"
-                            inputclass="form-control"/>
+                        <angucomplete id="searchField" placeholder='Search by key="value" pairs. All keys are autocompleted. Some keys have autocompleted values.' pause="400" selectedObject="selected" localdata="autocompleteData" titlefield="key" searchfields="key" inputclass="form-control"
+                        />
                     </div>
 
                     <div class="form-group" style="font-size: 15px;">
-                        <span class="form-text">from</span> <quick-datepicker ng-model='fromDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker> <span class="form-text">to</span> <quick-datepicker ng-model='toDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                        <span class="form-text">from</span>
+                        <quick-datepicker ng-model='fromDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                        <span class="form-text">to</span>
+                        <quick-datepicker ng-model='toDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
                     </div>
 
                     <div class="form-group">
-                          <button type="button" class="btn btn-primary" ng-click='search()' ng-disabled="searchForm.$invalid">Search</button>
+                        <button type="button" class="btn btn-primary" ng-click='search()' ng-disabled="searchForm.$invalid">Search</button>
                     </div>
 
                 </form>
@@ -31,7 +28,7 @@
     <div class="row">
         <div class="col-xs-12" id="errorDisplayPane">
             <div ui-layout="{ flow: 'column' }" id="errorGridColumn">
-                <div ui-layout-container size="400px" ng-controller="gridResizeController">
+                <div ui-layout-container size="400px" ng-controller="GridResizeBroadcastController">
                     <div id="grid" ng-grid="gridOptions"></div>
                 </div>
                 <div ui-layout-container>
@@ -49,7 +46,9 @@
                             <tab heading="Payload">
                                 <br/>
                                 <form ng-if="message">
-                                    <button type="button" class="btn btn-primary" ng-click='resubmitMessage()'>Resubmit message</button><br/><br/>
+                                    <button type="button" class="btn btn-primary" ng-click='resubmitMessage()'>Resubmit message</button>
+                                    <br/>
+                                    <br/>
                                     <textarea class="payload" ng-trim="true">{{message.payload}}</textarea>
                                 </form>
                             </tab>
@@ -57,7 +56,11 @@
                                 <br/>
                                 <table ng-if="message" class="table table-striped">
                                     <thead>
-                                        <tr><th>Name</th><th>Type</th><th>Value</th></tr>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Value</th>
+                                        </tr>
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="header in message.headers">

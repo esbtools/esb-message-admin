@@ -17,6 +17,7 @@ CREATE TABLE `ESB_MESSAGE`
     `source_queue` varchar(255) DEFAULT NULL,
     `source_system` varchar(255) DEFAULT NULL,
     `jms_message_timestamp` datetime DEFAULT NULL,
+    'resubmitted_on' DATETIME DEFAULT NULL,
     PRIMARY KEY (`id`)
 );
 
