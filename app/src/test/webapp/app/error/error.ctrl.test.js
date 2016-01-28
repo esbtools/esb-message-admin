@@ -1,5 +1,5 @@
 describe("ErrorCtrl", function() {
-  var $controller, $scope, $rootScope, $q, msgSvc;
+  var $controller, $scope, $rootScope, $q, messageCenterService, msgSvc;
 
   var emptySearchResponse = {
     data: {
@@ -10,6 +10,11 @@ describe("ErrorCtrl", function() {
 
   var testMessage = {
     id: "testMessage"
+  };
+
+  var resubmittableMessage = {
+    id: "testMessage",
+    allowsResubmit: true
   };
 
   beforeEach(module("esbMessageAdminApp"));
@@ -36,6 +41,14 @@ describe("ErrorCtrl", function() {
               messages: [testMessage]
             }
           });
+        },
+
+        resubmitMessage: function() {
+          return $q.when({
+            data: {
+              status: "Success"
+            }
+          })
         }
       };
     });
@@ -52,12 +65,14 @@ describe("ErrorCtrl", function() {
         }
       };
     });
+
   }));
 
-  beforeEach(inject(function(_$controller_, _$rootScope_, _$q_, _EsbMessageService_) {
+  beforeEach(inject(function(_$controller_, _$rootScope_, _$q_, _messageCenterService_, _EsbMessageService_) {
     $controller = _$controller_;
     $rootScope = _$rootScope_;
     $q = _$q_;
+    messageCenterService = _messageCenterService_;
     msgSvc = _EsbMessageService_;
     $scope = $rootScope.$new();
   }));
@@ -176,6 +191,70 @@ describe("ErrorCtrl", function() {
 
           expect($detailsScope.$eval("message")).toBeFalsy();
         });
+    });
+  });
+
+  describe("success after calling resubmit", function() {
+    it("should display a success message when the message is resubmitted", function() {
+      spyOn(messageCenterService, 'add');
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = resubmittableMessage;
+
+      $scope.resubmitMessage();
+      $scope.$apply();
+
+      expect(messageCenterService.add).toHaveBeenCalledWith('success', 'Resubmit successful!', { "timeout": 3000 });
+    });
+  });
+
+  describe("failure after calling resubmit", function() {
+    beforeEach(function resubmitWithServerProblem() {
+      msgSvc.resubmitMessage = function() {
+        return $q.when({
+          data: {
+            "status": "Failure",
+            "errorMessage": "Just failed"
+          }
+        });
+
+      };
+    });
+
+    it("should display a failure message when a message isn't resubmittable", function(){
+
+      spyOn(messageCenterService, 'add');
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = testMessage;
+
+      $scope.resubmitMessage();
+
+      expect(messageCenterService.add).toHaveBeenCalledWith('warning', 'Message can not be resubmitted', {
+        timeout: 5000
+      });
+
+    });
+
+    it("should display failure message when there's a server problem", function() {
+      spyOn(messageCenterService, 'add');
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = resubmittableMessage;
+
+      $scope.resubmitMessage();
+      $scope.$apply();
+
+      expect(messageCenterService.add).toHaveBeenCalledWith('danger', 'Just failed', { "status": messageCenterService.status.permanent });
     });
   });
 });

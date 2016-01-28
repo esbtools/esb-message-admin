@@ -179,5 +179,11 @@ esbMessageAdminApp.service('EsbMessageService', [
         }
       );
     };
+
+    self.resubmitMessage = function(message) {
+      return $http.post("api/key/resubmit/{id}".supplant({ id: message.id }),
+        message.payload,
+        {headers : { 'Content-Type': 'application/json' }});
+    }
   }
 ]);
