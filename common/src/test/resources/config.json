@@ -57,5 +57,18 @@
         "https://localhost/emagateway/resync",
         "https://anotherhost/blah",
         "https://anotherhost2/resynch"
-    ]
+    ],
+    "resubmitRestEndpoints":[
+        "https://sandwich/pasta/resubmit"
+    ],
+    "editableMessageTypes":[
+        "PERSON",
+        "PLACE",
+        "THING"
+    ],
+    "resubmitBlackList":[
+        "STUFF"
+    ],
+    "resubmitControlHeader":"someRandomHeader",
+    "resubmitHeaderNamespace":"blar"
 }

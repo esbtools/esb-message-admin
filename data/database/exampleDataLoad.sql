@@ -101,3 +101,5 @@ INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'visibil
 INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'visibility', 'METADATA', 'Public', 9);
 
 INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'timezone', 'METADATA', 'GMT+1', 10);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'resubmitControlHeaderTest', 'METADATA', 'someQueueName', 10);

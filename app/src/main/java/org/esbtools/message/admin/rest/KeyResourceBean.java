@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.ejb.Stateless;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -141,6 +142,23 @@ public class KeyResourceBean {
            StringUtils.isNotBlank(values)) {
            String[] valueArray = values.split(",");
            return client.get().sync(entity, system, key, valueArray);
+        }
+        return null;
+    }
+
+    /**
+     * resubmit an entity to the bus
+     *
+     * @param id        the id of the message ( from the esbmessage )
+     * @param message   the body of the message you'd like to resubmit in place of the extant body
+     */
+    @POST
+    @Path("/resubmit/{id}/")
+    @Produces( {MediaType.APPLICATION_JSON} )
+    @Consumes( MediaType.APPLICATION_JSON )
+    public MetadataResponse resubmit( @PathParam("id") Long messageId, String message ) {
+        if( messageId != null && StringUtils.isNotBlank(message) ){
+            return client.get().resubmit( messageId, message );
         }
         return null;
     }

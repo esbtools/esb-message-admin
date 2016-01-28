@@ -47,6 +47,15 @@ public interface Provider {
     void persist(EsbMessage[] esbMessages) throws IOException;
 
     /**
+     * Updates a given ESB Message ( Payload only )
+     *
+     * @param messageId - a message Id
+     * @param messageBody - the message body
+     * @throws IOException
+     */
+    MetadataResponse resubmit(Long messageId, String messageBody);
+
+    /**
      * @param criteria          search
      * @param fromDate          the start timestamp of the range
      * @param toDate            the end timestamp of the range
