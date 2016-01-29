@@ -1,4 +1,4 @@
-esbMessageAdminApp.controller('ErrorsSearchCtrl', [
+esbMessageAdminApp.controller('ErrorCtrl', [
   '$scope',
   '$rootScope',
   'EsbMessageService',
@@ -137,9 +137,43 @@ esbMessageAdminApp.controller('ErrorsSearchCtrl', [
     $scope.$watch('messageSelections',
       function() {
         if ($scope.messageSelections.length > 0) {
-          $rootScope.selectedMessage = $scope.messageSelections[0];
+          EsbMessageService.getMessage($scope.messageSelections[0].id).then(
+            function(result) {
+              $scope.message = result.data.messages[0];
+              if (result.data.messages[0].payload) {
+                var payload = result.data.messages[0].payload;
+                var formatted = '';
+                var reg = /(>)\s(<)(\/*)/g;
+                payload = payload.replace(reg, '$1\r\n$2$3');
+                var pad = 0;
+                jQuery.each(payload.split('\r\n'), function(index, node) {
+                  var indent = 0;
+                  if (node.match(/.+<\/\w[^>]*>$/)) {
+                    indent = 0;
+                  } else if (node.match(/^<\/\w/)) {
+                    if (pad != 0) {
+                      pad -= 1;
+                    }
+                  } else if (node.match(/^<\w[^>]*[^\/]>.*$/)) {
+                    indent = 1;
+                  } else {
+                    indent = 0;
+                  }
+
+                  var padding = '';
+                  for (var i = 0; i < pad; i++) {
+                    padding += '  ';
+                  }
+
+                  formatted += padding + node + '\r\n';
+                  pad += indent;
+                });
+                $scope.message.payload = formatted;
+              }
+            }
+          );
         } else {
-          delete $rootScope.selectedMessage;
+          $scope.message = null;
         }
       },
       true
@@ -170,5 +204,9 @@ esbMessageAdminApp.controller('ErrorsSearchCtrl', [
       $scope.calendarToOpened = true;
     };
     // End Date picker stuff
+
+    $scope.resubmitMessage = function() {
+      alert("Not implemented yet");
+    };
   }
 ]);
