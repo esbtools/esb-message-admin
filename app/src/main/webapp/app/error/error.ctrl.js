@@ -137,8 +137,7 @@ esbMessageAdminApp.controller('ErrorCtrl', [
     $scope.$watch('messageSelections',
       function() {
         if ($scope.messageSelections.length > 0) {
-          $scope.selectedMessage = $scope.messageSelections[0];
-          EsbMessageService.getMessage($scope.selectedMessage.id).then(
+          EsbMessageService.getMessage($scope.messageSelections[0].id).then(
             function(result) {
               $scope.message = result.data.messages[0];
               if (result.data.messages[0].payload) {
