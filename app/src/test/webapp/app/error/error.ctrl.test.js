@@ -150,9 +150,6 @@ describe("ErrorCtrl", function() {
         $controller("ErrorCtrl", {
           $scope: $scope
         });
-        $controller("ErrorCtrl", {
-          $scope: $detailsScope
-        });
 
         $scope.search();
         $scope.$apply();
@@ -163,7 +160,7 @@ describe("ErrorCtrl", function() {
       });
 
       it("populates {{message}} in ErrorCtrl with the selection", function() {
-        expect($detailsScope.$eval("message")).toEqual(testMessage);
+        expect($scope.$eval("message")).toEqual(testMessage);
       });
 
       it("resets {{message}} in ErrorCtrl after a second search " +

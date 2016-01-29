@@ -137,44 +137,7 @@ esbMessageAdminApp.controller('ErrorCtrl', [
     $scope.$watch('messageSelections',
       function() {
         if ($scope.messageSelections.length > 0) {
-          $rootScope.selectedMessage = $scope.messageSelections[0];
-        } else {
-          delete $rootScope.selectedMessage;
-        }
-      },
-      true
-    );
-
-    // Begin Date picker stuff
-    $scope.dateFormat = Globals.dateFormat.datepicker;
-    $scope.timeFormat = Globals.dateFormat.timepicker;
-
-    $scope.maxDate = new Date(); // now
-
-    $scope.toDate = new Date(); // now
-
-    $scope.fromDate = new Date($scope.toDate.getTime());
-    $scope.fromDate.setDate($scope.fromDate.getDate() - 1); // yesterday
-
-    $scope.calendarFromOpen = function($event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-
-      $scope.calendarFromOpened = true;
-    };
-
-    $scope.calendarToOpen = function($event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-
-      $scope.calendarToOpened = true;
-    };
-    // End Date picker stuff
-
-    // on message select, fetch message details
-    $rootScope.$watch('selectedMessage',
-      function() {
-        if ($scope.selectedMessage) {
+          $scope.selectedMessage = $scope.messageSelections[0];
           EsbMessageService.getMessage($scope.selectedMessage.id).then(
             function(result) {
               $scope.message = result.data.messages[0];
@@ -213,8 +176,35 @@ esbMessageAdminApp.controller('ErrorCtrl', [
         } else {
           $scope.message = null;
         }
-      }
+      },
+      true
     );
+
+    // Begin Date picker stuff
+    $scope.dateFormat = Globals.dateFormat.datepicker;
+    $scope.timeFormat = Globals.dateFormat.timepicker;
+
+    $scope.maxDate = new Date(); // now
+
+    $scope.toDate = new Date(); // now
+
+    $scope.fromDate = new Date($scope.toDate.getTime());
+    $scope.fromDate.setDate($scope.fromDate.getDate() - 1); // yesterday
+
+    $scope.calendarFromOpen = function($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      $scope.calendarFromOpened = true;
+    };
+
+    $scope.calendarToOpen = function($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+
+      $scope.calendarToOpened = true;
+    };
+    // End Date picker stuff
 
     $scope.resubmitMessage = function() {
       alert("Not implemented yet");
