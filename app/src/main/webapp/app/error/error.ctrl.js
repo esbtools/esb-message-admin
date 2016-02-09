@@ -215,9 +215,7 @@ esbMessageAdminApp.controller('ErrorCtrl', [
         });
 
       } else {
-        var promise = EsbMessageService.resubmitMessage(message);
-
-        promise.then(
+        EsbMessageService.resubmitMessage(message).then(
           function(response) {
             if (response.data.status === "Success") {
               messageCenterService.add('success', 'Resubmit successful!', {

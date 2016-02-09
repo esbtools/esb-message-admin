@@ -48,7 +48,7 @@ describe("ErrorCtrl", function() {
             data: {
               status: "Success"
             }
-          })
+          });
         }
       };
     });
@@ -212,7 +212,29 @@ describe("ErrorCtrl", function() {
   });
 
   describe("failure after calling resubmit", function() {
-    beforeEach(function resubmitWithServerProblem() {
+    it("should display a failure message when a message isn't resubmittable", function(){
+
+      var messageWithoutResubmitHeader = {
+        id: 1
+      };
+
+      spyOn(messageCenterService, 'add');
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = messageWithoutResubmitHeader;
+
+      $scope.resubmitMessage();
+
+      expect(messageCenterService.add).toHaveBeenCalledWith('warning', 'Message can not be resubmitted', {
+        timeout: 5000
+      });
+
+    });
+
+    beforeEach(function failedCallToResubmitBackend() {
       msgSvc.resubmitMessage = function() {
         return $q.when({
           data: {
@@ -222,24 +244,6 @@ describe("ErrorCtrl", function() {
         });
 
       };
-    });
-
-    it("should display a failure message when a message isn't resubmittable", function(){
-
-      spyOn(messageCenterService, 'add');
-
-      $controller("ErrorCtrl", {
-        $scope: $scope
-      });
-
-      $scope.message = testMessage;
-
-      $scope.resubmitMessage();
-
-      expect(messageCenterService.add).toHaveBeenCalledWith('warning', 'Message can not be resubmitted', {
-        timeout: 5000
-      });
-
     });
 
     it("should display failure message when there's a server problem", function() {
@@ -252,7 +256,7 @@ describe("ErrorCtrl", function() {
       $scope.message = resubmittableMessage;
 
       $scope.resubmitMessage();
-      $scope.$apply();
+      $scope.$apply();:w
 
       expect(messageCenterService.add).toHaveBeenCalledWith('danger', 'Just failed', { "status": messageCenterService.status.permanent });
     });

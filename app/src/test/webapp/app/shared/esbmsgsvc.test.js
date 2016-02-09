@@ -4,14 +4,13 @@ describe("EsbMessageService", function() {
 
   var resubmitRequest = {
     "id": 1,
-    "payload": "<foo></foo>"
+    "payload": {
+      "body": "<foo>bar</foo>"
+    }
   };
 
   var resubmitResponse = {
-    "status": "Status",
-    "data": {
-      "field": "Present"
-    }
+    "status": "Status"
   };
 
   beforeEach(module("esbMessageAdminApp"));
@@ -24,11 +23,15 @@ describe("EsbMessageService", function() {
   describe("after calling resubmit", function(){
 
     it("should return a promise with the server response", function() {
-      $httpBackend.expectPOST("api/key/resubmit/1", resubmitRequest).respond(200, resubmitResponse);
-      EsbMessageService.resubmitMessage(resubmitRequest).then(function(response) {
-        expect(response).toEqual(resubmitResponse);
-      });
+      $httpBackend.expectPOST("api/key/resubmit/1", resubmitRequest.payload).respond(200, resubmitResponse);
+      EsbMessageService.resubmitMessage(resubmitRequest)
+        .then(function(response) {
+        expect(response.data).toEqual(resubmitResponse);}
+      );
+
+      $httpBackend.flush();
     });
+
   });
 
 });
