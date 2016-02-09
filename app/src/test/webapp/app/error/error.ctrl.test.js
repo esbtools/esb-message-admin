@@ -256,7 +256,7 @@ describe("ErrorCtrl", function() {
       $scope.message = resubmittableMessage;
 
       $scope.resubmitMessage();
-      $scope.$apply();:w
+      $scope.$apply();
 
       expect(messageCenterService.add).toHaveBeenCalledWith('danger', 'Just failed', { "status": messageCenterService.status.permanent });
     });
