@@ -186,10 +186,12 @@ esbMessageAdminApp.controller('ErrorCtrl', [
 
     $scope.maxDate = new Date(); // now
 
-    $scope.toDate = new Date(); // now
+    $scope.toDate = new Date();
+    $scope.toDate.setHours(0, 0, 0, 0); // This sets the time to midnight of the current day
 
     $scope.fromDate = new Date($scope.toDate.getTime());
     $scope.fromDate.setDate($scope.fromDate.getDate() - 1); // yesterday
+    $scope.fromDate.setHours(0, 0, 0, 0);
 
     $scope.calendarFromOpen = function($event) {
       $event.preventDefault();
