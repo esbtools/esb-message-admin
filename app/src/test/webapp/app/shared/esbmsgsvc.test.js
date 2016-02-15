@@ -21,12 +21,13 @@ describe("EsbMessageService", function() {
   }));
 
   describe("after calling resubmit", function(){
-
-    it("should POST resubmitted payload to api/key/resubmit/{id} and return the response", function() {
+    it("should POST resubmitted payload to api/key/resubmit/{id} and return the response", function(done) {
       $httpBackend.expectPOST("api/key/resubmit/1", resubmitRequest.payload).respond(200, resubmitResponse);
       EsbMessageService.resubmitMessage(resubmitRequest)
         .then(function(response) {
-        expect(response.data).toEqual(resubmitResponse);}
+          expect(response.data).toEqual(resubmitResponse);
+          done();
+        }
       );
 
       $httpBackend.flush();

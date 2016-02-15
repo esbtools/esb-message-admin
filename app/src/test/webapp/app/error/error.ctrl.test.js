@@ -208,7 +208,6 @@ describe("ErrorCtrl", function() {
       $scope.message = resubmittableMessage;
 
       $scope.resubmitMessage();
-      $scope.$apply();
 
       expect(msgSvc.resubmitMessage).toHaveBeenCalledWith(resubmittableMessage);
     });
