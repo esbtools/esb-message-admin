@@ -43,12 +43,9 @@ describe("ErrorCtrl", function() {
           });
         },
 
+        // Returns an empty promise
         resubmitMessage: function() {
-          return $q.when({
-            data: {
-              status: "Success"
-            }
-          });
+          return $q.when();
         }
       };
     });
@@ -194,9 +191,15 @@ describe("ErrorCtrl", function() {
     });
   });
 
-  describe("success after calling resubmit", function() {
-    it("should display a success message when the message is resubmitted", function() {
-      spyOn(messageCenterService, 'add');
+  describe("after calling resubmit", function() {
+    it("should call resubmitMessage() in service with a resubmittable message", function() {
+      spyOn(msgSvc, 'resubmitMessage').and.callFake(function() {
+        return $q.when({
+          data: {
+            status: "Success"
+          }
+        })
+      });
 
       $controller("ErrorCtrl", {
         $scope: $scope
@@ -207,18 +210,16 @@ describe("ErrorCtrl", function() {
       $scope.resubmitMessage();
       $scope.$apply();
 
-      expect(messageCenterService.add).toHaveBeenCalledWith('success', 'Resubmit successful!', { "timeout": 3000 });
+      expect(msgSvc.resubmitMessage).toHaveBeenCalledWith(resubmittableMessage);
     });
-  });
 
-  describe("failure after calling resubmit", function() {
-    it("should display a failure message when a message isn't resubmittable", function(){
+    it("should not call resubmitMessage() in service if message is not resubmittable", function(){
 
       var messageWithoutResubmitHeader = {
         id: 1
       };
 
-      spyOn(messageCenterService, 'add');
+      spyOn(msgSvc, 'resubmitMessage');
 
       $controller("ErrorCtrl", {
         $scope: $scope
@@ -228,37 +229,8 @@ describe("ErrorCtrl", function() {
 
       $scope.resubmitMessage();
 
-      expect(messageCenterService.add).toHaveBeenCalledWith('warning', 'Message can not be resubmitted', {
-        timeout: 5000
-      });
+      expect(msgSvc.resubmitMessage).not.toHaveBeenCalled();
 
-    });
-
-    beforeEach(function failedCallToResubmitBackend() {
-      msgSvc.resubmitMessage = function() {
-        return $q.when({
-          data: {
-            "status": "Failure",
-            "errorMessage": "Just failed"
-          }
-        });
-
-      };
-    });
-
-    it("should display failure message when there's a server problem", function() {
-      spyOn(messageCenterService, 'add');
-
-      $controller("ErrorCtrl", {
-        $scope: $scope
-      });
-
-      $scope.message = resubmittableMessage;
-
-      $scope.resubmitMessage();
-      $scope.$apply();
-
-      expect(messageCenterService.add).toHaveBeenCalledWith('danger', 'Just failed', { "status": messageCenterService.status.permanent });
     });
   });
 });

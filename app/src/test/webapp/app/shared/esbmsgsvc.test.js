@@ -22,7 +22,7 @@ describe("EsbMessageService", function() {
 
   describe("after calling resubmit", function(){
 
-    it("should return a promise with the server response", function() {
+    it("should POST resubmitted payload to api/key/resubmit/{id} and return the response", function() {
       $httpBackend.expectPOST("api/key/resubmit/1", resubmitRequest.payload).respond(200, resubmitResponse);
       EsbMessageService.resubmitMessage(resubmitRequest)
         .then(function(response) {
