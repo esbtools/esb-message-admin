@@ -6,7 +6,8 @@ esbMessageAdminApp.controller('ErrorCtrl', [
   '$log',
   'Globals',
   'ngGridLayoutPlugin',
-  function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log, Globals, layoutPlugin) {
+  'messageCenterService',
+  function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log, Globals, layoutPlugin, messageCenterService) {
 
     // initialize autocomplete data
     EsbMessageService.getSuggestions().then(
@@ -206,7 +207,34 @@ esbMessageAdminApp.controller('ErrorCtrl', [
     // End Date picker stuff
 
     $scope.resubmitMessage = function() {
-      alert("Not implemented yet");
+      var message = $scope.message;
+
+      if (!message.allowsResubmit) {
+        messageCenterService.add('warning', 'Message can not be resubmitted', {
+          timeout: 5000
+        });
+
+      } else {
+        EsbMessageService.resubmitMessage(message).then(
+          function(response) {
+            if (response.data.status === "Success") {
+              messageCenterService.add('success', 'Resubmit successful!', {
+                timeout: 3000
+              });
+            } else {
+              messageCenterService.add('danger', response.data.errorMessage, {
+                status: messageCenterService.status.permanent
+              });
+            }
+          },
+          function(err) {
+            var errorMessage = "There was a problem communicating with the server. Server Returned: "
+              + err.status + ": " + err.data;
+            messageCenterService.add('danger', errorMessage, {
+              status: messageCenterService.status.permanent
+            });
+          });
+      }
     };
   }
 ]);

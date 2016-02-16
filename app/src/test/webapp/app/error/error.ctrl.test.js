@@ -1,5 +1,5 @@
 describe("ErrorCtrl", function() {
-  var $controller, $scope, $rootScope, $q, msgSvc;
+  var $controller, $scope, $rootScope, $q, messageCenterService, msgSvc;
 
   var emptySearchResponse = {
     data: {
@@ -10,6 +10,11 @@ describe("ErrorCtrl", function() {
 
   var testMessage = {
     id: "testMessage"
+  };
+
+  var resubmittableMessage = {
+    id: "testMessage",
+    allowsResubmit: true
   };
 
   beforeEach(module("esbMessageAdminApp"));
@@ -36,6 +41,11 @@ describe("ErrorCtrl", function() {
               messages: [testMessage]
             }
           });
+        },
+
+        // Returns an empty promise
+        resubmitMessage: function() {
+          return $q.when();
         }
       };
     });
@@ -52,12 +62,14 @@ describe("ErrorCtrl", function() {
         }
       };
     });
+
   }));
 
-  beforeEach(inject(function(_$controller_, _$rootScope_, _$q_, _EsbMessageService_) {
+  beforeEach(inject(function(_$controller_, _$rootScope_, _$q_, _messageCenterService_, _EsbMessageService_) {
     $controller = _$controller_;
     $rootScope = _$rootScope_;
     $q = _$q_;
+    messageCenterService = _messageCenterService_;
     msgSvc = _EsbMessageService_;
     $scope = $rootScope.$new();
   }));
@@ -176,6 +188,48 @@ describe("ErrorCtrl", function() {
 
           expect($detailsScope.$eval("message")).toBeFalsy();
         });
+    });
+  });
+
+  describe("after calling resubmit", function() {
+    it("should call resubmitMessage() in service with a resubmittable message", function() {
+      spyOn(msgSvc, 'resubmitMessage').and.callFake(function() {
+        return $q.when({
+          data: {
+            status: "Success"
+          }
+        })
+      });
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = resubmittableMessage;
+
+      $scope.resubmitMessage();
+
+      expect(msgSvc.resubmitMessage).toHaveBeenCalledWith(resubmittableMessage);
+    });
+
+    it("should not call resubmitMessage() in service if message is not resubmittable", function(){
+
+      var messageWithoutResubmitHeader = {
+        id: 1
+      };
+
+      spyOn(msgSvc, 'resubmitMessage');
+
+      $controller("ErrorCtrl", {
+        $scope: $scope
+      });
+
+      $scope.message = messageWithoutResubmitHeader;
+
+      $scope.resubmitMessage();
+
+      expect(msgSvc.resubmitMessage).not.toHaveBeenCalled();
+
     });
   });
 });
