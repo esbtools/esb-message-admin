@@ -97,7 +97,6 @@ public class KeyExtractorUtil {
         return hash;
     }
 
-    // TODO: Change this List<String> to a Set<String>
     private void addToMap(Map<String, Set<String>> keysMap, String key, String value) {
         if (!keysMap.containsKey(key)) {
             keysMap.put(key, new HashSet<String>());
