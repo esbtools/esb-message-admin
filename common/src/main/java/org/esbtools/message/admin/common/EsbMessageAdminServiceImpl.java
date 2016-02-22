@@ -64,6 +64,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -125,7 +126,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
     @Override
     public void persist(EsbMessage esbMessage) throws IOException {
 
-        Map<String, List<String>> extractedHeaders = null;
+        Map<String, Set<String>> extractedHeaders = null;
 
         try {
             extractedHeaders = getKeyExtractor().getEntriesFromPayload(esbMessage.getPayload());
@@ -186,7 +187,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
      * @param esbMessage
      * @param extractedHeaders
      */
-    public void create(EsbMessage esbMessage, Map<String, List<String>> extractedHeaders) {
+    public void create(EsbMessage esbMessage, Map<String, Set<String>> extractedHeaders) {
 
         EsbMessageEntity eme = ConversionUtility.convertFromEsbMessage(esbMessage);
         maskSensitiveInfo(esbMessage, eme);
@@ -318,8 +319,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
         }
     }
 
-    private void extractHeaders(Map<String, List<String>> extractedHeaders, EsbMessageEntity eme) {
-        for (Map.Entry<String, List<String>> headerSet : extractedHeaders.entrySet()) {
+    private void extractHeaders(Map<String, Set<String>> extractedHeaders, EsbMessageEntity eme) {
+        for (Map.Entry<String, Set<String>> headerSet : extractedHeaders.entrySet()) {
             for(String value : headerSet.getValue()) {
                 EsbMessageHeaderEntity extractedHeader= new EsbMessageHeaderEntity();
                 extractedHeader.setName(headerSet.getKey());
@@ -818,7 +819,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         }
     }
 
-    public void ensureSuggestionsArePresent(EsbMessage message, Map<String, List<String>> extractedHeaders) {
+    public void ensureSuggestionsArePresent(EsbMessage message, Map<String, Set<String>> extractedHeaders) {
 
         if(message.getHeaders()!=null) {
             for(Header header:message.getHeaders()) {
@@ -828,7 +829,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
             }
         }
         for(String suggestedField: getSuggestedFields()) {
-            List<String> extractedValues = extractedHeaders.get(suggestedField);
+            Set<String> extractedValues = extractedHeaders.get(suggestedField);
             if(extractedValues!=null && !extractedValues.isEmpty()) {
                 for(String extractedValue: extractedValues) {
                     ensureSuggestionIsPresent(suggestedField, extractedValue);

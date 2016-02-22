@@ -21,10 +21,12 @@ package org.esbtools.message.admin.common.extractor;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -95,14 +97,14 @@ public class KeyExtractorUtil {
         return hash;
     }
 
-    private void addToMap(Map<String, List<String>> keysMap, String key, String value) {
+    private void addToMap(Map<String, Set<String>> keysMap, String key, String value) {
         if (!keysMap.containsKey(key)) {
-            keysMap.put(key, new LinkedList<String>());
+            keysMap.put(key, new HashSet<String>());
         }
         keysMap.get(key).add(value);
     }
 
-    public Map<String, List<String>> getEntriesFromPayload(String payload) throws KeyExtractorException {
+    public Map<String, Set<String>> getEntriesFromPayload(String payload) throws KeyExtractorException {
 
         try {
             return getEntriesFromXPaths(payload);
@@ -112,8 +114,8 @@ public class KeyExtractorUtil {
 
     }
 
-    private Map<String, List<String>> getEntriesFromXPaths(String payload) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
-        Map<String, List<String>> keysMap = new HashMap<>();
+    private Map<String, Set<String>> getEntriesFromXPaths(String payload) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        Map<String, Set<String>> keysMap = new HashMap<>();
 
         DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = domFactory.newDocumentBuilder();
@@ -131,7 +133,7 @@ public class KeyExtractorUtil {
         return keysMap;
     }
 
-    private void getXPathMatches(Map<String, List<String>> keysMap, Document doc, String key, XPathExpression valuePath) throws XPathExpressionException {
+    private void getXPathMatches(Map<String, Set<String>> keysMap, Document doc, String key, XPathExpression valuePath) throws XPathExpressionException {
         valuePath.evaluate(doc);
         NodeList result;
         try {

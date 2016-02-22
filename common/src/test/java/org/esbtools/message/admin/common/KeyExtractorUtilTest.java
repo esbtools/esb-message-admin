@@ -21,8 +21,12 @@ package org.esbtools.message.admin.common;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
@@ -109,23 +113,22 @@ public class KeyExtractorUtilTest {
 
         try {
             KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
-            Map<String,List<String>> extractedData = util.getEntriesFromPayload(payload);
+            Map<String,Set<String>> extractedData = util.getEntriesFromPayload(payload);
 
             assertEquals(1, extractedData.get("email").size());
-            assertEquals("john.doe@example.com", extractedData.get("email").get(0));
+            assertThat(extractedData.get("email"), hasItem("john.doe@example.com"));
             assertEquals(1, extractedData.get("systemBId").size());
-            assertEquals("1532", extractedData.get("systemBId").get(0));
+            assertThat(extractedData.get("systemBId"), hasItem("1532"));
             assertEquals(1, extractedData.get("emailConfirmed").size());
-            assertEquals("true", extractedData.get("emailConfirmed").get(0));
+            assertThat(extractedData.get("emailConfirmed"), hasItem("true"));
             assertEquals(2, extractedData.get("addressType").size());
-            assertEquals("Private", extractedData.get("addressType").get(0));
-            assertEquals("Work", extractedData.get("addressType").get(1));
+            assertThat(extractedData.get("addressType"), hasItems("Private", "Work"));
             assertEquals(1, extractedData.get("addressCount").size());
-            assertEquals("2", extractedData.get("addressCount").get(0));
+            assertThat(extractedData.get("addressCount"), hasItem("2"));
             assertEquals(1, extractedData.get("name").size());
-            assertEquals("John Doe", extractedData.get("name").get(0));
+            assertThat(extractedData.get("name"), hasItem("John Doe"));
             assertEquals(1, extractedData.get("id").size());
-            assertEquals("12345", extractedData.get("id").get(0));
+            assertThat(extractedData.get("id"), hasItem("12345"));
         } catch (KeyExtractorException e) {
             System.out.println(e);
             fail();
@@ -172,7 +175,7 @@ public class KeyExtractorUtilTest {
 
         try {
             KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
-            Map<String,List<String>> extractedData = util.getEntriesFromPayload(badPayload);
+            Map<String,Set<String>> extractedData = util.getEntriesFromPayload(badPayload);
             fail();
 
         } catch (KeyExtractorException e) {
@@ -205,7 +208,7 @@ public class KeyExtractorUtilTest {
 
         try {
             KeyExtractorUtil util = new KeyExtractorUtil(extractors,"test");
-            Map<String,List<String>> extractedData = util.getEntriesFromPayload(payload);
+            Map<String,Set<String>> extractedData = util.getEntriesFromPayload(payload);
 
             // invalid xpath are ignored.
             assertEquals(0, extractedData.size());
