@@ -1,9 +1,5 @@
 package org.esbtools.message.admin.common.config;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +9,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 public final class EMAConfiguration {
 
@@ -225,7 +225,7 @@ public final class EMAConfiguration {
     }
 
     private static String loadResubmitControlHeader() {
-        return (String) getJsonConfig().get("resubmitControlHeader");
+        return (String) getJsonConfig().get("esbResubmitDestination");
     }
 
     private static String loadResubmitHeaderNamespace() {
