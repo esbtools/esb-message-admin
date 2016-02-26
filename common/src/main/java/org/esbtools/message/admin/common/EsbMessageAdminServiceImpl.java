@@ -18,6 +18,38 @@
  */
 package org.esbtools.message.admin.common;
 
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getEncryptionKey;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitControlHeader;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitHeaderNamespace;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitRestEndpoints;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -27,6 +59,7 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.esbtools.gateway.resubmit.ResubmitRequest;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
@@ -47,40 +80,8 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
-import org.esbtools.gateway.resubmit.ResubmitRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getEncryptionKey;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitRestEndpoints;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitControlHeader;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitHeaderNamespace;
 
 @Named
 public class EsbMessageAdminServiceImpl implements Provider {
@@ -867,14 +868,26 @@ public class EsbMessageAdminServiceImpl implements Provider {
     }
 
     private Boolean isEditableMessage( EsbMessage message ){
+        if(message.getMessageType() == null){
+            return false;
+        }
+        
         return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
     }
 
     private Boolean isEditableMessage( EsbMessageEntity message ){
+        if(message.getMessageType() == null){
+            return false;
+        }
+        
         return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
     }
 
     private Boolean allowsResubmit( EsbMessage message ){
+        if(message.getMessageType() == null){
+            return false;
+        }
+        
         // if it is NOT in the blacklist, and if it has NOT been previously resubmitted
         return !getResubmitBlackList().contains( message.getMessageType().toUpperCase() ) && message.getResubmittedOn() == null;
     }
