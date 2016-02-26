@@ -50,7 +50,7 @@
     <sonar.jdbc.password>sonar</sonar.jdbc.password>
     <sonar.host.url>http://127.0.0.1:8080</sonar.host.url>
     <sonar.projectName>esb-message-admin</sonar.projectName>
-    <jenkins.build.number>1</jenkins.build.number>
+    <ci.buildNumber>1</ci.buildNumber>
   </properties>
   <distributionManagement>
     <repository>
@@ -345,7 +345,7 @@
                     <configuration>
                         <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
                         <name>generated.rpm.release</name>
-                        <value>${jenkins.build.number}.${parsedVersion.qualifier}.${buildNumber}</value>
+                        <value>${ci.buildNumber}.${parsedVersion.qualifier}.${buildNumber}</value>
                         <regex>\.{2}</regex>
                         <replacement>.</replacement>
                         <failIfNoMatch>false</failIfNoMatch>
