@@ -225,7 +225,7 @@ public final class EMAConfiguration {
     }
 
     private static String loadResubmitControlHeader() {
-        return (String) getJsonConfig().get("esbResubmitDestination");
+        return (String) getJsonConfig().get("resubmitControlHeader");
     }
 
     private static String loadResubmitHeaderNamespace() {
