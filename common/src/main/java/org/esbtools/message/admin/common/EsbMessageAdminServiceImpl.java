@@ -18,12 +18,9 @@
  */
 package org.esbtools.message.admin.common;
 
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getEncryptionKey;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
 
@@ -51,13 +48,13 @@ import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
 import org.esbtools.message.admin.common.feature.EmaResubmit;
+import org.esbtools.message.admin.common.feature.EmaResync;
 import org.esbtools.message.admin.common.orm.AuditEventEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.common.utility.ConversionUtility;
 import org.esbtools.message.admin.common.utility.EncryptionUtility;
-import org.esbtools.message.admin.common.utility.RestRequestUtility;
 import org.esbtools.message.admin.model.AuditEvent;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
@@ -92,6 +89,9 @@ public class EsbMessageAdminServiceImpl implements Provider {
     
     @Inject
     private EmaResubmit emaResubmit;
+    
+    @Inject
+    private EmaResync emaResync;
 
     void setErrorEntityManager(EntityManager entityMgr) {
         this.entityMgr = entityMgr;
@@ -295,8 +295,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
                 msg.setErrorSystem((String) cols[4]);
                 msg.setOccurrenceCount((Integer) cols[5]);
                 msg.setResubmittedOn( (Date) cols[6] );
-                msg.setAllowsResubmit( allowsResubmit( msg ) );
-                msg.setEditableMessage( isEditableMessage(msg) );
+                msg.setAllowsResubmit( EmaResubmit.allowsResubmit( msg ) );
+                msg.setEditableMessage( EmaResubmit.isEditableMessage(msg) );
                 resultMessages[i] = msg;
             }
             result.setMessages(resultMessages);
@@ -375,8 +375,8 @@ public class EsbMessageAdminServiceImpl implements Provider {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
-            messageArray[0].setAllowsResubmit( allowsResubmit(messageArray[0]) );
-            messageArray[0].setEditableMessage( isEditableMessage(messageArray[0]) );
+            messageArray[0].setAllowsResubmit( EmaResubmit.allowsResubmit(messageArray[0]) );
+            messageArray[0].setEditableMessage( EmaResubmit.isEditableMessage(messageArray[0]) );
             Map<String,String> matchedConfiguration = matchCriteria(messageArray[0], getNonViewableMessages());
             if(matchedConfiguration!=null) {
                 messageArray[0].setPayload(matchedConfiguration.get("replaceMessage"));
@@ -656,45 +656,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Override
     public MetadataResponse sync(String entity, String system, String key, String... values) {
-
-        StringBuilder message = new StringBuilder("{");
-        message.append("\"entity\" : \"");
-        message.append(entity);
-        message.append("\",");
-        message.append("\"system\" : \"");
-        message.append(system);
-        message.append("\",");
-        message.append("\"key\": \"");
-        message.append(key);
-        message.append("\",");
-        message.append("\"values\" : [");
-
-        int i = 0;
-        for(String value: values) {
-            if(value!=null && value.length()>0) {
-                if(i>0) {
-                    message.append(",");
-                }
-                message.append("\"");
-                message.append(value);
-                message.append("\"");
-            }
-            i++;
-        }
-        message.append("]");
-        message.append("}");
-
-        LOG.info("Initiating sync request: {}", message.toString());
-
-        saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
-
-        if( RestRequestUtility.sendMessageToRestEndPoint( message.toString(), getResyncRestEndpoints() ) ){
-            return new MetadataResponse();
-        }else{
-            MetadataResponse result = new MetadataResponse();
-            result.setErrorMessage("Unable to resync message");
-            return result;
-        }
+        return emaResync.syncMessage(entity, system, key, values);
     }
 
     @Override
@@ -773,22 +735,5 @@ public class EsbMessageAdminServiceImpl implements Provider {
             return queryResult.get(0).getId();
         }
         return null;
-    }
-
-    private Boolean isEditableMessage( EsbMessage message ){
-        if(message.getMessageType() == null){
-            return false;
-        }
-        
-        return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
-    }
-
-    private Boolean allowsResubmit( EsbMessage message ){
-        if(message.getMessageType() == null){
-            return false;
-        }
-        
-        // if it is NOT in the blacklist, and if it has NOT been previously resubmitted
-        return !getResubmitBlackList().contains( message.getMessageType().toUpperCase() ) && message.getResubmittedOn() == null;
     }
 }
