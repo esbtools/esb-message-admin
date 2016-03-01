@@ -31,6 +31,8 @@ public class RestRequestUtility {
                     HttpPost httpPost = new HttpPost(restEndPoint);
                     httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
                     httpPost.setEntity(new StringEntity(message.toString()));
+                    
+                    LOG.debug(httpPost.toString());
 
                     CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 
