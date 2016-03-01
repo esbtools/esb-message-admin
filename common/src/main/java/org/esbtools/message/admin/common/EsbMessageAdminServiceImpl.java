@@ -23,15 +23,11 @@ import static org.esbtools.message.admin.common.config.EMAConfiguration.getEncry
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonViewableMessages;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitControlHeader;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitHeaderNamespace;
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitRestEndpoints;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResyncRestEndpoints;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,26 +46,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.esbtools.gateway.resubmit.ResubmitRequest;
 import org.esbtools.message.admin.Provider;
 import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
+import org.esbtools.message.admin.common.feature.EmaResubmit;
 import org.esbtools.message.admin.common.orm.AuditEventEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageEntity;
 import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.orm.MetadataEntity;
 import org.esbtools.message.admin.common.utility.ConversionUtility;
 import org.esbtools.message.admin.common.utility.EncryptionUtility;
+import org.esbtools.message.admin.common.utility.RestRequestUtility;
 import org.esbtools.message.admin.model.AuditEvent;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
@@ -94,7 +82,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
     private static final String METADATA_KEY_TYPE = "metadata";
     private static final String TYPE_PLACEHOLDER = "$TYPE";
     private static final String METADATA_QUERY = "select f from MetadataEntity f where f.type = '" + TYPE_PLACEHOLDER + "'";
-    private static final String RESUBMIT_EVENT = "Resubmit Happened";
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtility encryptor;
     private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
@@ -102,9 +89,16 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
     @Inject
     private EntityManager entityMgr;
+    
+    @Inject
+    private EmaResubmit emaResubmit;
 
     void setErrorEntityManager(EntityManager entityMgr) {
         this.entityMgr = entityMgr;
+    }
+    
+    void setEmaResubmit(EmaResubmit emaResubmit){
+        this.emaResubmit = emaResubmit;
     }
 
     private KeyExtractorUtil getKeyExtractor() {
@@ -153,7 +147,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
         EsbMessage esbMessage = new EsbMessage();
         esbMessage.setId( messageId );
         esbMessage.setPayload( messageBody );
-        return resubmitMessage(esbMessage);
+        return emaResubmit.resubmitMessage(esbMessage);
     }
 
     @Override
@@ -211,92 +205,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
             eme.setOccurrenceCount(++occurrenceCount);
         }
         entityMgr.persist(eme);
-    }
-
-    public MetadataResponse resubmitMessage(EsbMessage esbMessage) {
-
-        ResubmitRequest request = new ResubmitRequest();
-
-        EsbMessageEntity persistedMessage = entityMgr.find(EsbMessageEntity.class, esbMessage.getId());
-        // scold the user for trying to update instead of insert
-        if( persistedMessage == null ){
-            throw new IllegalArgumentException("Message {\n}"+esbMessage.toString()+"\n} does not exist in backend store, cannot update.");
-        }
-
-
-        // It may be the case that the header we're configured to use isn't
-        // present on the message So we should indicate this with an appropriate
-        // return object so the front end can act.
-        try{
-            request.setDestination( persistedMessage.getHeader( getResubmitControlHeader() ).getValue() );
-        }catch(Exception e){
-            LOG.warn("Warning: Message that was resubmitted lacked configured control header! Message ID: " + new Long(esbMessage.getId()).toString() );
-            MetadataResponse result = new MetadataResponse();
-            result.setErrorMessage("Unable to resubmit message due to configured resubmit control header not being present on message.");
-            return result;
-        }
-        request.setHeaders( reduceToEsbHeaders(persistedMessage) );
-        request.setSystem( persistedMessage.getSourceSystem() );
-
-        // explicitly check if the loaded message is in our list of allowed message types
-        LOG.warn(esbMessage.toString());
-        if( isEditableMessage(persistedMessage) ){
-            request.setPayload( esbMessage.getPayload() );
-        } else {
-            request.setPayload( persistedMessage.getPayload() );
-        }
-
-        saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", request.getPayload().toString() ) );
-        MetadataResponse result = sendMessageToResubmitGateway( request.toString() );
-        persistedMessage.setResubmittedOn(new Date());
-        entityMgr.flush();
-        return result;
-    }
-
-    private MetadataResponse sendMessageToResubmitGateway( String message ) {
-
-        if( sendMessageToRestEndPoint( message, getResubmitRestEndpoints() ) ){
-            return new MetadataResponse();
-        } else{
-            MetadataResponse result = new MetadataResponse();
-            result.setErrorMessage("Unable to resubmit message.");
-            return result;
-        }
-
-    }
-
-    private Boolean sendMessageToRestEndPoint( String message, List<String> endpoints ) {
-        CloseableHttpClient httpClient;
-        try {
-            SSLContextBuilder builder = new SSLContextBuilder();
-            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(builder.build());
-            httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
-            for(String restEndPoint: endpoints ) {
-                try {
-                    HttpPost httpPost = new HttpPost(restEndPoint);
-                    httpPost.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-                    httpPost.setEntity(new StringEntity(message.toString()));
-
-                    CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
-
-                    if (httpResponse.getStatusLine().getStatusCode() == HttpURLConnection.HTTP_OK) {
-                        // status is Success by default
-                        return true;
-                    } else {
-                        // try another host
-                        LOG.warn("Message failed to transmit, received HTTP response code:" +
-                                httpResponse.getStatusLine().getStatusCode() + " with message:" + httpResponse.getEntity().toString() + " from:" + restEndPoint);
-                    }
-                } catch (IOException e) {
-                    LOG.error(e.getMessage(), e);
-                }
-            }
-            httpClient.close();
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-        }
-        return false;
     }
 
     private void maskSensitiveInfo(EsbMessage em, EsbMessageEntity eme) {
@@ -780,7 +688,7 @@ public class EsbMessageAdminServiceImpl implements Provider {
 
         saveAuditEvent(new AuditEvent(DEFAULT_USER, "SYNC", METADATA_KEY_TYPE, entity, key, message.toString()));
 
-        if( sendMessageToRestEndPoint( message.toString(), getResyncRestEndpoints() ) ){
+        if( RestRequestUtility.sendMessageToRestEndPoint( message.toString(), getResyncRestEndpoints() ) ){
             return new MetadataResponse();
         }else{
             MetadataResponse result = new MetadataResponse();
@@ -875,14 +783,6 @@ public class EsbMessageAdminServiceImpl implements Provider {
         return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
     }
 
-    private Boolean isEditableMessage( EsbMessageEntity message ){
-        if(message.getMessageType() == null){
-            return false;
-        }
-        
-        return getEditableMessageTypes().contains( message.getMessageType().toUpperCase() );
-    }
-
     private Boolean allowsResubmit( EsbMessage message ){
         if(message.getMessageType() == null){
             return false;
@@ -890,17 +790,5 @@ public class EsbMessageAdminServiceImpl implements Provider {
         
         // if it is NOT in the blacklist, and if it has NOT been previously resubmitted
         return !getResubmitBlackList().contains( message.getMessageType().toUpperCase() ) && message.getResubmittedOn() == null;
-    }
-
-    private Map<String,String> reduceToEsbHeaders( EsbMessageEntity message ){
-        Map<String,String> headers = new HashMap<String,String>();
-
-        for( EsbMessageHeaderEntity header : message.getErrorHeaders() ){
-            if( header.getName().contains( getResubmitHeaderNamespace() ) ){
-                headers.put( header.getName(), header.getValue() );
-            }
-        }
-
-        return headers;
     }
 }
