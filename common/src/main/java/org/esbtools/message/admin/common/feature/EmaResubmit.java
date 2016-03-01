@@ -71,7 +71,8 @@ public class EmaResubmit {
         }
 
         saveAuditEvent( new AuditEvent(DEFAULT_USER, RESUBMIT_EVENT, "", "", "", request.getPayload().toString() ) );
-        MetadataResponse result = sendMessageToResubmitGateway( request.toString() );
+        LOG.info("Initiating resubmit request: {}", request.toJson());
+        MetadataResponse result = sendMessageToResubmitGateway( request.toJson() );
         persistedMessage.setResubmittedOn(new Date());
         entityMgr.flush();
         return result;
