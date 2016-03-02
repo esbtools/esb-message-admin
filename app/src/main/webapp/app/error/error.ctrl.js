@@ -144,7 +144,7 @@ esbMessageAdminApp.controller('ErrorCtrl', [
               if (result.data.messages[0].payload) {
                 var payload = result.data.messages[0].payload;
                 var formatted = '';
-                var reg = /(>)\s(<)(\/*)/g;
+                var reg = /(>)\s*(<)(\/*)/g;
                 payload = payload.replace(reg, '$1\r\n$2$3');
                 var pad = 0;
                 jQuery.each(payload.split('\r\n'), function(index, node) {
