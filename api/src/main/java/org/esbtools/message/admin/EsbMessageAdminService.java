@@ -28,7 +28,7 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
-public interface Provider {
+public interface EsbMessageAdminService {
 
     /**
      * Persists a single ESB Message

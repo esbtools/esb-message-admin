@@ -37,7 +37,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.StringUtils;
-import org.esbtools.message.admin.Provider;
+import org.esbtools.message.admin.EsbMessageAdminService;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 
@@ -55,7 +55,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class KeyResourceBean {
 
     @Inject
-    private Instance<Provider> client;
+    private Instance<EsbMessageAdminService> client;
 
     /**
      * Returns entire metadata keys tree based on the type of the tree requested

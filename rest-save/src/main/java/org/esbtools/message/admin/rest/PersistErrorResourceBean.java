@@ -28,7 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
-import org.esbtools.message.admin.Provider;
+import org.esbtools.message.admin.EsbMessageAdminService;
 import org.esbtools.message.admin.model.EsbMessage;
 
 
@@ -42,7 +42,7 @@ import org.esbtools.message.admin.model.EsbMessage;
 public class PersistErrorResourceBean {
 
     @Inject
-    private Instance<Provider> client;
+    private Instance<EsbMessageAdminService> client;
 
     /**
      * Persists an ESB Error Message into the DB

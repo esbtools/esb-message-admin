@@ -43,7 +43,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
-import org.esbtools.message.admin.Provider;
+import org.esbtools.message.admin.EsbMessageAdminService;
 import org.esbtools.message.admin.common.config.VisibilityConfiguration;
 import org.esbtools.message.admin.common.extractor.KeyExtractorException;
 import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
@@ -69,7 +69,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Named
-public class EsbMessageAdminServiceImpl implements Provider {
+public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
 
     private static final Logger LOG = LoggerFactory.getLogger(EsbMessageAdminServiceImpl.class);
     private static final String ERROR_KEY_TYPE = "error";

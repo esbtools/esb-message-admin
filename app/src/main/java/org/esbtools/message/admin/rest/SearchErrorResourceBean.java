@@ -39,7 +39,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 
 import org.apache.commons.lang3.StringUtils;
-import org.esbtools.message.admin.Provider;
+import org.esbtools.message.admin.EsbMessageAdminService;
 import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchField;
@@ -58,7 +58,7 @@ import org.slf4j.Logger;
 public class SearchErrorResourceBean {
 
     @Inject
-    private Instance<Provider> client;
+    private Instance<EsbMessageAdminService> client;
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final Logger LOGGER= LoggerFactory.getLogger(SearchErrorResourceBean.class);
 
