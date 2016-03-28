@@ -168,7 +168,8 @@ public class KeyResourceBean {
     @Produces({MediaType.APPLICATION_JSON})
     @JsonInclude(Include.NON_EMPTY)
     public Map<String, List<String>> getAllKeysAndValues() throws IOException {
-        return client.get().getSearchKeyValueSuggestions();
+        //return client.get().getSearchKeyValueSuggestions();
+        return null;
     }
 
     private MetadataType getType(String name) {

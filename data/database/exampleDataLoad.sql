@@ -16,29 +16,20 @@ insert into METADATA (id,name,parent_id,type,value) values (6,'OrgManager',3,'Sy
 insert into METADATA (id,name,parent_id,type,value) values (7,'RepoManager',4,'System','REPOMANAGER');
 insert into METADATA (id,name,parent_id,type,value) values (8,'UserManager',5,'System','USERMANAGER');
 
-insert into METADATA (id,name,parent_id,type,value) values (9,'Name','1','SearchKey','name');
-insert into METADATA (id,name,parent_id,type,value) values (10,'name',9,'XPATH','/GitHubOrganization/OrganizationName/text()');
-insert into METADATA (id,name,parent_id,type,value) values (11,'name',9,'XPATH','/GitHubRepository/RepositoryName/text()');
-insert into METADATA (id,name,parent_id,type,value) values (12,'name',9,'XPATH','/GitHubUser/Name/text()');
-insert into METADATA (id,name,parent_id,type,value) values (13,'name',9,'Suggestion','esbtools');
-insert into METADATA (id,name,parent_id,type,value) values (14,'name',9,'Suggestion','lightblue-platform');
-insert into METADATA (id,name,parent_id,type,value) values (15,'name',9,'Suggestion','darcy-framework');
-insert into METADATA (id,name,parent_id,type,value) values (16,'name',9,'Suggestion','esb-message-admin');
-insert into METADATA (id,name,parent_id,type,value) values (17,'name',9,'Suggestion','esbtools.github.io');
-insert into METADATA (id,name,parent_id,type,value) values (18,'name',9,'Suggestion','lightblue');
-insert into METADATA (id,name,parent_id,type,value) values (19,'name',9,'Suggestion','lightblue-applications');
-insert into METADATA (id,name,parent_id,type,value) values (20,'name',9,'Suggestion','lightblue-client');
-insert into METADATA (id,name,parent_id,type,value) values (21,'name',9,'Suggestion','darcy-framework');
-insert into METADATA (id,name,parent_id,type,value) values (22,'name',9,'Suggestion','Derek Haynes');
+insert into METADATA (id,name,parent_id,type,value) values (9,'Name','6','SearchKey','name');
+insert into METADATA (id,name,parent_id,type,value) values (10,'Name','7','SearchKey','name');
+insert into METADATA (id,name,parent_id,type,value) values (11,'Name','8','SearchKey','name');
+insert into METADATA (id,name,parent_id,type,value) values (12,'name',9,'XPATH','/GitHubOrganization/OrganizationName/text()');
+insert into METADATA (id,name,parent_id,type,value) values (13,'name',10,'XPATH','/GitHubRepository/RepositoryName/text()');
+insert into METADATA (id,name,parent_id,type,value) values (14,'name',11,'XPATH','/GitHubUser/Name/text()');
 
-insert into METADATA (id,name,parent_id,type,value) values (23,'Visibility','1','SearchKey','visibility');
-insert into METADATA (id,name,parent_id,type,value) values (24,'visibility',23,'XPATH','/GitHubOrganization/Visibility/text()');
-insert into METADATA (id,name,parent_id,type,value) values (25,'visibility',23,'XPATH','/GitHubRepository/Visibility/text()');
-insert into METADATA (id,name,parent_id,type,value) values (26,'visibility',23,'Suggestion','Public');
+insert into METADATA (id,name,parent_id,type,value) values (15,'Visibility','6','SearchKey','visibility');
+insert into METADATA (id,name,parent_id,type,value) values (16,'Visibility','7','SearchKey','visibility');
+insert into METADATA (id,name,parent_id,type,value) values (17,'visibility',15,'XPATH','/GitHubOrganization/Visibility/text()');
+insert into METADATA (id,name,parent_id,type,value) values (18,'visibility',16,'XPATH','/GitHubRepository/Visibility/text()');
 
-insert into METADATA (id,name,parent_id,type,value) values (27,'Time Zone','1','SearchKey','timezone');
-insert into METADATA (id,name,parent_id,type,value) values (28,'timezone',27,'XPATH','/GitHubUser/TimeZone/text()');
-insert into METADATA (id,name,parent_id,type,value) values (29,'timezone',27,'Suggestion','GMT +1');
+insert into METADATA (id,name,parent_id,type,value) values (19,'Time Zone','8','SearchKey','timezone');
+insert into METADATA (id,name,parent_id,type,value) values (20,'timezone',19,'XPATH','/GitHubUser/TimeZone/text()');
 
 INSERT INTO ESB_MESSAGE (id, error_component, error_details, error_message, error_queue, error_system, error_type, message_guid, jms_message_id, message_type, occurrence_count, payload, service_name, source_location, source_queue, source_system, jms_message_timestamp) VALUES ( 1, 'GitHubOrgCreate', 'There was a problem syncing your GitHub organization', 'That organization already exsits', 'GITHUB_ORG_ERROR', 'GitHubSystem', 'DATA_ERROR', '8675309', 'JMS8675309', 'XML', 1, '<GitHubOrganization><OrganizationName>esbtools</OrganizationName><BillingEmail>admin@esbtools.org</BillingEmail><OrganizationsPlan>Open Source</OrganizationsPlan><Visibility>Public</Visibility></GitHubOrganization>', 'GitHub', 'Internet', 'GITHUB_ORG_CREATE', 'GitHub', CURRENT_TIMESTAMP);
 

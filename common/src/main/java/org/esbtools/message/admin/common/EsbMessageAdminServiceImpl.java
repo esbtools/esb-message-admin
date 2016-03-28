@@ -82,7 +82,6 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     private static transient KeyExtractorUtil extractor;
     private static transient EncryptionUtility encryptor;
     private static transient Map<MetadataType, MetadataResponse> treeCache = new ConcurrentHashMap<>();
-    private static transient Map<String, List<String>> suggestionsCache = new ConcurrentHashMap<>();
 
     @Inject
     private EntityManager entityMgr;
@@ -103,7 +102,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
 
     private KeyExtractorUtil getKeyExtractor() {
 
-        MetadataResponse searchKeyResponse = getMetadataTree(MetadataType.SearchKeys);
+        MetadataResponse searchKeyResponse = getMetadataTree(MetadataType.Entities);
         if (extractor == null || !extractor.getHash().contentEquals(searchKeyResponse.getHash())) {
             List<MetadataField> searchKeys = (searchKeyResponse.getTree() != null) ? searchKeyResponse.getTree().getChildren() : new ArrayList<MetadataField>();
             extractor = new KeyExtractorUtil(searchKeys, searchKeyResponse.getHash());
@@ -131,7 +130,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
         }
 
         create(esbMessage, extractedHeaders);
-        ensureSuggestionsArePresent(esbMessage, extractedHeaders);
+        //ensureSuggestionsArePresent(esbMessage, extractedHeaders);
 
     }
 
@@ -407,7 +406,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
 
     private String getMetadataHash(MetadataType type) {
         String hash = "";
-        if(type==MetadataType.SearchKeys || type==MetadataType.Entities) {
+        if(type==MetadataType.Entities) {
             Query query = entityMgr.createQuery(METADATA_QUERY.replace(TYPE_PLACEHOLDER, type.toString()));
 
             List<MetadataEntity> result = query.getResultList();
@@ -419,11 +418,12 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     }
 
     private String markTreeDirty(MetadataType metadataType) {
+        /*
+         * TODO: (bmiller) Shouldn't be a need for a cache with one parent now
+         */
         String hash = null;
 
-        MetadataType type = metadataType.isSearchKeyType() ? MetadataType.SearchKeys : MetadataType.Entities;
-
-        Query query = entityMgr.createQuery(METADATA_QUERY.replace(TYPE_PLACEHOLDER, type.toString()));
+        Query query = entityMgr.createQuery(METADATA_QUERY.replace(TYPE_PLACEHOLDER, MetadataType.Entities.toString()));
         List<MetadataEntity> result = query.getResultList();
         if(result!=null && !result.isEmpty()) {
             hash = UUID.randomUUID().toString();
@@ -446,8 +446,13 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     @Override
     public MetadataResponse getMetadataTree(MetadataType type) {
 
+        /*
+         * TODO: (bmiller) Since there's only a single type now, there
+         * is no need for caching
+         */
+
         MetadataResponse result;
-        if(type == MetadataType.Entities || type == MetadataType.SearchKeys) {
+        if(type == MetadataType.Entities) {
             String hash = getMetadataHash(type);
             if(treeCache.containsKey(type) && hash.contentEquals(treeCache.get(type).getHash())) {
                 return treeCache.get(type);
@@ -464,22 +469,13 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     private MetadataResponse refreshCache(MetadataType type, String hash) {
         MetadataResponse result;
         result = new MetadataResponse();
-        String inClause = null;
-        if (type == MetadataType.Entities) {
-            inClause = "('Entities', 'Entity', 'System', 'SyncKey')";
-        } else {
-            inClause = "('SearchKeys', 'SearchKey', 'XPATH', 'Suggestion')";
-        }
-        if (inClause != null) {
-            Query query = entityMgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
-            List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
-            result.setTree(makeTree(queryResult));
-            result.setHash(hash);
-            treeCache.put(type, result);
-            if(type == MetadataType.SearchKeys) {
-                updateSuggestions(result.getTree());
-            }
-        }
+        String inClause = "('Entities', 'Entity', 'System', 'SyncKey', 'SearchKey', 'XPATH')";
+
+        Query query = entityMgr.createQuery("select f from MetadataEntity f where f.type in " + inClause);
+        List<MetadataEntity> queryResult = (List<MetadataEntity>) query.getResultList();
+        result.setTree(makeTree(queryResult));
+        result.setHash(hash);
+        treeCache.put(type, result);
         return result;
     }
 
@@ -492,7 +488,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
         Map<Long, MetadataField> map = new HashMap<>();
         for (MetadataEntity entity : entities) {
             MetadataField field = ConversionUtility.convertToMetadataField(entity);
-            if (entity.getType() == MetadataType.Entities || entity.getType() == MetadataType.SearchKeys) {
+            if (entity.getType() == MetadataType.Entities) {
                 root = field;
                 root.setValue(entity.getType().toString());
             }
@@ -530,7 +526,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
         MetadataResponse result = new MetadataResponse();
         MetadataEntity curr = new MetadataEntity(type, name, value, parentId);
         if (parentId == -1L) {
-            if (type != MetadataType.Entities && type != MetadataType.SearchKeys) {
+            if (type != MetadataType.Entities) {
                 result.setErrorMessage(ILLEGAL_ARGUMENT + type + ", If parent = -1, Expected: Entities or SearchKeys");
             } else {
                 markTreeDirty(type);
@@ -613,11 +609,7 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
      */
     private MetadataResponse createMetadataResult(MetadataField field) {
         MetadataResponse result = new MetadataResponse();
-        if (field.getType().isSyncKeyType()) {
-            result.setTree(getMetadataTree(MetadataType.Entities).getTree());
-        } else {
-            result.setTree(getMetadataTree(MetadataType.SearchKeys).getTree());
-        }
+        result.setTree(getMetadataTree(MetadataType.Entities).getTree());
         result.setResult(searchField(result.getTree(), field));
         return result;
     }
@@ -657,74 +649,6 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     @Override
     public MetadataResponse sync(String entity, String system, String key, String... values) {
         return emaResync.syncMessage(entity, system, key, values);
-    }
-
-    @Override
-    public Map<String, List<String>> getSearchKeyValueSuggestions() {
-
-        // ensure cache exists and is upto date.
-        getMetadataTree(MetadataType.SearchKeys).getTree();
-        return suggestionsCache;
-    }
-
-    private void updateSuggestions(MetadataField searchKeysTree) {
-
-        Map<String, List<String>> newSuggestions = new HashMap<>();
-        if(searchKeysTree!=null && !searchKeysTree.getChildren().isEmpty()) {
-            for (MetadataField searchKey : searchKeysTree.getChildren()) {
-                addSuggestion(newSuggestions, searchKey);
-            }
-        }
-        suggestionsCache = newSuggestions;
-    }
-
-    private void addSuggestion(Map<String, List<String>> newSuggestions, MetadataField searchKey) {
-        if (getSuggestedFields().contains(searchKey.getValue())) {
-            List<String> values = new ArrayList<>();
-            for (MetadataField suggestion : searchKey.getSuggestions()) {
-                values.add(suggestion.getValue());
-            }
-            newSuggestions.put(searchKey.getValue(), values);
-        } else {
-            newSuggestions.put(searchKey.getValue(), null);
-        }
-    }
-
-    public void ensureSuggestionsArePresent(EsbMessage message, Map<String, Set<String>> extractedHeaders) {
-
-        if(message.getHeaders()!=null) {
-            for(Header header:message.getHeaders()) {
-                if(getSuggestedFields().contains(header.getName())) {
-                    ensureSuggestionIsPresent(header.getName(), header.getValue());
-                }
-            }
-        }
-        for(String suggestedField: getSuggestedFields()) {
-            Set<String> extractedValues = extractedHeaders.get(suggestedField);
-            if(extractedValues!=null && !extractedValues.isEmpty()) {
-                for(String extractedValue: extractedValues) {
-                    ensureSuggestionIsPresent(suggestedField, extractedValue);
-                }
-            }
-        }
-    }
-
-    // should be called only for fields defined as suggested fields
-    private void ensureSuggestionIsPresent(String suggestedField, String suggestion) {
-        if(!suggestionsCache.containsKey(suggestedField)) {
-            Long parentId = treeCache.get(MetadataType.SearchKeys).getTree().getId();
-            addChildMetadataField(parentId, suggestedField, MetadataType.SearchKey, suggestedField);
-        }
-        Long searchKeyId = null;
-        if(!suggestionsCache.get(suggestedField).contains(suggestion)) {
-            searchKeyId = fetchSearchKeyId(suggestedField);
-            // fetch method can return null
-            if(searchKeyId!=null) {
-                addChildMetadataField(searchKeyId, suggestion, MetadataType.Suggestion, suggestion);
-            } else {
-                LOG.error("unable to add suggestion!");
-            }
-        }
     }
 
     private Long fetchSearchKeyId(String suggestedField) {

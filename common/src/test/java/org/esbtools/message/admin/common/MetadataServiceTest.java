@@ -222,30 +222,6 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         MetadataResponse result = service.getMetadataTree(MetadataType.Entities);
     }
 
-    @Test
-    public void testSearchKeyAndValueSuggestionsRead() {
-
-        long id = -1L;
-        service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
-        MetadataField searchKeys = fetchMetadataField("SearchKeys", "suggestionsTest", MetadataType.SearchKeys);
-        service.addChildMetadataField(searchKeys.getId(), "SearchKey1", MetadataType.SearchKey, "suggestionLessKey");
-        MetadataField suggestionLessKey = fetchMetadataField("SearchKey1", "suggestionLessKey", MetadataType.SearchKey);
-        service.addChildMetadataField(searchKeys.getId(), "SourceSystem", MetadataType.SearchKey, "SourceSystem");
-        MetadataField sourceSystem = fetchMetadataField("SourceSystem", "SourceSystem", MetadataType.SearchKey);
-        service.addChildMetadataField(suggestionLessKey.getId(), "Suggestion1", MetadataType.Suggestion, "suggestion1");
-        MetadataField Suggestion1 = fetchMetadataField("Suggestion1", "suggestion1", MetadataType.Suggestion);
-        service.addChildMetadataField(sourceSystem.getId(), "Suggestion2", MetadataType.Suggestion, "suggestion2");
-        MetadataField Suggestion2 = fetchMetadataField("Suggestion2", "suggestion2", MetadataType.Suggestion);
-
-        Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-        Assert.assertEquals("all search keys should be listed ", 2, suggestions.keySet().size());
-        Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
-        Assert.assertTrue(suggestions.containsKey("SourceSystem"));
-        List<String> suggestionList = suggestions.get("SourceSystem");
-        Assert.assertEquals("SourceSystem should have 1 suggestion!", 1, suggestionList.size());
-        Assert.assertNull("suggestion less key should be listed, but its suggestions, even if it has any , should be ignored", suggestions.get("suggestionLessKey"));
-    }
-
     private void assertSuccess(MetadataResponse result) {
         Assert.assertEquals(result.getErrorMessage(), MetadataResponse.Status.Success, result.getStatus());
         Assert.assertNotNull("Result's root cannot be null!", result.getTree());
@@ -260,63 +236,6 @@ public class MetadataServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals(value, field.getValue());
         Assert.assertEquals(name, field.getName());
         Assert.assertEquals(type, field.getType());
-    }
-
-    @Test
-    public void addSuggestionsFromJMSHeadersTest() {
-        EsbMessage message = getTestMessage();
-        message.setHeaders(new ArrayList<Header>());
-        message.getHeaders().add(new Header(HeaderType.JMS, "SourceQueue", "QueueName"));
-        message.getHeaders().add(new Header(HeaderType.JMS, "Taylor", "Swift"));
-        service.addChildMetadataField(-1L, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
-        try {
-            service.persist(message);
-            //Persist again to make sure suggestions are not saved twice
-            service.persist(message);
-        } catch (IOException e) {
-            Assert.fail();
-        }
-        Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-        Assert.assertEquals("Unexpected number of keys returned",1, suggestions.size());
-        Assert.assertTrue("JMS Suggestions are no longer automatically added",suggestions.containsKey("SourceQueue"));
-        Assert.assertTrue("JMS Suggestions added with wrong value",suggestions.get("SourceQueue").contains("QueueName"));
-        Assert.assertFalse("unecessary JMS Suggestions are automatically added",suggestions.containsKey("Taylor"));
-    }
-
-    @Test
-    public void addSuggestionsToMetadataTest() {
-
-    long id = -1L;
-    service.addChildMetadataField(id, "SearchKeys", MetadataType.SearchKeys, "suggestionsTest");
-    MetadataField searchKeys = fetchMetadataField("SearchKeys", "suggestionsTest", MetadataType.SearchKeys);
-
-    service.addChildMetadataField(searchKeys.getId(), "Email", MetadataType.SearchKey, "suggestionLessKey");
-
-    service.addChildMetadataField(searchKeys.getId(), "SourceSystem", MetadataType.SearchKey, "SourceSystem");
-    MetadataField sourceSystem = fetchMetadataField("SourceSystem", "SourceSystem", MetadataType.SearchKey);
-    service.addChildMetadataField(sourceSystem.getId(), "", MetadataType.XPATH, "/Person/SourceSystem");
-    service.addChildMetadataField(sourceSystem.getId(), "SystemB", MetadataType.Suggestion, "SystemB");
-
-
-    // persist message and check suggestion
-    try {
-        service.persist(getTestMessage());
-        //Persist again to make sure suggestions are not saved twice
-        service.persist(getTestMessage());
-    } catch (IOException e) {
-        Assert.fail();
-    }
-
-    Map<String, List<String>> suggestions = service.getSearchKeyValueSuggestions();
-
-    Assert.assertEquals("Unexpected number of keys returned",2, suggestions.size());
-
-    Assert.assertNotNull(suggestions.get("SourceSystem"));
-    Assert.assertEquals("Unexpected number of sugggestions returned",2,suggestions.get("SourceSystem").size());
-    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemA"));
-    Assert.assertTrue(suggestions.get("SourceSystem").contains("SystemB"));
-
-    Assert.assertTrue(suggestions.containsKey("suggestionLessKey"));
     }
 
     private EsbMessage getTestMessage() {
