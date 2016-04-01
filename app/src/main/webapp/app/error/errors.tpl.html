@@ -3,18 +3,56 @@
     <div class="row">
         <div class="col-xs-12 panel panel-default">
             <div class="panel-body">
-                <form class="form-inline" role="form" name='searchForm' style="vertical-align: middle;">
+                <form role="form" name='searchForm'>
 
-                    <div class="form-group">
-                        <angucomplete id="searchField" placeholder='Search by key="value" pairs. All keys are autocompleted. Some keys have autocompleted values.' pause="400" selectedObject="selected" localdata="autocompleteData" titlefield="key" searchfields="key" inputclass="form-control"
-                        />
+                    <div class="form-group row">
+                        <label for="systemSelect" class="col-sm-1 form-control-label">System:</label>
+                        <div class="col-sm-11">
+                            <select id="system" name="systemSelect" ng-model="searchCriteria.sourceSystem">
+                                <option ng-repeat="system in availableSystems" value="{{system.value}}">{{system.label}}</option>
+                            </select>
+                        </div>
                     </div>
 
-                    <div class="form-group" style="font-size: 15px;">
-                        <span class="form-text">from</span>
-                        <quick-datepicker ng-model='fromDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
-                        <span class="form-text">to</span>
-                        <quick-datepicker ng-model='toDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                    <div class="form-group row">
+
+                        <label for="entitySelect" class="col-sm-1 form-control-label">Entity:</label>
+                        <div class="col-sm-11">
+                            <select id="entity" name="entitySelect" ng-model="searchCriteria.messageType">
+                                <option ng-repeat="entity in availableEntities" value="{{entity.value}}">{{entity.label}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="filterSelect" class="col-sm-1 form-control-label">Filter by:</label>
+                        <div class="row">
+                            <div ng-repeat="messageFilter in messageFilters" class="col-sm-11">
+                                <select name="filterSelect" ng-model="messageFilter.key" ng-disabled='!searchCriteria.sourceSystem || !searchCriteria.messageType'>
+                                    <option ng-repeat="filterKey in availableFilters" ng-if="filterKey.availableEntities.indexOf(searchCriteria.messageType) > -1" value="{{ filterKey.value }}">{{ filterKey.label }}</option>
+                                </select>
+
+                                <label for="filterValue">is equal to: </label>
+                                <input ng-model="messageFilter.value" ng-disabled='!searchCriteria.sourceSystem || !searchCriteria.messageType'>
+                                <button type="button" class="btn btn-success" ng-click='addFilter()' ng-show='$last'>
+                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                </button>
+
+                                <button type="button" class="btn btn-danger" ng-click='removeFilter($index)' ng-show='!$last'>
+                                    <span class="glyphicon glyphicon-minus-sign"></span>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="fromDatePicker" class="col-sm-1">From:</label>
+                        <quick-datepicker name="fromDatePicker" class="col-sm-11" ng-model='fromDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                    </div>
+                    <div class="form-group row">
+                        <label for="toDatePicker" class="col-sm-1">To:</label>
+                        <quick-datepicker name="toDatePicker" class="col-sm-11" ng-model='toDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
                     </div>
 
                     <div class="form-group">

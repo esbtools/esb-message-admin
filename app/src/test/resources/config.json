@@ -68,5 +68,22 @@
         "STUFF"
     ],
     "resubmitControlHeader":"resubmitControlHeaderTest",
-    "resubmitHeaderNamespace":"namespace"
+    "resubmitHeaderNamespace":"namespace",
+    "messageSearchSystemKey": "sourceSystem",
+    "messageSearchSystems": [
+        { "label" : "Org Manager", "value" : "ORGMANAGER" },
+        { "label" : "Repo Manager", "value" : "REPOMANAGER" },
+        { "label" : "User Manager", "value" : "USERMANAGER" }
+    ],
+    "messageSearchEntityKey": "messageType",
+    "messageSearchEntities": [
+        { "label" : "Organization", "value" : "ORGANIZATION" },
+        { "label" : "Repository", "value" : "REPOSITORY" },
+        { "label" : "User", "value" : "USER" }
+    ],
+    "messageSearchFilters": [
+        { "label" : "Name", "value" : "name", "availableEntities" : ["ORGANIZATION", "REPOSITORY", "USER"] },
+        { "label" : "Visibility", "value" : "visibility", "availableEntities" : ["ORGANIZATION", "REPOSITORY"] },
+        { "label" : "Time Zone", "value" : "timezone", "availableEntities" : ["USER"] }
+    ]
 }

@@ -23,6 +23,7 @@ import static org.esbtools.message.admin.common.config.EMAConfiguration.getNonVi
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getPartiallyViewableMessages;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSortingFields;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getSuggestedFields;
+import static org.esbtools.message.admin.common.config.EMAConfiguration.getMessageSearchConfigurations;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,6 +61,7 @@ import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.HeaderType;
+import org.esbtools.message.admin.model.MessageSearchConfigurations;
 import org.esbtools.message.admin.model.MetadataField;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
@@ -660,6 +662,11 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
     }
 
     @Override
+    public MessageSearchConfigurations getSearchConfigurations() {
+        return getMessageSearchConfigurations();
+    }
+
+    @Override
     public Map<String, List<String>> getSearchKeyValueSuggestions() {
 
         // ensure cache exists and is upto date.
@@ -736,4 +743,5 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
         }
         return null;
     }
+
 }

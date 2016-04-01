@@ -34,6 +34,7 @@ import org.esbtools.message.admin.model.Criterion;
 import org.esbtools.message.admin.model.EsbMessage;
 import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.HeaderType;
+import org.esbtools.message.admin.model.MessageSearchConfigurations;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchField;
 import org.esbtools.message.admin.model.SearchResult;
@@ -388,6 +389,16 @@ public class ErrorServiceTest extends EsbMessageAdminTestBase {
         Assert.assertEquals("<Payload>NotHiddenPayload</Payload>",result.getMessages()[0].getPayload());
     }
 
+    // TODO: This test could be way better, but the configs need better testing in general
+    @Test
+    public void testConifgurations() {
+        MessageSearchConfigurations testConfigs = service.getSearchConfigurations();
+        String searchSystemLabel = testConfigs.getSearchSystems().get(0).getLabel();
+        String searchSystemValue = testConfigs.getSearchSystems().get(0).getValue();
+
+        Assert.assertEquals("First system from config should equal System 1", "System 1", searchSystemLabel);
+        Assert.assertEquals("First system value should equal SYS1", "SYS1", searchSystemValue);
+    }
 
     @Test
     public void testHiddenPayloadUponMultipleCriteriaMatch() {
