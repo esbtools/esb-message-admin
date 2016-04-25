@@ -6,7 +6,7 @@ sudo: false
 before_install:
   - cp ./etc/settings.xml ~/.m2/
   - cp ./etc/onTravisBuildFailure.sh  ~/
-  - cp ./etc/onTravisSuccess.sh  ~/
+  - cp ./etc/onTravisBuildSuccess.sh  ~/
   - chmod 777 ~/onTravisBuildFailure.sh
   - chmod 777 ~/onTravisBuildSuccess.sh
 script:
