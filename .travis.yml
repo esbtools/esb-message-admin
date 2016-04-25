@@ -5,8 +5,8 @@ jdk:
 sudo: false
 before_install:
   - cp ./etc/settings.xml ~/.m2/
-  - cp ./etc/onFailure.sh  ~/
-  - cp ./etc/onSuccess.sh  ~/
+  - cp ./etc/onTravisBuildFailure.sh  ~/
+  - cp ./etc/onTravisSuccess.sh  ~/
   - chmod 777 ~/onTravisBuildFailure.sh
   - chmod 777 ~/onTravisBuildSuccess.sh
 script:
