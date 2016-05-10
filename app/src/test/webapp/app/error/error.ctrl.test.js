@@ -25,11 +25,6 @@ describe("ErrorCtrl", function() {
       // Service is recreated before each so overwrites will not affect other
       // tests.
       return {
-        // Never resolves to anything.
-        getSuggestions: function() {
-          var deferred = $q.defer();
-          return deferred.promise;
-        },
         // Returns 0 results for any parameters
         search: function() {
           return $q.when(emptySearchResponse);

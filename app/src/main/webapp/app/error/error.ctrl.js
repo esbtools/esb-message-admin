@@ -9,16 +9,6 @@ esbMessageAdminApp.controller('ErrorCtrl', [
   'messageCenterService',
   function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log, Globals, layoutPlugin, messageCenterService) {
 
-    // initialize autocomplete data
-    EsbMessageService.getSuggestions().then(
-      function(response) {
-        $scope.autocompleteData = response.data;
-      },
-      function(error) {
-        // TODO: handle error
-        $log.error(error.status);
-      }
-    );
     $scope.message = null;
     $scope.messageSelections = [];
 

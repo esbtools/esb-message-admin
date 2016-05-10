@@ -5,26 +5,26 @@ esbMessageAdminApp.controller('SearchKeysCtrl', [
 
     $scope.searchKeys = {
       "id": 0,
-      "name": "Search Keys",
-      "type": "SearchKeys",
-      "value": "searchKeys",
+      "name": "Entities",
+      "type": "Entities",
+      "value": "entities",
       "children": []
     };
 
     $scope.getChildTypes = function(type) {
-      if (type === "SearchKeys") {
+      if (type === "Entities") {
+        return ["Entity"];
+      } else if (type === "Entity") {
+        return ["System"];
+      } else if (type === "System") {
         return ["SearchKey"];
       } else {
-        return ["XPATH", "Suggestion"];
+        return ["XPATH"];
       }
     };
 
     $scope.getPeerTypes = function(type) {
-      if (type === "SearchKey") {
-        return ["SearchKey"];
-      } else {
-        return ["XPATH", "Suggestion"];
-      }
+      return [type];
     };
 
     $scope.updateParent = function(parent) {
@@ -47,6 +47,7 @@ esbMessageAdminApp.controller('SearchKeysCtrl', [
         $scope.searchKeys = response.data.tree || $scope.searchKeys;
         $scope.updateParent($scope.searchKeys || $scope.parent);
         $scope.crumbs = [$scope.searchKeys];
+        window.getSearchKeysResponse = response;
       }
     );
 
@@ -116,7 +117,6 @@ esbMessageAdminApp.controller('SearchKeysCtrl', [
 
       if (field == null ||
         field.type == null ||
-        field.type === "Suggestion" ||
         field.type === "XPATH") {
         return true;
       }
@@ -127,7 +127,7 @@ esbMessageAdminApp.controller('SearchKeysCtrl', [
       $scope.addMode = false;
       $scope.updateMode = false;
 
-      if (crumb.type === "SearchKeys") {
+      if (crumb.type === "Entities") {
         $scope.updateParent($scope.searchKeys);
       } else {
         var currChildren = $scope.searchKeys.children;
@@ -147,9 +147,9 @@ esbMessageAdminApp.controller('SearchKeysCtrl', [
         }
       }
 
-      if (crumb.type === "SearchKeys") {
+      if (crumb.type === "Entities") {
         $scope.crumbs = $scope.crumbs.slice(0, 1);
-      } else if (crumb.type == "SearchKey") {
+      } else {
         $scope.crumbs = $scope.crumbs.slice(0, 2);
       }
     };

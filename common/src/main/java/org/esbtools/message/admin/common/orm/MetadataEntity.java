@@ -118,7 +118,7 @@ public class MetadataEntity implements Serializable {
     }
 
     private boolean checkSearchKeysChildren(MetadataType parentType) {
-        return isSearchKeyWithSearchKeysParent(parentType) || isXpathOrSuggestionWithSearchKeyParent(parentType);
+        return isSearchKeyWithSystemParent(parentType) || isXpathOrSuggestionWithSearchKeyParent(parentType);
     }
 
     private boolean isEntityWithEntitiesParent(MetadataType parentType) {
@@ -133,8 +133,8 @@ public class MetadataEntity implements Serializable {
         return this.type==MetadataType.SyncKey && parentType==MetadataType.System;
     }
 
-    private boolean isSearchKeyWithSearchKeysParent(MetadataType parentType) {
-        return this.type==MetadataType.SearchKey && parentType==MetadataType.SearchKeys;
+    private boolean isSearchKeyWithSystemParent(MetadataType parentType) {
+        return this.type==MetadataType.SearchKey && parentType==MetadataType.System;
     }
 
     private boolean isXpathOrSuggestionWithSearchKeyParent(MetadataType parentType) {

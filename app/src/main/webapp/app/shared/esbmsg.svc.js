@@ -60,21 +60,12 @@ esbMessageAdminApp.service('EsbMessageService', [
       });
     };
 
-    // fetch keys and values used for search query autocompletion
-    self.getSuggestions = function() {
-      return $http({
-        method: 'GET',
-        url: 'api/key/suggest/',
-        cache: true
-      });
-    };
-
     self.getSyncKeysTree = function() {
       return self.getTree("Entities");
     };
 
     self.getSearchKeysTree = function() {
-      return self.getTree("SearchKeys");
+      return self.getTree("Entities");
     };
 
     self.respondSuccess = function(argResponse) {
@@ -86,14 +77,14 @@ esbMessageAdminApp.service('EsbMessageService', [
         });
         return null;
       }
-    }
+    };
 
     self.respondError = function() {
       messageCenterService.add('danger', 'Unable to contact server!', {
         status: messageCenterService.status.permanent
       });
       return null;
-    }
+    };
 
     self.getTree = function(argType) {
       return $http.get("api/key/tree/" + argType).success(

@@ -74,13 +74,6 @@ public interface EsbMessageAdminService {
     SearchResult getMessageById(Long id);
 
     /**
-     * Suggests search key and value suggestions
-     *
-     * @return all key and value suggestions
-     */
-    Map<String, List<String>> getSearchKeyValueSuggestions();
-
-    /**
      * @param type       specific tree type to return, possible values:
      *                   [Entities,KeyGroups]
      * @return MetadataResponse the entire keys tree

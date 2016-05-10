@@ -80,11 +80,7 @@ public class MetadataField {
         this.suggestions = suggestions;
     }
     public void addDescendant(MetadataField descendant) {
-        if (descendant.getType() == MetadataType.Suggestion) {
-            getSuggestions().add(descendant);
-        } else {
-            getChildren().add(descendant);
-        }
+        getChildren().add(descendant);
     }
     public void addDescendants(List<MetadataField> descendants) {
         for (MetadataField descendant : descendants) {

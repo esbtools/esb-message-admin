@@ -19,10 +19,11 @@
 package org.esbtools.message.admin.model;
 
 public enum MetadataType {
-    Entities, Entity, System, SyncKey, SearchKeys, SearchKey, XPATH, Suggestion;
+    Entities, Entity, System, SyncKey, SearchKey, XPATH, Suggestion;
 
+    // TODO: (bmiller) If there are errors with this, consider adding some logic around Entities
     public boolean isSearchKeyType() {
-        return this==SearchKeys || this==SearchKey || this==XPATH || this==Suggestion;
+        return this==SearchKey || this==XPATH;
     }
 
     public boolean isSyncKeyType() {
