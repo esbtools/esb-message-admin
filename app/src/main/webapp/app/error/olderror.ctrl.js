@@ -1,4 +1,4 @@
-esbMessageAdminApp.controller('ErrorCtrl', [
+esbMessageAdminApp.controller('OldErrorCtrl', [
   '$scope',
   '$rootScope',
   'EsbMessageService',
