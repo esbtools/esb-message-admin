@@ -28,6 +28,8 @@ import org.esbtools.message.admin.model.MetadataResponse;
 import org.esbtools.message.admin.model.MetadataType;
 import org.esbtools.message.admin.model.SearchCriteria;
 import org.esbtools.message.admin.model.SearchResult;
+import org.esbtools.message.admin.model.MessageSearchConfigurations;
+
 public interface EsbMessageAdminService {
 
     /**
@@ -119,4 +121,10 @@ public interface EsbMessageAdminService {
      */
     MetadataResponse sync(String entity, String system, String key, String... values);
 
+    /**
+     * Fetches configurations used for searching messages from the configuration store
+     *
+     * @return MessageSearchConfigurations an object containing all pertinent configurations
+     */
+    MessageSearchConfigurations getSearchConfigurations();
 }

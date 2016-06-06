@@ -18,23 +18,14 @@
  */
 package org.esbtools.message.admin.common;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
-import org.esbtools.message.admin.common.EsbMessageAdminServiceImpl;
-import org.esbtools.message.admin.common.extractor.KeyExtractorException;
-import org.esbtools.message.admin.common.extractor.KeyExtractorUtil;
-import org.esbtools.message.admin.model.MetadataField;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.internal.runners.statements.Fail;
 
 public abstract class EsbMessageAdminTestBase {
 

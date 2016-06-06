@@ -1,0 +1,80 @@
+<div id="errorpane" ng-controller="OldErrorCtrl">
+    <div mc-messages id="messageCenter"></div>
+    <div class="row">
+        <div class="col-xs-12 panel panel-default">
+            <div class="panel-body">
+                <form class="form-inline" role="form" name='searchForm' style="vertical-align: middle;">
+
+                    <div class="form-group">
+                        <angucomplete id="searchField" placeholder='Search by key="value" pairs. All keys are autocompleted. Some keys have autocompleted values.' pause="400" selectedObject="selected" localdata="autocompleteData" titlefield="key" searchfields="key" inputclass="form-control"
+                        />
+                    </div>
+
+                    <div class="form-group" style="font-size: 15px;">
+                        <span class="form-text">from</span>
+                        <quick-datepicker ng-model='fromDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                        <span class="form-text">to</span>
+                        <quick-datepicker ng-model='toDate' date-format="{{dateFormat}}" time-format="{{timeFormat}}"></quick-datepicker>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" ng-click='search()' ng-disabled="searchForm.$invalid">Search</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12" id="errorDisplayPane">
+            <div ui-layout="{ flow: 'column' }" id="errorGridColumn">
+                <div ui-layout-container size="400px" ng-controller="GridResizeBroadcastController">
+                    <div id="grid" ng-grid="gridOptions"></div>
+                </div>
+                <div ui-layout-container>
+                    <div id="details" class="panel panel-default center-back">
+                        <tabset type="tabs">
+                            <tab heading="Error">
+                                <br/>
+                                <span ng-if="message">
+                                    <h4>Error Message</h4>
+                                    <p>{{message.errorMessage}}</p>
+                                    <h4>Error Details</h4>
+                                    <p>{{message.errorDetails}}</p>
+                                </span>
+                            </tab>
+                            <tab heading="Payload">
+                                <br/>
+                                <form ng-if="message">
+                                    <button type="button" class="btn btn-primary" ng-click='resubmitMessage()'>Resubmit message</button>
+                                    <br/>
+                                    <br/>
+                                    <textarea class="payload" ng-trim="true" ng-disabled="!message.editableMessage">{{message.payload}}</textarea>
+                                </form>
+                            </tab>
+                            <tab heading="Headers">
+                                <br/>
+                                <table ng-if="message" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Type</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="header in message.headers">
+                                            <td>{{header.name}}</td>
+                                            <td>{{header.type}}</td>
+                                            <td>{{header.value}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </tab>
+                        </tabset>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

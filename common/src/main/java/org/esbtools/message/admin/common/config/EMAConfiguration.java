@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.esbtools.message.admin.model.MessageSearchConfiguration;
+import org.esbtools.message.admin.model.MessageSearchConfigurations;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -29,6 +31,8 @@ public final class EMAConfiguration {
     private static List<String> resubmitRestEndpoints;
     private static String resubmitControlHeader;
     private static String resubmitHeaderNamespace;
+    private static MessageSearchConfigurations messageSearchConfigurations;
+
     
     private EMAConfiguration() {
 
@@ -116,6 +120,19 @@ public final class EMAConfiguration {
             resubmitHeaderNamespace = loadResubmitHeaderNamespace();
         }
         return resubmitHeaderNamespace;
+    }
+
+    public static MessageSearchConfigurations getMessageSearchConfigurations() {
+        if (null == messageSearchConfigurations) {
+            messageSearchConfigurations = new MessageSearchConfigurations();
+            messageSearchConfigurations.setSearchEntities(loadSearchEntities());
+            messageSearchConfigurations.setSearchFilters(loadMessageSearchFilters());
+            messageSearchConfigurations.setSearchSystems(loadSearchSystems());
+            messageSearchConfigurations.setSearchEntityKey(loadSearchEntityKey());
+            messageSearchConfigurations.setSearchSystemKey(loadSearchSystemKey());
+        }
+
+        return messageSearchConfigurations;
     }
 
     private static JSONObject loadJsonConfiguration() {
@@ -232,6 +249,26 @@ public final class EMAConfiguration {
         return (String) getJsonConfig().get("resubmitHeaderNamespace");
     }
 
+    private static String loadSearchSystemKey() {
+        return (String) getJsonConfig().get("messageSearchSystemKey");
+    }
+
+    private static List<MessageSearchConfiguration> loadSearchSystems() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchSystems"));
+    }
+
+    private static String loadSearchEntityKey() {
+        return (String) getJsonConfig().get("messageSearchEntityKey");
+    }
+
+    private static List<MessageSearchConfiguration> loadSearchEntities() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchEntities"));
+    }
+
+    private static List<MessageSearchConfiguration> loadMessageSearchFilters() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchFilters"));
+    }
+
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
 
         List<VisibilityConfiguration> result = new ArrayList<>();
@@ -245,12 +282,39 @@ public final class EMAConfiguration {
         return result;
     }
 
+    private static List<MessageSearchConfiguration> getMessageSearchConfigurations(JSONArray jsonConfigurations) {
+        List<MessageSearchConfiguration> searchConfigurations = new ArrayList<>();
+
+        for (int i = 0; i < jsonConfigurations.size(); i++) {
+            MessageSearchConfiguration configuration = new MessageSearchConfiguration();
+            JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
+            configuration.setLabel((String) jsonConfiguration.get("label"));
+            configuration.setValue((String) jsonConfiguration.get("value"));
+            configuration.setAvailableEntities(jsonArrayToStringArray((JSONArray) jsonConfiguration.get("availableEntities")));
+            searchConfigurations.add(configuration);
+        }
+        return searchConfigurations;
+    }
+
     private static Map<String, String> getMap(JSONObject jsonMap) {
         Map<String,String> map = new HashMap<>();
         for(Map.Entry<String,String> entry : (Set<Map.Entry<String,String>>)jsonMap.entrySet()) {
             map.put(entry.getKey(),entry.getValue());
         }
         return map;
+    }
+
+    private static String[] jsonArrayToStringArray(JSONArray jsonArray) {
+        String[] destinationArray = null;
+
+        if (jsonArray != null) {
+            destinationArray = new String[jsonArray.size()];
+            for (int i = 0; i < jsonArray.size(); i++) {
+                destinationArray[i] = jsonArray.get(i).toString();
+            }
+        }
+
+        return destinationArray;
     }
 
 
