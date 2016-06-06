@@ -298,7 +298,6 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
                 msg.setOccurrenceCount((Integer) cols[5]);
                 msg.setResubmittedOn( (Date) cols[6] );
                 msg.setAllowsResubmit( EmaResubmit.allowsResubmit( msg ) );
-                msg.setEditableMessage( EmaResubmit.isEditableMessage(msg) );
                 resultMessages[i] = msg;
             }
             result.setMessages(resultMessages);
