@@ -59,11 +59,6 @@
     "resubmitRestEndpoints":[
         "https://sandwich/pasta/resubmit"
     ],
-    "editableMessageTypes":[
-        "PERSON",
-        "PLACE",
-        "XML"
-    ],
     "resubmitBlackList":[
         "STUFF"
     ],

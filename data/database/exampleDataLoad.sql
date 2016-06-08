@@ -104,3 +104,22 @@ INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'timezon
 
 INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'resubmitControlHeaderTest', 'METADATA', 'someQueueName', 10);
 
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 1);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 2);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'FALSE', 3);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 4);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 5);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 6);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 7);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 8);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 9);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 10);

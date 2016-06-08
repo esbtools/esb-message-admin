@@ -1,6 +1,5 @@
 package org.esbtools.message.admin.common.feature;
 
-import static org.esbtools.message.admin.common.config.EMAConfiguration.getEditableMessageTypes;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitBlackList;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitControlHeader;
 import static org.esbtools.message.admin.common.config.EMAConfiguration.getResubmitHeaderNamespace;
@@ -22,6 +21,7 @@ import org.esbtools.message.admin.common.orm.EsbMessageHeaderEntity;
 import org.esbtools.message.admin.common.utility.RestRequestUtility;
 import org.esbtools.message.admin.model.AuditEvent;
 import org.esbtools.message.admin.model.EsbMessage;
+import org.esbtools.message.admin.model.Header;
 import org.esbtools.message.admin.model.MetadataResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,17 +103,20 @@ public class EmaResubmit {
     }
     
     public static Boolean isEditableMessage( EsbMessageEntity message ){
+        boolean editable = true;
         if(message.getMessageType() == null){
-            LOG.warn(message.getMessageId()  + " not editable - has no message type, defaulting to not allowing editing");
-            return false;
+            LOG.warn(message.getMessageId() + " has no message type, defaulting to not allowing editing");
+            editable = false;
         }
-        
-        if(!getEditableMessageTypes().contains(message.getMessageType().toUpperCase())){
-            LOG.info(message.getMessageId()  + " not editable - " + message.getMessageType() + " is not an editable message type");
-            return false;
+
+        if (message.getHeader("editableMessage") == null) {
+            LOG.warn(message.getMessageId() + " has no editable header set, defaulting to not allowing editing");
+            editable = false;
+        } else {
+            editable = Boolean.parseBoolean(message.getHeader("editableMessage").getValue());
         }
-        
-        return true;
+
+        return editable;
     }
     
     public static Boolean allowsResubmit( EsbMessage message ){
@@ -136,17 +139,24 @@ public class EmaResubmit {
     }
     
     public static Boolean isEditableMessage( EsbMessage message ){
+        boolean editable = true;
         if(message.getMessageType() == null){
             LOG.warn(message.getMessageId() + " has no message type, defaulting to not allowing editing");
-            return false;
+            editable = false;
         }
-        
-        if(!getEditableMessageTypes().contains(message.getMessageType().toUpperCase())){
-            LOG.info(message.getMessageId()  + " not editable - " + message.getMessageType() + " is not an editable message type");
-            return false;
+
+        if (message.getHeaders() == null) {
+            LOG.warn(message.getMessageId() + " has no message headers, defaulting to not allowing editing");
+            editable = false;
         }
-        
-        return true;
+
+        for (Header header : message.getHeaders()) {
+            if (header.getName().equals("editableMessage")) {
+                editable = Boolean.parseBoolean(header.getValue());
+            }
+        }
+
+        return editable;
     }
     
     private Map<String,String> reduceToEsbHeaders( EsbMessageEntity message ){
