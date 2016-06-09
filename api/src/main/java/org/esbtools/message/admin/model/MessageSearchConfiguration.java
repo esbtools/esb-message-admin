@@ -18,7 +18,7 @@ public class MessageSearchConfiguration {
      * A list of systems that this configuration is applicable for. This will be null if
      * none exist
      */
-    private String[] availableEntities;
+    private String[] availableSystems;
 
     public MessageSearchConfiguration() {
         this.label = "";
@@ -46,12 +46,12 @@ public class MessageSearchConfiguration {
         this.value = value;
     }
 
-    public String[] getAvailableEntities() {
-        return availableEntities;
+    public String[] getAvailableSystems() {
+        return availableSystems;
     }
 
-    public void setAvailableEntities(String[] availableEntities) {
-        this.availableEntities = availableEntities;
+    public void setAvailableSystems(String[] availableSystems) {
+        this.availableSystems = availableSystems;
     }
 
 }
