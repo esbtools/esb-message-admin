@@ -79,6 +79,6 @@
         { "label" : "Entity 3", "value" : "ENT3" }
     ],
     "messageSearchFilters": [
-        { "label" : "Filter 1", "value" : "FILTER1", "availableEntities" : ["ENT1", "ENT2"] }
+        { "label" : "Filter 1", "value" : "FILTER1", "availableSystems" : ["SYS1", "SYS2"] }
     ]
 }

@@ -29,17 +29,17 @@
                         <div class="row">
                             <div ng-repeat="messageFilter in messageFilters" class="col-sm-11">
                                 <select name="filterSelect" ng-model="messageFilter.key" ng-disabled='!searchCriteria.sourceSystem || !searchCriteria.messageType'>
-                                    <option ng-repeat="filterKey in availableFilters" ng-if="filterKey.availableEntities.indexOf(searchCriteria.messageType) > -1" value="{{ filterKey.value }}">{{ filterKey.label }}</option>
+                                    <option ng-repeat="filterKey in availableFilters" ng-if="filterKey.availableSystems.indexOf(searchCriteria.sourceSystem) > -1" value="{{ filterKey.value }}">{{ filterKey.label }}</option>
                                 </select>
 
                                 <label for="filterValue">is equal to: </label>
                                 <input ng-model="messageFilter.value" ng-disabled='!searchCriteria.sourceSystem || !searchCriteria.messageType'>
                                 <button type="button" class="btn btn-success" ng-click='addFilter()' ng-show='$last'>
-                                    <span class="glyphicon glyphicon-plus-sign"></span>
+                                    <span>Add</span>
                                 </button>
 
                                 <button type="button" class="btn btn-danger" ng-click='removeFilter($index)' ng-show='!$last'>
-                                    <span class="glyphicon glyphicon-minus-sign"></span>
+                                    <span>Remove</span>
                                 </button>
                             </div>
                         </div>

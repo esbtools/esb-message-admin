@@ -271,7 +271,7 @@ public final class EMAConfiguration {
             JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
             configuration.setLabel((String) jsonConfiguration.get("label"));
             configuration.setValue((String) jsonConfiguration.get("value"));
-            configuration.setAvailableEntities(jsonArrayToStringArray((JSONArray) jsonConfiguration.get("availableEntities")));
+            configuration.setAvailableSystems(jsonArrayToStringArray((JSONArray) jsonConfiguration.get("availableSystems")));
             searchConfigurations.add(configuration);
         }
         return searchConfigurations;
