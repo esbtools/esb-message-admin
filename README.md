@@ -2,9 +2,6 @@
 [![Coverage Status](https://coveralls.io/repos/esbtools/esb-message-admin/badge.svg?branch=master&service=github)](https://coveralls.io/github/esbtools/esb-message-admin?branch=master)
 [![Stories in Ready](https://badge.waffle.io/esbtools/esb-message-admin.png?label=ready&title=Ready)](https://waffle.io/esbtools/esb-message-admin)
 
-# Introduction to ESB Message Admin
-This book is intended for those that want to know about the ESB Message Admin project and applications.
-
 ## The Challenge
 
 Working with and supporting an Enterprise Service Bus (ESB) can be a challenging endeavor, especially if you're using
@@ -24,4 +21,4 @@ architecture enables deployment of ESB Message Admin in virtually any environmen
 enabled.  This basically means you can deploy ESB Message Admin where you want and plug in the puzzle pieces you want!
 
 ##Documentation
-Full documentation can be found at the [esb-message-admin GitBooks site](https://esbtools.gitbooks.io/esb-message-admin/content/).
+Full documentation the ESB Message Admin project and associated applications can be found at the [esb-message-admin GitBooks site](https://esbtools.gitbooks.io/esb-message-admin/content/).
