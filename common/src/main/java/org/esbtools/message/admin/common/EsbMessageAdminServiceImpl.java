@@ -297,7 +297,6 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
                 msg.setErrorSystem((String) cols[4]);
                 msg.setOccurrenceCount((Integer) cols[5]);
                 msg.setResubmittedOn( (Date) cols[6] );
-                msg.setAllowsResubmit( EmaResubmit.allowsResubmit( msg ) );
                 resultMessages[i] = msg;
             }
             result.setMessages(resultMessages);
@@ -376,7 +375,6 @@ public class EsbMessageAdminServiceImpl implements EsbMessageAdminService {
             result.setTotalResults(1);
             EsbMessage[] messageArray = new EsbMessage[1];
             messageArray[0] = ConversionUtility.convertToEsbMessage(messages.get(0));
-            messageArray[0].setAllowsResubmit( EmaResubmit.allowsResubmit(messageArray[0]) );
             messageArray[0].setEditableMessage( EmaResubmit.isEditableMessage(messageArray[0]) );
             Map<String,String> matchedConfiguration = matchCriteria(messageArray[0], getNonViewableMessages());
             if(matchedConfiguration!=null) {

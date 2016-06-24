@@ -65,8 +65,10 @@ public class EmaResubmit {
 
         // explicitly check if the loaded message is in our list of allowed message types
         if( isEditableMessage(persistedMessage) ){
+            LOG.info("Message " + persistedMessage.getId() + " resubmitted with new payload");
             request.setPayload( esbMessage.getPayload() );
         } else {
+            LOG.info("Message " + persistedMessage.getId() + " is not editable");
             request.setPayload( persistedMessage.getPayload() );
         }
 
@@ -117,25 +119,6 @@ public class EmaResubmit {
         }
 
         return editable;
-    }
-    
-    public static Boolean allowsResubmit( EsbMessage message ){
-        if(message.getMessageType() == null){
-            LOG.warn(message.getMessageId()  + " not resubmitted - has no message type, defaulting to not allowing resubmit");
-            return false;
-        }
-        
-        if(message.getResubmittedOn() != null){
-            LOG.info(message.getMessageId() + " not resubmitted - already resubmitted on " + message.getResubmittedOn().toString());
-            return false;
-        }
-        
-        if(getResubmitBlackList().contains( message.getMessageType().toUpperCase() )){
-            LOG.info(message.getMessageId()  + " not resubmitted - message type " + message.getMessageType() + " is in the blacklist");
-            return false;
-        }
-        
-        return true;
     }
     
     public static Boolean isEditableMessage( EsbMessage message ){

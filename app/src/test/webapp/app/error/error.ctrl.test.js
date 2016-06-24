@@ -221,24 +221,5 @@ describe("ErrorCtrl", function() {
       expect(msgSvc.resubmitMessage).toHaveBeenCalledWith(resubmittableMessage);
     });
 
-    it("should not call resubmitMessage() in service if message is not resubmittable", function(){
-
-      var messageWithoutResubmitHeader = {
-        id: 1
-      };
-
-      spyOn(msgSvc, 'resubmitMessage');
-
-      $controller("ErrorCtrl", {
-        $scope: $scope
-      });
-
-      $scope.message = messageWithoutResubmitHeader;
-
-      $scope.resubmitMessage();
-
-      expect(msgSvc.resubmitMessage).not.toHaveBeenCalled();
-
-    });
   });
 });

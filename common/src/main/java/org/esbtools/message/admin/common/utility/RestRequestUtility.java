@@ -70,7 +70,7 @@ public class RestRequestUtility {
             }
             httpClient.close();
         } catch (Exception e) {
-            LOG.error(e.getMessage());
+            LOG.error(e.getMessage(), e);
         }
         return false;
     }

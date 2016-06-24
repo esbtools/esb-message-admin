@@ -51,7 +51,6 @@ public class EsbMessage implements Serializable {
     private String payload;
     private List<Header> headers;
     private Boolean editableMessage;
-    private Boolean allowsResubmit;
 
     public long getId() {
         return id;
@@ -239,14 +238,6 @@ public class EsbMessage implements Serializable {
         this.editableMessage = isEditableMessage;
     }
 
-    public Boolean isAllowsResubmit() {
-        return this.allowsResubmit;
-    }
-
-    public void setAllowsResubmit(Boolean allowsResubmit) {
-        this.allowsResubmit = allowsResubmit;
-    }
-
     @Override
     public String toString() {
         return "EsbMessage [id=" + id
@@ -267,7 +258,6 @@ public class EsbMessage implements Serializable {
                 + ", errorType=" + errorType
                 + ", occurrenceCount=" + occurrenceCount
                 + ", editableMessage=" + editableMessage
-                + ", allowsResubmit=" + allowsResubmit
                 + ", resubmittedOn=" + resubmittedOn
                 + ", payload=" + payload
                 + ", headers=" + headers + "]";
