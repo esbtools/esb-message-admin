@@ -66,6 +66,7 @@
     ],
     "resubmitControlHeader":"someRandomHeader",
     "resubmitHeaderNamespace":"blar",
+    "caCertificate":"myca.crt"
     "messageSearchSystemKey": "sourceSystem",
     "messageSearchSystems": [
         { "label" : "System 1", "value" : "SYS1" },
