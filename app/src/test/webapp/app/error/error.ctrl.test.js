@@ -46,6 +46,11 @@ describe("ErrorCtrl", function() {
         // Returns an empty promise
         resubmitMessage: function() {
           return $q.when();
+        },
+
+        getConfigs: function() {
+          var deferred = $q.defer();
+          return deferred.promise;
         }
       };
     });
@@ -146,8 +151,6 @@ describe("ErrorCtrl", function() {
           directions: ["asc"]
         };
 
-        $rootScope.searchField_searchStr = "foo=bar";
-
         msgSvc.search = function() {
           // Simulate a result for the first call...
           return $q.when({
@@ -181,6 +184,12 @@ describe("ErrorCtrl", function() {
           // Simulate no results for next search
           msgSvc.search = function() {
             return $q.when(emptySearchResponse);
+          };
+
+          $scope.searchCriteria = {
+            "messageType"  : "foo",
+            "sourceSystem" : "bar",
+            "filters" : []
           };
 
           $scope.search();

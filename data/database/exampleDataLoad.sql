@@ -58,7 +58,7 @@ INSERT INTO ESB_MESSAGE (id, error_component, error_details, error_message, erro
 
 INSERT INTO ESB_MESSAGE (id, error_component, error_details, error_message, error_queue, error_system, error_type, message_guid, jms_message_id, message_type, occurrence_count, payload, service_name, source_location, source_queue, source_system, jms_message_timestamp) VALUES ( 9, 'GitHubRepoCreator', 'There was a problem creating your GitHub repository', 'Your repository could not be created', 'GITHUB_REPO_ERROR', 'GitHubSystem', 'DATA_ERROR', '8638157306', 'JMS8638157306', 'XML', 1, '<GitHubRespository> <Owner>darcy-framework</Owner> <RepositoryName>darcy-framework</RepositoryName> <Description>Collection of all darcy projects aggregated as git submodules.</Description> <Visibility>Public</Visibility> <InitializeWithReadMe>true</InitializeWithReadMe> <GitIgnores> <GitIgnore> /target </GitIgnore> </GitIgnores> <License>GNU General Public License v3.0</License> </GitHubRespository>', 'GitHub', 'Internet', 'GITHUB_REPO_CREATE', 'GitHub', CURRENT_TIMESTAMP);
 
-INSERT INTO ESB_MESSAGE (id, error_component, error_details, error_message, error_queue, error_system, error_type, message_guid, jms_message_id, message_type, occurrence_count, payload, service_name, source_location, source_queue, source_system, jms_message_timestamp) VALUES ( 10, 'GitHubUserCreator', 'There was a problem creating your GitHub user', 'That user already exists', 'GITHUB_USER_ERROR', 'GitHubSystem', 'DATA_ERROR', '8636447490', 'JMS8636447490', 'XML', 1, '<GitHubUser> <Login>derek63</Login> <Name>Derek</Name> <Location>Berlin, Germany</Location> <TimeZone>GMT+1</TimeZone> </GitHubUser>', 'GitHub', 'Internet', 'GITHUB_USER_CREATE', 'GitHub', CURRENT_TIMESTAMP);
+INSERT INTO ESB_MESSAGE (id, error_component, error_details, error_message, error_queue, error_system, error_type, message_guid, jms_message_id, message_type, occurrence_count, payload, service_name, source_location, source_queue, source_system, jms_message_timestamp) VALUES ( 10, 'GitHubUserCreator', 'There was a problem creating your GitHub user', 'That user already exists', 'GITHUB_USER_ERROR', 'GitHubSystem', 'DATA_ERROR', '8636447490', 'JMS8636447490', 'USER', 1, '<GitHubUser> <Login>derek63</Login> <Name>Derek</Name> <Location>Berlin, Germany</Location> <TimeZone>GMT+1</TimeZone> </GitHubUser>', 'GitHub', 'Internet', 'GITHUB_USER_CREATE', 'USERMANAGER', CURRENT_TIMESTAMP);
 
 TRUNCATE TABLE ESB_MESSAGE_HEADER;
 
@@ -103,3 +103,23 @@ INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'visibil
 INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'timezone', 'METADATA', 'GMT+1', 10);
 
 INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'resubmitControlHeaderTest', 'METADATA', 'someQueueName', 10);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 1);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 2);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'FALSE', 3);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 4);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 5);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 6);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 7);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 8);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 9);
+
+INSERT INTO ESB_MESSAGE_HEADER (name, type, value, message_id) VALUES ( 'editableMessage', 'METADATA', 'TRUE', 10);

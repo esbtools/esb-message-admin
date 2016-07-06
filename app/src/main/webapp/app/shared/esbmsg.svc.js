@@ -189,6 +189,14 @@ esbMessageAdminApp.service('EsbMessageService', [
       return $http.post("api/key/resubmit/{id}".supplant({ id: message.id }),
         message.payload,
         config);
-    }
+    };
+
+    self.getConfigs = function() {
+      return $http.get("api/config/messageSearch").then(
+        function(results) {
+          return results;
+        }
+      );
+    };
   }
 ]);

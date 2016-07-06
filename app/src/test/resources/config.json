@@ -59,14 +59,24 @@
     "resubmitRestEndpoints":[
         "https://sandwich/pasta/resubmit"
     ],
-    "editableMessageTypes":[
-        "PERSON",
-        "PLACE",
-        "XML"
-    ],
     "resubmitBlackList":[
         "STUFF"
     ],
     "resubmitControlHeader":"resubmitControlHeaderTest",
-    "resubmitHeaderNamespace":"namespace"
+    "resubmitHeaderNamespace":"namespace",
+    "messageSearchSystems": [
+        { "label" : "Org Manager", "value" : "ORGMANAGER" },
+        { "label" : "Repo Manager", "value" : "REPOMANAGER" },
+        { "label" : "User Manager", "value" : "USERMANAGER" }
+    ],
+    "messageSearchEntities": [
+        { "label" : "Organization", "value" : "ORGANIZATION" },
+        { "label" : "Repository", "value" : "REPOSITORY" },
+        { "label" : "User", "value" : "USER" }
+    ],
+    "messageSearchFilters": [
+        { "label" : "Name", "value" : "name", "availableSystems" : ["ORGMANAGER", "REPOMANAGER", "USERMANAGER"] },
+        { "label" : "Visibility", "value" : "visibility", "availableSystems" : ["ORGMANAGER", "REPOMANAGER"] },
+        { "label" : "Time Zone", "value" : "timezone", "availableSystems" : ["USERMANAGER"] }
+    ]
 }

@@ -1,17 +1,20 @@
 language: java
 jdk:
-- openjdk7
-- oraclejdk8
+  - openjdk7
+  - oraclejdk8
 sudo: false
 before_install:
-- cp ./settings.xml ~/.m2/
+  - cp ./etc/settings.xml ~/.m2/
+  - cp ./etc/onTravisBuildFailure.sh  ~/
+  - cp ./etc/onTravisBuildSuccess.sh  ~/
+  - chmod 777 ~/onTravisBuildFailure.sh
+  - chmod 777 ~/onTravisBuildSuccess.sh
 script:
-- mvn -B clean verify
-after_success:
-- '[[ $TRAVIS_BRANCH == "master" ]] && [[ $TRAVIS_JDK_VERSION == "openjdk7" ]] &&
-  { mvn -B clean deploy -DskipTests; };'
+  - mvn -B clean verify
+after_failure: ~/onTravisBuildFailure.sh
+after_success: ~/onTravisBuildSuccess.sh
 after_script:
-- mvn clean -DsourceEncoding=UTF-8 cobertura:cobertura coveralls:report
+  - mvn clean -DsourceEncoding=UTF-8 cobertura:cobertura coveralls:report
 notifications:
   email: false
   irc:

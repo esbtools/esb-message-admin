@@ -1,4 +1,4 @@
-esbMessageAdminApp.controller('ErrorCtrl', [
+esbMessageAdminApp.controller('OldErrorCtrl', [
   '$scope',
   '$rootScope',
   'EsbMessageService',
@@ -8,30 +8,19 @@ esbMessageAdminApp.controller('ErrorCtrl', [
   'ngGridLayoutPlugin',
   'messageCenterService',
   function($scope, $rootScope, EsbMessageService, errorColumnPrefs, $log, Globals, layoutPlugin, messageCenterService) {
+
+    // initialize autocomplete data
+    EsbMessageService.getSuggestions().then(
+      function(response) {
+        $scope.autocompleteData = response.data;
+      },
+      function(error) {
+        // TODO: handle error
+        $log.error(error.status);
+      }
+    );
     $scope.message = null;
     $scope.messageSelections = [];
-
-    $scope.availableFilters = null;
-    $scope.availableSystems = null;
-    $scope.availableEntities = null;
-
-    // Fetch message search configurations
-    EsbMessageService.getConfigs().then(function(result) {
-      window.resAvailableFilter = result.data.searchFilters;
-      $scope.availableFilters = result.data.searchFilters;
-      $scope.availableSystems = result.data.searchSystems;
-      $scope.availableEntities = result.data.searchEntities;
-    });
-
-    $scope.messageFilters = [
-      { "key" : "", "value" : ""}
-    ];
-
-    $scope.searchCriteria = {
-      "messageType"  : null,
-      "sourceSystem" : null,
-      "filters" : $scope.messageFilters
-    };
 
     // ngGrid
     $scope.$on(
@@ -79,23 +68,21 @@ esbMessageAdminApp.controller('ErrorCtrl', [
       enableColumnReordering: true,
     };
 
-    $scope.addFilter = function() {
-      $scope.messageFilters.push({"key" : "", "value" : ""});
-    };
-
-    $scope.removeFilter = function(index) {
-      $scope.messageFilters.splice(index, 1);
-    };
-
-    var parseSearchCriteria = function(searchCriteria) {
+    var parseSearchString = function(searchStr) {
+      var searchParams = searchStr.split(';');
       var criteria = {};
-      criteria.messageType = searchCriteria.messageType;
-      criteria.sourceSystem = searchCriteria.sourceSystem;
-
-      for (var i = 0; i < searchCriteria.filters.length; i++) {
-        criteria[searchCriteria.filters[i].key] = searchCriteria.filters[i].value;
-      }
-
+      searchParams.forEach(function(param) {
+        var keyValue = param.split('=');
+        if (keyValue.length == 2) {
+          criteria[keyValue[0].trim()] = keyValue[1]
+            .replace(/"/g, '')
+            .trim();
+        } else {
+          if (param) {
+            $log.error("Could not parse: " + param);
+          }
+        }
+      });
       return criteria;
     };
 
@@ -104,10 +91,9 @@ esbMessageAdminApp.controller('ErrorCtrl', [
       var maxResults = $scope.pagingOptions.pageSize;
       var sortField = $scope.sortOptions.fields[0];
       var sortAsc = ($scope.sortOptions.directions[0] === "asc");
-      var emptySearch = (!$scope.searchCriteria.sourceSystem && !$scope.searchCriteria.messageType);
 
-      if (!emptySearch) {
-        var criteria = parseSearchCriteria($scope.searchCriteria);
+      if ($rootScope.searchField_searchStr) {
+        var criteria = parseSearchString($rootScope.searchField_searchStr);
 
         EsbMessageService.search(
           criteria,
@@ -118,7 +104,7 @@ esbMessageAdminApp.controller('ErrorCtrl', [
           sortField,
           sortAsc
         ).then(
-          function (response) {
+          function(response) {
             $scope.messages = response.data.messages;
             $scope.totalServerItems = response.data.totalResults;
             $scope.messageSelections.splice(0, $scope.messageSelections.length);

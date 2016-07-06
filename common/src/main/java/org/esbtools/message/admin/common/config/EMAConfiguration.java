@@ -14,6 +14,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.esbtools.message.admin.model.MessageSearchConfiguration;
+import org.esbtools.message.admin.model.MessageSearchConfigurations;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+
 public final class EMAConfiguration {
 
     private static final String DEFAULT_ENCODING = "UTF-8";
@@ -24,13 +31,13 @@ public final class EMAConfiguration {
     private static List<String> resyncRestEndpoints;
     private static List<VisibilityConfiguration> nonViewableMessages;
     private static List<VisibilityConfiguration> partiallyViewableMessages;
-    private static List<String> editableMessageTypes;
     private static List<String> resubmitBlackList;
     private static List<String> resubmitRestEndpoints;
     private static String resubmitControlHeader;
     private static String resubmitHeaderNamespace;
     private static String caCertificate;
-    
+    private static MessageSearchConfigurations messageSearchConfigurations;
+
     private EMAConfiguration() {
 
     }
@@ -68,13 +75,6 @@ public final class EMAConfiguration {
             resyncRestEndpoints = loadResyncRestEndpoints();
         }
         return resyncRestEndpoints;
-    }
-
-    public static synchronized List<String> getEditableMessageTypes() {
-        if (null == editableMessageTypes) {
-            editableMessageTypes = loadEditableMessageTypes();
-        }
-        return editableMessageTypes;
     }
 
     public static synchronized List<String> getResubmitBlackList() {
@@ -119,11 +119,25 @@ public final class EMAConfiguration {
         return resubmitHeaderNamespace;
     }
 
+
     public static String getCaCertificate() {
         if (null == caCertificate) {
             caCertificate = loadCaCertificate();
         }
         return caCertificate;
+    }
+
+    public static MessageSearchConfigurations getMessageSearchConfigurations() {
+        if (null == messageSearchConfigurations) {
+            messageSearchConfigurations = new MessageSearchConfigurations();
+            messageSearchConfigurations.setSearchEntities(loadSearchEntities());
+            messageSearchConfigurations.setSearchFilters(loadMessageSearchFilters());
+            messageSearchConfigurations.setSearchSystems(loadSearchSystems());
+            messageSearchConfigurations.setSearchEntityKey(loadSearchEntityKey());
+            messageSearchConfigurations.setSearchSystemKey(loadSearchSystemKey());
+        }
+
+        return messageSearchConfigurations;
     }
 
     private static JSONObject loadJsonConfiguration() {
@@ -199,17 +213,6 @@ public final class EMAConfiguration {
         return getVisibilityConfigurations((JSONArray) getJsonConfig().get("partiallyViewableMessages"));
     }
 
-    private static List<String> loadEditableMessageTypes() {
-        List<String> editableMessageTypes = new ArrayList<>();
-        JSONArray entities = (JSONArray) getJsonConfig().get("editableMessageTypes");
-        if(entities!=null) {
-            for(Object entity: entities) {
-                editableMessageTypes.add( entity.toString().toUpperCase() ); // this will make comparison more sane
-            }
-        }
-        return editableMessageTypes;
-    }
-
     private static List<String> loadResubmitBlackList() {
         List<String> resubmitBlackList = new ArrayList<>();
         JSONArray entities = (JSONArray) getJsonConfig().get("resubmitBlackList");
@@ -244,6 +247,26 @@ public final class EMAConfiguration {
         return (String) getJsonConfig().get("caCertificate");
     }
 
+    private static String loadSearchSystemKey() {
+        return (String) getJsonConfig().get("messageSearchSystemKey");
+    }
+
+    private static List<MessageSearchConfiguration> loadSearchSystems() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchSystems"));
+    }
+
+    private static String loadSearchEntityKey() {
+        return (String) getJsonConfig().get("messageSearchEntityKey");
+    }
+
+    private static List<MessageSearchConfiguration> loadSearchEntities() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchEntities"));
+    }
+
+    private static List<MessageSearchConfiguration> loadMessageSearchFilters() {
+        return getMessageSearchConfigurations((JSONArray) getJsonConfig().get("messageSearchFilters"));
+    }
+
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
 
         List<VisibilityConfiguration> result = new ArrayList<>();
@@ -257,12 +280,39 @@ public final class EMAConfiguration {
         return result;
     }
 
+    private static List<MessageSearchConfiguration> getMessageSearchConfigurations(JSONArray jsonConfigurations) {
+        List<MessageSearchConfiguration> searchConfigurations = new ArrayList<>();
+
+        for (int i = 0; i < jsonConfigurations.size(); i++) {
+            MessageSearchConfiguration configuration = new MessageSearchConfiguration();
+            JSONObject jsonConfiguration = (JSONObject) jsonConfigurations.get(i);
+            configuration.setLabel((String) jsonConfiguration.get("label"));
+            configuration.setValue((String) jsonConfiguration.get("value"));
+            configuration.setAvailableSystems(jsonArrayToStringArray((JSONArray) jsonConfiguration.get("availableSystems")));
+            searchConfigurations.add(configuration);
+        }
+        return searchConfigurations;
+    }
+
     private static Map<String, String> getMap(JSONObject jsonMap) {
         Map<String,String> map = new HashMap<>();
         for(Map.Entry<String,String> entry : (Set<Map.Entry<String,String>>)jsonMap.entrySet()) {
             map.put(entry.getKey(),entry.getValue());
         }
         return map;
+    }
+
+    private static String[] jsonArrayToStringArray(JSONArray jsonArray) {
+        String[] destinationArray = null;
+
+        if (jsonArray != null) {
+            destinationArray = new String[jsonArray.size()];
+            for (int i = 0; i < jsonArray.size(); i++) {
+                destinationArray[i] = jsonArray.get(i).toString();
+            }
+        }
+
+        return destinationArray;
     }
 
 
