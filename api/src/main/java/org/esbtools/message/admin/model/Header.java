@@ -61,4 +61,34 @@ public class Header implements Serializable {
         return String.format("%s: %s = %s", type, name, value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Header header = (Header) o;
+
+        if (type != header.type) {
+            return false;
+        }
+
+        if (!name.equals(header.name)) {
+            return false;
+        }
+
+        return value != null ? value.equals(header.value) : header.value == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = type.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
+    }
 }
