@@ -70,5 +70,6 @@
         "STUFF"
     ],
     "resubmitControlHeader":"someRandomHeader",
-    "resubmitHeaderNamespace":"blar"
+    "resubmitHeaderNamespace":"blar",
+    "caCertificate":"myca.crt"
 }

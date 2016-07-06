@@ -1,5 +1,9 @@
 package org.esbtools.message.admin.common.config;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,10 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 public final class EMAConfiguration {
 
@@ -29,6 +29,7 @@ public final class EMAConfiguration {
     private static List<String> resubmitRestEndpoints;
     private static String resubmitControlHeader;
     private static String resubmitHeaderNamespace;
+    private static String caCertificate;
     
     private EMAConfiguration() {
 
@@ -116,6 +117,13 @@ public final class EMAConfiguration {
             resubmitHeaderNamespace = loadResubmitHeaderNamespace();
         }
         return resubmitHeaderNamespace;
+    }
+
+    public static String getCaCertificate() {
+        if (null == caCertificate) {
+            caCertificate = loadCaCertificate();
+        }
+        return caCertificate;
     }
 
     private static JSONObject loadJsonConfiguration() {
@@ -230,6 +238,10 @@ public final class EMAConfiguration {
 
     private static String loadResubmitHeaderNamespace() {
         return (String) getJsonConfig().get("resubmitHeaderNamespace");
+    }
+
+    private static String loadCaCertificate() {
+        return (String) getJsonConfig().get("caCertificate");
     }
 
     private static List<VisibilityConfiguration> getVisibilityConfigurations(JSONArray jsonConfigurations) {
