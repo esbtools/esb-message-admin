@@ -222,34 +222,29 @@ esbMessageAdminApp.controller('ErrorCtrl', [
     // End Date picker stuff
 
     $scope.resubmitMessage = function() {
+      // TODO: (bmiller) Here, I removed the check for resubmittable messages.
+      // Might need to add it back, or remove the rest of the functionality
       var message = $scope.message;
 
-      if (!message.allowsResubmit) {
-        messageCenterService.add('warning', 'Message can not be resubmitted', {
-          timeout: 5000
-        });
-
-      } else {
-        EsbMessageService.resubmitMessage(message).then(
-          function(response) {
-            if (response.data.status === "Success") {
-              messageCenterService.add('success', 'Resubmit successful!', {
-                timeout: 3000
-              });
-            } else {
-              messageCenterService.add('danger', response.data.errorMessage, {
-                status: messageCenterService.status.permanent
-              });
-            }
-          },
-          function(err) {
-            var errorMessage = "There was a problem communicating with the server. Server Returned: "
-              + err.status + ": " + err.data;
-            messageCenterService.add('danger', errorMessage, {
+      EsbMessageService.resubmitMessage(message).then(
+        function(response) {
+          if (response.data.status === "Success") {
+            messageCenterService.add('success', 'Resubmit successful!', {
+              timeout: 3000
+            });
+          } else {
+            messageCenterService.add('danger', response.data.errorMessage, {
               status: messageCenterService.status.permanent
             });
+          }
+        },
+        function(err) {
+          var errorMessage = "There was a problem communicating with the server. Server Returned: "
+            + err.status + ": " + err.data;
+          messageCenterService.add('danger', errorMessage, {
+            status: messageCenterService.status.permanent
           });
-      }
+        });
     };
   }
 ]);
