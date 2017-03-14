@@ -31,7 +31,7 @@
     <junit.version>4.11</junit.version>
     <hsqldb.version>2.2.8</hsqldb.version>
     <entitymanager.version>4.2.2.Final</entitymanager.version>
-    <jackson.version>2.4.4</jackson.version>
+    <jackson.version>2.7.2</jackson.version>
     <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
     <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
     <maven.compiler.debuglevel>lines,vars,source</maven.compiler.debuglevel>
