@@ -90,7 +90,7 @@ Too many to list. Here is the pull request https://github.com/angular-ui/ng-grid
 ### Features
 
 - **Development**
-  - Continuous integration testing with [Travis CI](https://travis-ci.org/angular-ui/ng-grid). A few tests that were looking for pixel perfection had to be relaxed due to rendering differences between browsers and OSes.
+  - Continuous integration testing with external CI. A few tests that were looking for pixel perfection had to be relaxed due to rendering differences between browsers and OSes.
   - Moved this changelog to CHANGELOG.md!
   - Added tests for i18n languages. Any new language must cover all the properties that the default language (English) has.
   - CSS files compiling with less ([24bb173](https://github.com/angular-ui/ng-grid/commit/24bb173))

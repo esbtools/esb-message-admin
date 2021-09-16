@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/mateu-aguilo-bosch/message-center.png?branch=master)](https://travis-ci.org/mateu-aguilo-bosch/message-center)
 
 # Message center service
 

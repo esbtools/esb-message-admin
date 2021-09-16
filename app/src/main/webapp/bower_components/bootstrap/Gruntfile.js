@@ -341,7 +341,7 @@ module.exports = function (grunt) {
     'saucelabs-qunit': {
       all: {
         options: {
-          build: process.env.TRAVIS_JOB_ID,
+          build: process.env.JOB_ID,
           concurrency: 10,
           urls: ['http://127.0.0.1:3000/js/tests/index.html'],
           browsers: grunt.file.readYAML('test-infra/sauce_browsers.yml')
@@ -415,7 +415,7 @@ module.exports = function (grunt) {
     generateRawFilesJs(banner);
   });
 
-  // Task for updating the npm packages used by the Travis build.
+  // Task for updating the npm packages used by the external build.
   grunt.registerTask('update-shrinkwrap', ['exec:npmUpdate', 'exec:npmShrinkWrap', '_update-shrinkwrap']);
   grunt.registerTask('_update-shrinkwrap', function () { updateShrinkwrap.call(this, grunt); });
 };
